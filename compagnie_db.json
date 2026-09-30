@@ -1,0 +1,351 @@
+{
+  "Airbus A319-100": {
+    "type": "A319",
+    "oew_kg": 40800,
+    "oew_arm_m": 17.30,
+    "crew_kg": 450,
+    "crew_arm_m": 5.50,
+    "max_zfw_kg": 57900,
+    "max_tow_kg": 75500,
+    "max_lw_kg": 62500,
+    "mfuel": 19000,
+    "fuel_density": 0.800,
+    "fuel_arm_m": 17.00,
+    "cg_min_m": 15.80,
+    "cg_max_m": 20.80,
+    "lemac": 14.80,
+    "mac_length": 4.19,
+    "pax_zones": [
+      {"name": "Zone Avant  (R1–R5)",   "arm_m": 10.00, "max_pax": 48},
+      {"name": "Zone Milieu (R6–R12)",  "arm_m": 15.50, "max_pax": 60},
+      {"name": "Zone Arrière (R13–R18)","arm_m": 23.50, "max_pax": 36}
+    ],
+    "cargo_comps": [
+      {"name": "FWD",  "arm_m": 11.00, "max_kg": 3200},
+      {"name": "AFT",  "arm_m": 18.50, "max_kg": 3200},
+      {"name": "Bulk", "arm_m": 25.50, "max_kg": 1497}
+    ],
+    "vspeeds": {
+      "vmo": 350, "mmo": 0.82,
+      "vs0_ref_mtow": 104, "vs1_ref_mtow": 110,
+      "vr_correction": 5, "v2_correction": 12, "vapp_factor": 1.23
+    },
+    "perf": {
+      "cl_per_1000ft": -3.5, "isa_dev_correction": 2.0,
+      "rwy_correction_per_100m": 1.4, "climb_gradient_min": 2.4,
+      "fuel_flow_cruise": 2100, "cruise_tas_kt": 450
+    },
+    "seats": 144
+  },
+
+  "Airbus A320-200": {
+    "type": "A320",
+    "oew_kg": 42500,
+    "oew_arm_m": 18.00,
+    "crew_kg": 600,
+    "crew_arm_m": 8.00,
+    "max_zfw_kg": 62500,
+    "max_tow_kg": 78000,
+    "max_lw_kg": 66000,
+    "mfuel": 14900,
+    "fuel_density": 0.800,
+    "fuel_arm_m": 18.00,
+    "cg_min_m": 17.50,
+    "cg_max_m": 22.00,
+    "lemac": 15.20,
+    "mac_length": 4.19,
+    "pax_zones": [
+      {"name": "Zone Avant  (R1–R5)",   "arm_m": 10.44, "max_pax": 48},
+      {"name": "Zone Milieu (R6–R14)",  "arm_m": 16.39, "max_pax": 78},
+      {"name": "Zone Arrière (R15–R19)","arm_m": 25.53, "max_pax": 48}
+    ],
+    "cargo_comps": [
+      {"name": "FWD",  "arm_m": 12.00, "max_kg": 3400},
+      {"name": "AFT",  "arm_m": 20.00, "max_kg": 5000},
+      {"name": "Bulk", "arm_m": 28.00, "max_kg": 1500}
+    ],
+    "vspeeds": {
+      "vmo": 350, "mmo": 0.82,
+      "vs0_ref_mtow": 108, "vs1_ref_mtow": 115,
+      "vr_correction": 5, "v2_correction": 12, "vapp_factor": 1.23
+    },
+    "perf": {
+      "cl_per_1000ft": -3.5, "isa_dev_correction": 2.1,
+      "rwy_correction_per_100m": 1.5, "climb_gradient_min": 2.4,
+      "fuel_flow_cruise": 2400, "cruise_tas_kt": 450
+    },
+    "seats": 174
+  },
+
+  "Airbus A321-200": {
+    "type": "A321",
+    "oew_kg": 48200,
+    "oew_arm_m": 21.00,
+    "crew_kg": 650,
+    "crew_arm_m": 6.00,
+    "max_zfw_kg": 73800,
+    "max_tow_kg": 93500,
+    "max_lw_kg": 77800,
+    "mfuel": 21000,
+    "fuel_density": 0.800,
+    "fuel_arm_m": 20.50,
+    "cg_min_m": 19.00,
+    "cg_max_m": 24.50,
+    "lemac": 17.50,
+    "mac_length": 4.19,
+    "pax_zones": [
+      {"name": "Zone Avant  (R1–R6)",   "arm_m": 10.50, "max_pax": 54},
+      {"name": "Zone Milieu (R7–R22)",  "arm_m": 19.50, "max_pax": 112},
+      {"name": "Zone Arrière (R23–R29)","arm_m": 30.00, "max_pax": 54}
+    ],
+    "cargo_comps": [
+      {"name": "FWD",   "arm_m": 12.50, "max_kg": 5000},
+      {"name": "AFT 1", "arm_m": 22.00, "max_kg": 5000},
+      {"name": "AFT 2", "arm_m": 31.00, "max_kg": 2000},
+      {"name": "Bulk",  "arm_m": 35.50, "max_kg": 1500}
+    ],
+    "vspeeds": {
+      "vmo": 350, "mmo": 0.82,
+      "vs0_ref_mtow": 118, "vs1_ref_mtow": 125,
+      "vr_correction": 5, "v2_correction": 12, "vapp_factor": 1.23
+    },
+    "perf": {
+      "cl_per_1000ft": -3.5, "isa_dev_correction": 2.2,
+      "rwy_correction_per_100m": 1.6, "climb_gradient_min": 2.4,
+      "fuel_flow_cruise": 2800, "cruise_tas_kt": 450
+    },
+    "seats": 220
+  },
+
+  "Boeing B737-800": {
+    "type": "B737-800",
+    "oew_kg": 41413,
+    "oew_arm_m": 15.60,
+    "crew_kg": 600,
+    "crew_arm_m": 4.00,
+    "max_zfw_kg": 61688,
+    "max_tow_kg": 79016,
+    "max_lw_kg": 66361,
+    "mfuel": 20800,
+    "fuel_density": 0.800,
+    "fuel_arm_m": 15.80,
+    "cg_min_m": 14.00,
+    "cg_max_m": 19.50,
+    "lemac": 13.40,
+    "mac_length": 3.91,
+    "pax_zones": [
+      {"name": "Zone Avant  (R1–R7)",   "arm_m": 9.80,  "max_pax": 56},
+      {"name": "Zone Milieu (R8–R18)",  "arm_m": 16.40, "max_pax": 88},
+      {"name": "Zone Arrière (R19–R26)","arm_m": 22.90, "max_pax": 45}
+    ],
+    "cargo_comps": [
+      {"name": "FWD",  "arm_m": 8.20,  "max_kg": 4400},
+      {"name": "AFT",  "arm_m": 23.50, "max_kg": 5400},
+      {"name": "Bulk", "arm_m": 27.80, "max_kg": 1497}
+    ],
+    "vspeeds": {
+      "vmo": 340, "mmo": 0.82,
+      "vs0_ref_mtow": 112, "vs1_ref_mtow": 119,
+      "vr_correction": 4, "v2_correction": 10, "vapp_factor": 1.23
+    },
+    "perf": {
+      "cl_per_1000ft": -4.0, "isa_dev_correction": 2.3,
+      "rwy_correction_per_100m": 1.8, "climb_gradient_min": 2.4,
+      "fuel_flow_cruise": 2800, "cruise_tas_kt": 450
+    },
+    "seats": 189
+  },
+
+  "Boeing B737-900": {
+    "type": "B737-900",
+    "oew_kg": 44676,
+    "oew_arm_m": 16.50,
+    "crew_kg": 600,
+    "crew_arm_m": 4.00,
+    "max_zfw_kg": 65090,
+    "max_tow_kg": 85130,
+    "max_lw_kg": 71350,
+    "mfuel": 20800,
+    "fuel_density": 0.800,
+    "fuel_arm_m": 16.00,
+    "cg_min_m": 14.80,
+    "cg_max_m": 20.50,
+    "lemac": 13.60,
+    "mac_length": 3.91,
+    "pax_zones": [
+      {"name": "Zone Avant  (R1–R8)",   "arm_m": 9.80,  "max_pax": 60},
+      {"name": "Zone Milieu (R9–R22)",  "arm_m": 17.00, "max_pax": 100},
+      {"name": "Zone Arrière (R23–R31)","arm_m": 24.50, "max_pax": 60}
+    ],
+    "cargo_comps": [
+      {"name": "FWD",  "arm_m": 8.20,  "max_kg": 4400},
+      {"name": "AFT",  "arm_m": 25.00, "max_kg": 6500},
+      {"name": "Bulk", "arm_m": 30.00, "max_kg": 1497}
+    ],
+    "vspeeds": {
+      "vmo": 340, "mmo": 0.82,
+      "vs0_ref_mtow": 116, "vs1_ref_mtow": 123,
+      "vr_correction": 4, "v2_correction": 10, "vapp_factor": 1.23
+    },
+    "perf": {
+      "cl_per_1000ft": -4.0, "isa_dev_correction": 2.4,
+      "rwy_correction_per_100m": 1.8, "climb_gradient_min": 2.4,
+      "fuel_flow_cruise": 3000, "cruise_tas_kt": 450
+    },
+    "seats": 220
+  },
+
+  "ATR 42-600": {
+    "type": "ATR42",
+    "oew_kg": 11580,
+    "oew_arm_m": 10.80,
+    "crew_kg": 300,
+    "crew_arm_m": 3.50,
+    "max_zfw_kg": 16400,
+    "max_tow_kg": 18600,
+    "max_lw_kg": 18300,
+    "mfuel": 4500,
+    "fuel_density": 0.800,
+    "fuel_arm_m": 11.00,
+    "cg_min_m": 9.50,
+    "cg_max_m": 13.50,
+    "lemac": 8.80,
+    "mac_length": 2.93,
+    "pax_zones": [
+      {"name": "Zone Avant  (R1–R3)",  "arm_m": 8.00,  "max_pax": 18},
+      {"name": "Zone Arrière (R4–R8)", "arm_m": 14.00, "max_pax": 30}
+    ],
+    "cargo_comps": [
+      {"name": "FWD", "arm_m": 4.50,  "max_kg": 700},
+      {"name": "AFT", "arm_m": 18.50, "max_kg": 900}
+    ],
+    "vspeeds": {
+      "vmo": 250, "mmo": 0.55,
+      "vs0_ref_mtow": 82, "vs1_ref_mtow": 88,
+      "vr_correction": 5, "v2_correction": 8, "vapp_factor": 1.30
+    },
+    "perf": {
+      "cl_per_1000ft": -2.5, "isa_dev_correction": 1.7,
+      "rwy_correction_per_100m": 2.2, "climb_gradient_min": 2.7,
+      "fuel_flow_cruise": 580, "cruise_tas_kt": 280
+    },
+    "seats": 48
+  },
+
+  "ATR 72-600": {
+    "type": "ATR72",
+    "oew_kg": 13010,
+    "oew_arm_m": 14.10,
+    "crew_kg": 350,
+    "crew_arm_m": 3.50,
+    "max_zfw_kg": 20800,
+    "max_tow_kg": 23000,
+    "max_lw_kg": 22350,
+    "mfuel": 6370,
+    "fuel_density": 0.800,
+    "fuel_arm_m": 14.50,
+    "cg_min_m": 12.80,
+    "cg_max_m": 17.50,
+    "lemac": 12.80,
+    "mac_length": 2.93,
+    "pax_zones": [
+      {"name": "Zone Avant  (R1–R4)",  "arm_m": 11.20, "max_pax": 26},
+      {"name": "Zone Arrière (R5–R9)", "arm_m": 15.80, "max_pax": 44}
+    ],
+    "cargo_comps": [
+      {"name": "FWD", "arm_m": 5.20,  "max_kg": 900},
+      {"name": "AFT", "arm_m": 22.80, "max_kg": 1200}
+    ],
+    "vspeeds": {
+      "vmo": 250, "mmo": 0.55,
+      "vs0_ref_mtow": 88, "vs1_ref_mtow": 94,
+      "vr_correction": 5, "v2_correction": 8, "vapp_factor": 1.30
+    },
+    "perf": {
+      "cl_per_1000ft": -2.8, "isa_dev_correction": 1.8,
+      "rwy_correction_per_100m": 2.5, "climb_gradient_min": 2.7,
+      "fuel_flow_cruise": 680, "cruise_tas_kt": 280
+    },
+    "seats": 70
+  },
+
+  "Airbus A350-900": {
+    "type": "A350-900",
+    "oew_kg": 142400,
+    "oew_arm_m": 37.50,
+    "crew_kg": 1500,
+    "crew_arm_m": 8.00,
+    "max_zfw_kg": 192000,
+    "max_tow_kg": 280000,
+    "max_lw_kg": 207000,
+    "mfuel": 119000,
+    "fuel_density": 0.800,
+    "fuel_arm_m": 37.00,
+    "cg_min_m": 36.00,
+    "cg_max_m": 38.50,
+    "lemac": 35.00,
+    "mac_length": 8.50,
+    "pax_zones": [
+      {"name": "Business (R1–R12)",      "arm_m": 20.00, "max_pax": 48},
+      {"name": "Éco Avant (R13–R35)",    "arm_m": 35.00, "max_pax": 180},
+      {"name": "Éco Arrière (R36–R55)",  "arm_m": 48.00, "max_pax": 141}
+    ],
+    "cargo_comps": [
+      {"name": "FWD",    "arm_m": 22.00, "max_kg": 10000},
+      {"name": "AFT 1",  "arm_m": 40.00, "max_kg": 10000},
+      {"name": "AFT 2",  "arm_m": 52.00, "max_kg": 6000},
+      {"name": "Bulk",   "arm_m": 58.00, "max_kg": 3400}
+    ],
+    "vspeeds": {
+      "vmo": 330, "mmo": 0.89,
+      "vs0_ref_mtow": 128, "vs1_ref_mtow": 136,
+      "vr_correction": 6, "v2_correction": 14, "vapp_factor": 1.23
+    },
+    "perf": {
+      "cl_per_1000ft": -4.5, "isa_dev_correction": 2.5,
+      "rwy_correction_per_100m": 1.8, "climb_gradient_min": 2.4,
+      "fuel_flow_cruise": 6500, "cruise_tas_kt": 500
+    },
+    "seats": 369
+  },
+
+  "Boeing B777-300ER": {
+    "type": "B777-300ER",
+    "oew_kg": 167800,
+    "oew_arm_m": 40.50,
+    "crew_kg": 1500,
+    "crew_arm_m": 8.00,
+    "max_zfw_kg": 223000,
+    "max_tow_kg": 352400,
+    "max_lw_kg": 251300,
+    "mfuel": 145000,
+    "fuel_density": 0.800,
+    "fuel_arm_m": 40.50,
+    "cg_min_m": 39.50,
+    "cg_max_m": 42.00,
+    "lemac": 38.00,
+    "mac_length": 9.00,
+    "pax_zones": [
+      {"name": "Business (R1–R14)",      "arm_m": 20.00, "max_pax": 42},
+      {"name": "Éco Avant (R15–R35)",    "arm_m": 38.50, "max_pax": 180},
+      {"name": "Éco Arrière (R36–R55)",  "arm_m": 52.00, "max_pax": 174}
+    ],
+    "cargo_comps": [
+      {"name": "FWD 1",  "arm_m": 24.00, "max_kg": 12000},
+      {"name": "FWD 2",  "arm_m": 32.00, "max_kg": 10000},
+      {"name": "AFT",    "arm_m": 52.00, "max_kg": 12000},
+      {"name": "Bulk",   "arm_m": 60.00, "max_kg": 5100}
+    ],
+    "vspeeds": {
+      "vmo": 330, "mmo": 0.89,
+      "vs0_ref_mtow": 130, "vs1_ref_mtow": 138,
+      "vr_correction": 6, "v2_correction": 14, "vapp_factor": 1.23
+    },
+    "perf": {
+      "cl_per_1000ft": -5.0, "isa_dev_correction": 2.8,
+      "rwy_correction_per_100m": 2.0, "climb_gradient_min": 2.4,
+      "fuel_flow_cruise": 8000, "cruise_tas_kt": 500
+    },
+    "seats": 396
+  }
+}

@@ -1,0 +1,202 @@
+{
+  "LFPG - Paris Charles de Gaulle": {
+    "icao": "LFPG", "iata": "CDG",
+    "name": "Paris Charles de Gaulle",
+    "city": "Paris", "country": "France",
+    "lat": 49.0097, "lon": 2.5478,
+    "elev_ft": 392, "elev_m": 119,
+    "rwy_length_m": 4200, "rwy_ref": "08R/26L",
+    "transition_alt_ft": 5000,
+    "tz": "Europe/Paris"
+  },
+  "LFPO - Paris Orly": {
+    "icao": "LFPO", "iata": "ORY",
+    "name": "Paris Orly",
+    "city": "Paris", "country": "France",
+    "lat": 48.7233, "lon": 2.3794,
+    "elev_ft": 292, "elev_m": 89,
+    "rwy_length_m": 3650, "rwy_ref": "07/25",
+    "transition_alt_ft": 5000,
+    "tz": "Europe/Paris"
+  },
+  "LFMN - Nice Côte d'Azur": {
+    "icao": "LFMN", "iata": "NCE",
+    "name": "Nice Côte d'Azur",
+    "city": "Nice", "country": "France",
+    "lat": 43.6584, "lon": 7.2159,
+    "elev_ft": 12, "elev_m": 4,
+    "rwy_length_m": 2960, "rwy_ref": "04R/22L",
+    "transition_alt_ft": 5000,
+    "tz": "Europe/Paris"
+  },
+  "LFML - Marseille Provence": {
+    "icao": "LFML", "iata": "MRS",
+    "name": "Marseille Provence",
+    "city": "Marseille", "country": "France",
+    "lat": 43.4393, "lon": 5.2214,
+    "elev_ft": 74, "elev_m": 23,
+    "rwy_length_m": 3500, "rwy_ref": "13R/31L",
+    "transition_alt_ft": 5000,
+    "tz": "Europe/Paris"
+  },
+  "LFBO - Toulouse Blagnac": {
+    "icao": "LFBO", "iata": "TLS",
+    "name": "Toulouse-Blagnac",
+    "city": "Toulouse", "country": "France",
+    "lat": 43.6293, "lon": 1.3638,
+    "elev_ft": 499, "elev_m": 152,
+    "rwy_length_m": 3500, "rwy_ref": "14R/32L",
+    "transition_alt_ft": 5000,
+    "tz": "Europe/Paris"
+  },
+  "LFLL - Lyon Saint-Exupéry": {
+    "icao": "LFLL", "iata": "LYS",
+    "name": "Lyon Saint-Exupéry",
+    "city": "Lyon", "country": "France",
+    "lat": 45.7256, "lon": 5.0811,
+    "elev_ft": 821, "elev_m": 250,
+    "rwy_length_m": 4000, "rwy_ref": "17R/35L",
+    "transition_alt_ft": 5000,
+    "tz": "Europe/Paris"
+  },
+  "LFBD - Bordeaux Mérignac": {
+    "icao": "LFBD", "iata": "BOD",
+    "name": "Bordeaux-Mérignac",
+    "city": "Bordeaux", "country": "France",
+    "lat": 44.8283, "lon": -0.7155,
+    "elev_ft": 162, "elev_m": 49,
+    "rwy_length_m": 3450, "rwy_ref": "05/23",
+    "transition_alt_ft": 5000,
+    "tz": "Europe/Paris"
+  },
+  "LFSB - Bâle-Mulhouse-Fribourg": {
+    "icao": "LFSB", "iata": "BSL",
+    "name": "EuroAirport Basel-Mulhouse-Freiburg",
+    "city": "Bâle", "country": "France/Suisse",
+    "lat": 47.5896, "lon": 7.5299,
+    "elev_ft": 885, "elev_m": 270,
+    "rwy_length_m": 3900, "rwy_ref": "15/33",
+    "transition_alt_ft": 5000,
+    "tz": "Europe/Paris"
+  },
+  "EGLL - London Heathrow": {
+    "icao": "EGLL", "iata": "LHR",
+    "name": "London Heathrow",
+    "city": "Londres", "country": "Royaume-Uni",
+    "lat": 51.4775, "lon": -0.4614,
+    "elev_ft": 83, "elev_m": 25,
+    "rwy_length_m": 3902, "rwy_ref": "09L/27R",
+    "transition_alt_ft": 6000,
+    "tz": "Europe/London"
+  },
+  "EHAM - Amsterdam Schiphol": {
+    "icao": "EHAM", "iata": "AMS",
+    "name": "Amsterdam Schiphol",
+    "city": "Amsterdam", "country": "Pays-Bas",
+    "lat": 52.3086, "lon": 4.7639,
+    "elev_ft": -11, "elev_m": -3,
+    "rwy_length_m": 3800, "rwy_ref": "18R/36C",
+    "transition_alt_ft": 3000,
+    "tz": "Europe/Amsterdam"
+  },
+  "EDDF - Frankfurt am Main": {
+    "icao": "EDDF", "iata": "FRA",
+    "name": "Frankfurt am Main",
+    "city": "Francfort", "country": "Allemagne",
+    "lat": 50.0379, "lon": 8.5622,
+    "elev_ft": 364, "elev_m": 111,
+    "rwy_length_m": 4000, "rwy_ref": "07C/25C",
+    "transition_alt_ft": 5000,
+    "tz": "Europe/Berlin"
+  },
+  "LEMD - Madrid Barajas": {
+    "icao": "LEMD", "iata": "MAD",
+    "name": "Adolfo Suárez Madrid-Barajas",
+    "city": "Madrid", "country": "Espagne",
+    "lat": 40.4719, "lon": -3.5626,
+    "elev_ft": 1998, "elev_m": 609,
+    "rwy_length_m": 4350, "rwy_ref": "18L/36R",
+    "transition_alt_ft": 6000,
+    "tz": "Europe/Madrid"
+  },
+  "LIRF - Roma Fiumicino": {
+    "icao": "LIRF", "iata": "FCO",
+    "name": "Roma Leonardo da Vinci",
+    "city": "Rome", "country": "Italie",
+    "lat": 41.7999, "lon": 12.2462,
+    "elev_ft": 14, "elev_m": 4,
+    "rwy_length_m": 3902, "rwy_ref": "16R/34L",
+    "transition_alt_ft": 6000,
+    "tz": "Europe/Rome"
+  },
+  "LSZH - Zürich": {
+    "icao": "LSZH", "iata": "ZRH",
+    "name": "Zürich",
+    "city": "Zurich", "country": "Suisse",
+    "lat": 47.4647, "lon": 8.5492,
+    "elev_ft": 1416, "elev_m": 432,
+    "rwy_length_m": 3700, "rwy_ref": "10/28",
+    "transition_alt_ft": 10000,
+    "tz": "Europe/Zurich"
+  },
+  "TFFR - Pointe-à-Pitre Le Raizet": {
+    "icao": "TFFR", "iata": "PTP",
+    "name": "Pointe-à-Pitre Le Raizet",
+    "city": "Pointe-à-Pitre", "country": "Guadeloupe (France)",
+    "lat": 16.2653, "lon": -61.5272,
+    "elev_ft": 36, "elev_m": 11,
+    "rwy_length_m": 3540, "rwy_ref": "11/29",
+    "transition_alt_ft": 5000,
+    "tz": "America/Guadeloupe"
+  },
+  "TFFF - Fort-de-France Aimé Césaire": {
+    "icao": "TFFF", "iata": "FDF",
+    "name": "Martinique Aimé Césaire",
+    "city": "Fort-de-France", "country": "Martinique (France)",
+    "lat": 14.5910, "lon": -61.0032,
+    "elev_ft": 15, "elev_m": 5,
+    "rwy_length_m": 3300, "rwy_ref": "10/28",
+    "transition_alt_ft": 5000,
+    "tz": "America/Martinique"
+  },
+  "FMEE - Saint-Denis Roland Garros": {
+    "icao": "FMEE", "iata": "RUN",
+    "name": "La Réunion Roland Garros",
+    "city": "Saint-Denis", "country": "La Réunion (France)",
+    "lat": -20.8871, "lon": 55.5103,
+    "elev_ft": 66, "elev_m": 20,
+    "rwy_length_m": 3150, "rwy_ref": "12/30",
+    "transition_alt_ft": 5000,
+    "tz": "Indian/Reunion"
+  },
+  "DAAG - Alger Houari Boumédiène": {
+    "icao": "DAAG", "iata": "ALG",
+    "name": "Alger Houari Boumédiène",
+    "city": "Alger", "country": "Algérie",
+    "lat": 36.6910, "lon": 3.2154,
+    "elev_ft": 82, "elev_m": 25,
+    "rwy_length_m": 3500, "rwy_ref": "05/23",
+    "transition_alt_ft": 5000,
+    "tz": "Africa/Algiers"
+  },
+  "GMMN - Casablanca Mohammed V": {
+    "icao": "GMMN", "iata": "CMN",
+    "name": "Casablanca Mohammed V",
+    "city": "Casablanca", "country": "Maroc",
+    "lat": 33.3675, "lon": -7.5899,
+    "elev_ft": 656, "elev_m": 200,
+    "rwy_length_m": 3720, "rwy_ref": "17L/35R",
+    "transition_alt_ft": 5000,
+    "tz": "Africa/Casablanca"
+  },
+  "DIAP - Abidjan Félix Houphouët-Boigny": {
+    "icao": "DIAP", "iata": "ABJ",
+    "name": "Abidjan Félix Houphouët-Boigny",
+    "city": "Abidjan", "country": "Côte d'Ivoire",
+    "lat": 5.2613, "lon": -3.9263,
+    "elev_ft": 21, "elev_m": 6,
+    "rwy_length_m": 3150, "rwy_ref": "03/21",
+    "transition_alt_ft": 5000,
+    "tz": "Africa/Abidjan"
+  }
+}

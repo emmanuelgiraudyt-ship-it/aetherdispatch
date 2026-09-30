@@ -1,0 +1,39 @@
+{
+  "name": "AETHERDISPATCH",
+  "short_name": "AETHER",
+  "description": "Agent IA handling aérien – Masse & Centrage, Performances, Météo, Carburant",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0A0A1A",
+  "theme_color": "#00BFFF",
+  "orientation": "portrait-primary",
+  "categories": ["aviation", "productivity", "utilities"],
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Nouveau vol",
+      "short_name": "Nouveau vol",
+      "description": "Créer un nouveau plan de vol",
+      "url": "/?tab=vol"
+    },
+    {
+      "name": "Historique",
+      "short_name": "Historique",
+      "description": "Voir l'historique des vols",
+      "url": "/?tab=history"
+    }
+  ]
+}
