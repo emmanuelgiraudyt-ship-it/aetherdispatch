@@ -4,7 +4,6 @@ numpy==1.26.4
 requests==2.31.0
 fpdf2==2.7.9
 Pillow==10.2.0
-easyocr==1.7.1
 PuLP==2.8.0
 plotly==5.19.0
 matplotlib==3.8.3
