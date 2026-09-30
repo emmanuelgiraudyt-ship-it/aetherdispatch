@@ -1359,7 +1359,7 @@ def main():
                             <span>🌡 {temp_str}</span>
                             <span>💨 {wind_str}</span>
                             <span>👁 {vis_str}</span>
-                            <span> {str(metar.get('obs_time',''))[:5] if metar.get('obs_time') else 'N/D'}Z</span>
+                            <span> {str(metar.get('obs_time') or '')[:5] or 'N/D'}Z</span>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
