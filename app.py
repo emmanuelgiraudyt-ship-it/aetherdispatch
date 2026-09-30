@@ -989,10 +989,10 @@ def main():
                                       value=min(int(ac["mfuel"] * 0.40), ac["mfuel"]), step=100)
         with col_f2:
             trip_fuel = st.number_input("✈ Trip fuel estimé (kg)", 500, ac["mfuel"],
-                                        value=min(
-                                int(dist_nm / ac["perf"].get("cruise_tas_kt", 450)
-                                    * ac["perf"]["fuel_flow_cruise"]),
-                                ac["mfuel"] - 1000), step=100)
+                                        value=max(500, min(
+    int(dist_nm / ac["perf"].get("cruise_tas_kt", 450)
+        * ac["perf"]["fuel_flow_cruise"]),
+    ac["mfuel"] - 1000)), step=100)
 
         # ── Calcul M&C ────────────────────────────────────────────────────────
         result = compute_mc(ac, pax_zone_weights, cargo_weights, fuel_kg)
