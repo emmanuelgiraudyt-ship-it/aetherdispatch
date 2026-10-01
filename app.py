@@ -25,8 +25,8 @@ try:
     from pulp import (LpProblem, LpVariable, LpMaximize, lpSum,
                       LpStatus, value, PULP_CBC_CMD)
     PULP_OK = True
-except ImportError:
-    PULP_OK = False
+except Exception:
+        PULP_OK = False
 
 # ─── Tentative d'import EasyOCR (optionnel, lourd) ────────────────────────────
 try:
