@@ -1,5 +1,5 @@
 # =============================================================================
-# AETHERDISPATCH v2.0 — Agent IA Handling Aérien
+# AETHERDISPATCH v3.1 — Agent IA Handling Aérien
 # Développé par EG Conseil & Lobbying | Mars 2026
 # Modules : Masse & Centrage | Performances | V-Speeds | METAR Live
 #           Carburant | OCR Manifest | Optimisation PuLP | Export PDF | PWA
@@ -19,6 +19,7 @@ from fpdf import FPDF
 from PIL import Image, ImageDraw, ImageFont
 import io
 import re
+import copy
 
 # ─── Tentative d'import PuLP (optionnel) ──────────────────────────────────────
 try:
@@ -293,7 +294,7 @@ def login_page(users: dict):
         st.markdown("""
         <div style="text-align:center;font-size:0.72rem;color:#556688;letter-spacing:1px">
         ACCÈS RESTREINT — Équipe Handling & Dispatch autorisée uniquement<br>
-        AETHERDISPATCH v2.0 | EG Conseil & Lobbying © 2026
+        AETHERDISPATCH v3.1 | EG Conseil & Lobbying © 2026
         </div>
         """, unsafe_allow_html=True)
 
@@ -660,14 +661,15 @@ def generate_pdf(flight_data: dict) -> bytes:
     pdf.set_xy(10, 20)
     pdf.cell(190, 6, "LOAD & TRIM SHEET  |  EG Conseil & Lobbying  |  Confidentiel handling", align='C')
     pdf.set_xy(10, 28)
-    pdf.cell(190, 6, f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M UTC')}", align='C')
+    pdf.cell(190, 6, f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M UTC')}"
+             + (f"  |  LOADSHEET {flight_data['ls_status']}" if flight_data.get("ls_status") else ""), align='C')
 
     # ── Infos vol ─────────────────────────────────────────────────────────────
     pdf.set_xy(10, 45)
     pdf.set_fill_color(13, 31, 60)
     pdf.set_text_color(0, 191, 255)
     pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(190, 8, "INFORMATIONS VOL", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(190, 7, "INFORMATIONS VOL", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
 
     pdf.set_text_color(30, 30, 30)
@@ -679,12 +681,16 @@ def generate_pdf(flight_data: dict) -> bytes:
         ("Alternate", flight_data.get("alternate", "N/A")),
         ("Distance", f"{flight_data.get('dist_nm', 0)} NM"),
         ("Date/Heure", flight_data.get("datetime", "N/A")),
+        ("Statut loadsheet", flight_data.get("ls_status") or "PRELIMINAIRE"),
+        ("Passagers", f"Prévus {flight_data.get('pax_prevus') if flight_data.get('pax_prevus') is not None else '-'}   |   "
+                      f"Final {flight_data.get('pax_final') or '-'}   |   "
+                      f"Capacité max {flight_data.get('pax_max') or 'non renseignée'}"),
     ]
     for i, (label, val) in enumerate(rows):
         fill_color = (230, 240, 255) if i % 2 == 0 else (245, 248, 255)
         pdf.set_fill_color(*fill_color)
-        pdf.cell(80, 6, label, fill=True, border=1)
-        pdf.cell(110, 6, str(val), fill=True, border=1)
+        pdf.cell(80, 5.2, label, fill=True, border=1)
+        pdf.cell(110, 5.2, str(val), fill=True, border=1)
         pdf.ln()
 
     # ── Masses ────────────────────────────────────────────────────────────────
@@ -692,7 +698,7 @@ def generate_pdf(flight_data: dict) -> bytes:
     pdf.set_fill_color(13, 31, 60)
     pdf.set_text_color(0, 191, 255)
     pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(190, 8, "MASSES & CENTRAGE", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(190, 7, "MASSES & CENTRAGE", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
 
     pdf.set_text_color(30, 30, 30)
@@ -714,9 +720,9 @@ def generate_pdf(flight_data: dict) -> bytes:
         pdf.set_fill_color(*fill_color)
         font_style = "B" if i in bold_rows else ""
         pdf.set_font("Helvetica", font_style, 10)
-        pdf.cell(90, 6, label, fill=True, border=1)
-        pdf.cell(55, 6, val, fill=True, border=1, align='R')
-        pdf.cell(45, 6, note, fill=True, border=1, align='C')
+        pdf.cell(90, 5.2, label, fill=True, border=1)
+        pdf.cell(55, 5.2, val, fill=True, border=1, align='R')
+        pdf.cell(45, 5.2, note, fill=True, border=1, align='C')
         pdf.ln()
 
     # ── V-Speeds ──────────────────────────────────────────────────────────────
@@ -724,7 +730,7 @@ def generate_pdf(flight_data: dict) -> bytes:
     pdf.set_fill_color(13, 31, 60)
     pdf.set_text_color(0, 191, 255)
     pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(190, 8, "V-SPEEDS OPÉRATIONNELS", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(190, 7, "V-SPEEDS OPÉRATIONNELS", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
 
     pdf.set_text_color(30, 30, 30)
@@ -741,9 +747,9 @@ def generate_pdf(flight_data: dict) -> bytes:
         fill_color = (240, 248, 255) if i % 2 == 0 else (250, 252, 255)
         pdf.set_fill_color(*fill_color)
         pdf.set_font("Helvetica", "", 10)
-        pdf.cell(100, 6, label, fill=True, border=1)
+        pdf.cell(100, 5.2, label, fill=True, border=1)
         pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(90, 6, val, fill=True, border=1, align='C')
+        pdf.cell(90, 5.2, val, fill=True, border=1, align='C')
         pdf.ln()
 
     # ── Carburant ─────────────────────────────────────────────────────────────
@@ -751,7 +757,7 @@ def generate_pdf(flight_data: dict) -> bytes:
     pdf.set_fill_color(13, 31, 60)
     pdf.set_text_color(0, 191, 255)
     pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(190, 8, "PLAN CARBURANT OACI", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
+    pdf.cell(190, 7, "PLAN CARBURANT OACI", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
 
     fp = flight_data.get("fuel_plan", {})
@@ -774,8 +780,8 @@ def generate_pdf(flight_data: dict) -> bytes:
         pdf.set_fill_color(*fill_color)
         font_style = "B" if is_bold else ""
         pdf.set_font("Helvetica", font_style, 10)
-        pdf.cell(100, 6, label, fill=True, border=1)
-        pdf.cell(90, 6, val, fill=True, border=1, align='R')
+        pdf.cell(100, 5.2, label, fill=True, border=1)
+        pdf.cell(90, 5.2, val, fill=True, border=1, align='R')
         pdf.ln()
 
     # ── Signatures ────────────────────────────────────────────────────────────
@@ -788,12 +794,20 @@ def generate_pdf(flight_data: dict) -> bytes:
     pdf.cell(2)
     pdf.cell(62, 6, "Agent Handling : ________________", border=1, align='C')
 
+    # ── Origine des données ───────────────────────────────────────────────────
+    pdf.ln(9)
+    certified = bool(flight_data.get("data_certified"))
+    pdf.set_font("Helvetica", "B", 8)
+    pdf.set_text_color(*((0, 120, 60) if certified else (200, 40, 40)))
+    pdf.cell(190, 5, f"Origine des données : {flight_data.get('origin_text', '-')}"
+             + ("" if certified else "   -   DONNÉES NON CERTIFIÉES"), align='C')
+
     # ── Pied de page ──────────────────────────────────────────────────────────
     pdf.set_y(-20)
     pdf.set_font("Helvetica", "I", 7)
     pdf.set_text_color(150, 150, 150)
     pdf.cell(190, 5,
-             "Document généré automatiquement par AETHERDISPATCH v2.0 — EG Conseil & Lobbying — "
+             "Document généré automatiquement par AETHERDISPATCH v3.1 — EG Conseil & Lobbying — "
              "Usage restreint aux personnels habilités. Vérification obligatoire par le commandant de bord.",
              align='C')
 
@@ -817,16 +831,580 @@ def save_flight(flight_data: dict):
     load_json.clear()
 
 # =============================================================================
+# MODULE 8 : DONNÉES AÉRONEF MODIFIABLES · STATUTS D'ORIGINE · PROFIL COMPAGNIE
+#            · PANNEAU PASSAGERS (PAX prévus / PAX final)
+# =============================================================================
+
+STATUS_LABELS = {
+    "constructeur": "Constructeur",
+    "estime": "Estimé",
+    "compagnie": "Compagnie",
+    "a_renseigner": "À renseigner",
+}
+LABEL_TO_STATUS = {v: k for k, v in STATUS_LABELS.items()}
+
+# (clé, libellé, unité, requis pour les calculs)
+SCALAR_FIELDS = [
+    ("max_seats",  "Capacité maximale (sièges)",                "sièges", False),
+    ("seats",      "Sièges - configuration modèle",             "sièges", False),
+    ("oew_kg",     "Masse à vide exploitée (OEW)",              "kg",     True),
+    ("oew_arm_m",  "Bras de l'OEW",                             "m",      True),
+    ("crew_kg",    "Équipage (masse)",                          "kg",     True),
+    ("crew_arm_m", "Équipage (bras)",                           "m",      True),
+    ("max_zfw_kg", "MZFW (masse maximale sans carburant)",      "kg",     True),
+    ("max_tow_kg", "MTOW (masse maximale au décollage)",        "kg",     True),
+    ("max_lw_kg",  "MLW (masse maximale à l'atterrissage)",     "kg",     True),
+    ("mfuel",      "Capacité carburant maximale",               "kg",     True),
+    ("fuel_arm_m", "Bras du carburant",                         "m",      True),
+    ("cg_min_m",   "Limite de centrage avant",                  "m",      True),
+    ("cg_max_m",   "Limite de centrage arrière",                "m",      True),
+    ("lemac",      "LEMAC",                                     "m",      True),
+    ("mac_length", "Longueur de la corde moyenne (MAC)",        "m",      True),
+]
+SPEED_FIELDS = [
+    ("vspeeds.vmo",          "VMO",                               "kts", True),
+    ("vspeeds.mmo",          "MMO",                               "Mach", False),
+    ("vspeeds.vs0_ref_mtow", "VS0 de référence (au MTOW)",        "kts", True),
+    ("vspeeds.vs1_ref_mtow", "VS1 de référence (au MTOW)",        "kts", True),
+    ("vspeeds.vr_correction","Correction VR par rapport à V1",    "kts", True),
+    ("vspeeds.v2_correction","Correction V2 par rapport à VR",    "kts", True),
+    ("vspeeds.vapp_factor",  "Facteur VAPP / VS0",                "",    True),
+]
+PERF_FIELDS = [
+    ("perf.cl_per_1000ft",           "Correction altitude (par 1000 ft)",   "",       True),
+    ("perf.isa_dev_correction",      "Correction écart ISA",                "",       True),
+    ("perf.rwy_correction_per_100m", "Correction piste courte (par 100 m)", "",       True),
+    ("perf.climb_gradient_min",      "Gradient de montée minimal",          "%",      True),
+    ("perf.fuel_flow_cruise",        "Consommation en croisière",           "kg/h",   True),
+    ("perf.cruise_tas_kt",           "Vitesse de croisière (TAS)",          "kts",    False),
+]
+ALL_FIELDS = SCALAR_FIELDS + SPEED_FIELDS + PERF_FIELDS
+
+
+def fmt_num(v, unit=""):
+    """Format lisible ; « à renseigner » si la donnée est absente."""
+    if v is None:
+        return "à renseigner"
+    try:
+        s = f"{v:,.0f}" if float(v).is_integer() else f"{v:,.2f}"
+    except (TypeError, ValueError):
+        return str(v)
+    return f"{s} {unit}".strip()
+
+
+def get_field(ac: dict, key: str):
+    if "." in key:
+        sub, k = key.split(".", 1)
+        return (ac.get(sub) or {}).get(k)
+    return ac.get(key)
+
+
+def set_field(ac: dict, key: str, value):
+    if "." in key:
+        sub, k = key.split(".", 1)
+        if not isinstance(ac.get(sub), dict):
+            ac[sub] = {}
+        ac[sub][k] = value
+    else:
+        ac[key] = value
+
+
+def _meta(ac: dict) -> dict:
+    m = ac.setdefault("_meta", {})
+    m.setdefault("status", {})
+    m.setdefault("source", {})
+    return m
+
+
+def field_status(ac: dict, key: str) -> str:
+    if get_field(ac, key) is None:
+        return "a_renseigner"
+    return _meta(ac)["status"].get(key) or "estime"
+
+
+def missing_fields(ac: dict) -> list:
+    """Liste des données obligatoires manquantes (vide = calculs possibles)."""
+    out = [label for key, label, unit, req in ALL_FIELDS if req and get_field(ac, key) is None]
+    zones = ac.get("pax_zones") or []
+    if not zones:
+        out.append("Zones passagers (au moins une zone avec son bras)")
+    for z in zones:
+        if z.get("arm_m") is None:
+            out.append(f"Bras de la zone passagers « {z.get('name', '?')} »")
+    for c in ac.get("cargo_comps") or []:
+        if c.get("arm_m") is None:
+            out.append(f"Bras de la soute « {c.get('name', '?')} »")
+        if c.get("max_kg") is None:
+            out.append(f"Capacité de la soute « {c.get('name', '?')} »")
+    return out
+
+
+def split_pax(total: int, zones: list) -> list:
+    """Répartition automatique des passagers, proportionnelle à la capacité de chaque zone."""
+    n = len(zones)
+    if n == 0:
+        return []
+    caps = [max(int(z.get("max_pax") or 0), 0) for z in zones]
+    capsum = sum(caps)
+    raw = [total * c / capsum for c in caps] if capsum > 0 else [total / n] * n
+    base = [int(x) for x in raw]
+    rest = int(total) - sum(base)
+    order = sorted(range(n), key=lambda i: raw[i] - base[i], reverse=True)
+    for i in order[:max(rest, 0)]:
+        base[i] += 1
+    return base
+
+
+def origin_counts(ac: dict) -> dict:
+    counts = {k: 0 for k in STATUS_LABELS}
+    for key, label, unit, req in ALL_FIELDS:
+        if req:
+            counts[field_status(ac, key)] += 1
+    for row in (ac.get("pax_zones") or []) + (ac.get("cargo_comps") or []):
+        s = "a_renseigner" if row.get("arm_m") is None else (row.get("status") or "estime")
+        counts[s if s in counts else "estime"] += 1
+    return counts
+
+
+def origin_summary(ac: dict):
+    """Texte récapitulatif de l'origine des données + indicateur « entièrement issu de la compagnie »."""
+    c = origin_counts(ac)
+    others = sum(v for k, v in c.items() if k != "compagnie")
+    certified = c["compagnie"] > 0 and others == 0
+    txt = " / ".join(f"{c[k]} {STATUS_LABELS[k]}" for k in ("compagnie", "constructeur", "estime", "a_renseigner") if c[k])
+    return txt or "aucune donnée", certified
+
+
+def new_blank_aircraft(type_code: str = "") -> dict:
+    r = {"type": type_code, "seats_typical": "", "fuel_density": 0.8,
+         "pax_zones": [], "cargo_comps": [], "_meta": {"status": {}, "source": {}}}
+    for key, label, unit, req in ALL_FIELDS:
+        set_field(r, key, None)
+        r["_meta"]["status"][key] = "a_renseigner"
+    return r
+
+
+def normalize_aircraft(rec: dict) -> dict:
+    """Complète un enregistrement (clés absentes) sans modifier les valeurs existantes."""
+    r = copy.deepcopy(rec)
+    for key, label, unit, req in ALL_FIELDS:
+        set_field(r, key, get_field(r, key))
+    r.setdefault("type", "")
+    r.setdefault("seats_typical", "")
+    r.setdefault("fuel_density", 0.8)
+    for k in ("pax_zones", "cargo_comps"):
+        if not isinstance(r.get(k), list):
+            r[k] = []
+    _meta(r)
+    return r
+
+
+# ── Profil compagnie : export / import ───────────────────────────────────────
+def export_profile_bytes(db: dict, profile_name: str, user_name: str) -> bytes:
+    payload = {
+        "format": "aetherdispatch-profile", "version": 1,
+        "name": (profile_name or "Profil compagnie").strip(),
+        "exported_at": datetime.now(timezone.utc).isoformat(),
+        "exported_by": user_name,
+        "aircraft": db,
+    }
+    return json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
+
+
+def import_profile_bytes(raw: bytes):
+    """Retourne (ok, message, base_aéronefs, infos_profil)."""
+    try:
+        data = json.loads(raw.decode("utf-8"))
+    except Exception:
+        return False, "Fichier illisible (JSON invalide).", None, None
+    if (not isinstance(data, dict) or data.get("format") != "aetherdispatch-profile"
+            or not isinstance(data.get("aircraft"), dict) or not data["aircraft"]):
+        return False, "Ce fichier n'est pas un profil AETHERDISPATCH valide.", None, None
+    out = {}
+    for name, rec in data["aircraft"].items():
+        if not isinstance(rec, dict):
+            return False, f"Le type « {name} » est invalide.", None, None
+        out[str(name)] = normalize_aircraft(rec)
+    info = {"name": data.get("name") or "Profil sans nom",
+            "exported_at": data.get("exported_at", ""), "exported_by": data.get("exported_by", "")}
+    return True, f"{len(out)} type(s) d'aéronef chargé(s).", out, info
+
+
+def _mark_exported():
+    st.session_state.dirty = False
+    if not st.session_state.get("profile_info"):
+        st.session_state.profile_info = {"name": st.session_state.get("profile_name") or "Profil compagnie"}
+
+
+def render_profile_banner():
+    info = st.session_state.get("profile_info")
+    if st.session_state.get("dirty"):
+        st.warning("Modifications non exportées : exportez votre profil (onglet « Données aéronef ») pour ne pas "
+                   "les perdre lors du prochain redémarrage de l'application.")
+    elif not info:
+        st.warning("Profil compagnie non chargé : les valeurs affichées sont des valeurs constructeur ou estimées. "
+                   "Importez votre profil dans l'onglet « Données aéronef » avant de produire une loadsheet.")
+    else:
+        st.success(f"Profil compagnie chargé : {info.get('name', '')}")
+
+
+# ── Panneau passagers ────────────────────────────────────────────────────────
+def render_pax_panel(ac: dict, selected_ac: str) -> dict:
+    """PAX prévus / PAX final / statut, capacité du type, répartition automatique par zone."""
+    max_seats = ac.get("max_seats")
+    zones = ac.get("pax_zones") or []
+    typical = ac.get("seats_typical") or ""
+
+    st.markdown("**👥 Passagers — prévus et final**")
+    pax_std_weight = st.slider("Masse standard passager (bagages inclus) kg", 75, 100, 84,
+                               help="À aligner sur les masses standard de votre compagnie.")
+
+    c1, c2, c3, c4 = st.columns([1.1, 1, 1, 1.3])
+    with c1:
+        cap_txt = f"{int(max_seats):,}".replace(",", " ") if max_seats else "à renseigner"
+        typ_txt = f"Typique : {typical}" if typical else ""
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="label">Capacité maximale</div>
+            <div class="value">{cap_txt}</div>
+            <div class="unit">sièges</div>
+            <div style="font-size:0.68rem;color:#556688;margin-top:4px">{typ_txt}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with c2:
+        pax_prev = st.number_input("PAX prévus", 0, 1000, int(max_seats // 2) if max_seats else 0,
+                                   key=f"pax_prev_{selected_ac}")
+    with c3:
+        pax_final = st.number_input("PAX final", 0, 1000, 0, key=f"pax_final_{selected_ac}",
+                                    help="À saisir à la clôture du vol.")
+    with c4:
+        status = st.radio("Statut de la loadsheet", ["Préliminaire", "Final"], horizontal=True,
+                          key=f"ls_status_{selected_ac}")
+
+    active = int(pax_final if status == "Final" else pax_prev)
+    badge = "badge-ok" if status == "Final" else "badge-warn"
+    st.markdown(f'<span class="{badge}">LOADSHEET {status.upper()}</span>', unsafe_allow_html=True)
+
+    m1, m2, m3, m4 = st.columns(4)
+    m1.metric("PAX retenus", active)
+    m2.metric("Écart final − prévu", f"{int(pax_final - pax_prev):+d}" if pax_final else "—")
+    m3.metric("Remplissage", f"{active / max_seats * 100:.0f} %" if max_seats else "—")
+    m4.metric("Places libres", f"{int(max_seats - active)}" if max_seats else "—")
+
+    if status == "Final" and not pax_final:
+        st.warning("Statut « Final » sélectionné, mais le PAX final n'est pas saisi.")
+    if max_seats:
+        if active > max_seats:
+            st.error(f"PAX retenus ({active}) supérieurs à la capacité maximale ({int(max_seats)} sièges).")
+    else:
+        st.info("Capacité maximale à renseigner (onglet « Données aéronef ») : l'alerte de dépassement est désactivée.")
+
+    zone_counts = []
+    if zones:
+        auto = split_pax(active, zones)
+        with st.expander("Répartition par zone (automatique, ajustable)"):
+            cols = st.columns(len(zones))
+            for i, z in enumerate(zones):
+                with cols[i]:
+                    n = st.number_input(f"{z['name']}", 0, 1000, int(auto[i]),
+                                        key=f"paxz_{selected_ac}_{i}_{status}_{active}")
+                    zone_counts.append(int(n))
+                    cap = z.get("max_pax")
+                    st.caption(f"Capacité : {cap if cap is not None else '—'} | Bras : {z.get('arm_m', '—')} m")
+            if sum(zone_counts) != active:
+                st.warning(f"La somme des zones ({sum(zone_counts)}) diffère des PAX retenus ({active}).")
+    return {"pax_std_weight": pax_std_weight, "pax_prevus": int(pax_prev), "pax_final": int(pax_final),
+            "status": status, "active": active, "zone_counts": zone_counts, "max_seats": max_seats}
+
+
+def render_pax_comparison(ac: dict, pax: dict, cargo_weights: dict, fuel_kg: float):
+    """Tableau prévu / final : PAX, ZFW, TOW, centrage."""
+    zones = ac.get("pax_zones") or []
+
+    def scenario(n):
+        counts = split_pax(int(n), zones)
+        w = {z["name"]: c * pax["pax_std_weight"] for z, c in zip(zones, counts)}
+        return compute_mc(ac, w, cargo_weights, fuel_kg)
+
+    st.markdown("**Comparaison prévu / final**")
+    if not pax["pax_final"]:
+        st.caption("PAX final non saisi : la comparaison s'affichera dès qu'il le sera.")
+        return
+    rp, rf = scenario(pax["pax_prevus"]), scenario(pax["pax_final"])
+    rows = [
+        ("PAX", f"{pax['pax_prevus']}", f"{pax['pax_final']}", f"{pax['pax_final'] - pax['pax_prevus']:+d}"),
+        ("ZFW (kg)", f"{rp['zfw']:,}", f"{rf['zfw']:,}", f"{rf['zfw'] - rp['zfw']:+,}"),
+        ("TOW (kg)", f"{rp['tow']:,}", f"{rf['tow']:,}", f"{rf['tow'] - rp['tow']:+,}"),
+        ("CG au décollage (m)", f"{rp['tow_cg']:.2f}", f"{rf['tow_cg']:.2f}", f"{rf['tow_cg'] - rp['tow_cg']:+.2f}"),
+    ]
+    st.dataframe(pd.DataFrame(rows, columns=["Paramètre", "Prévu", "Final", "Écart"]),
+                 hide_index=True, use_container_width=True)
+
+
+# ── Édition des données aéronef ──────────────────────────────────────────────
+def _num(v):
+    if v is None:
+        return None
+    try:
+        if pd.isna(v):
+            return None
+        f = float(v)
+    except (TypeError, ValueError):
+        return None
+    return int(f) if f.is_integer() else f
+
+
+def _txt(v) -> str:
+    if v is None:
+        return ""
+    try:
+        if pd.isna(v):
+            return ""
+    except (TypeError, ValueError):
+        pass
+    return str(v).strip()
+
+
+def scalar_df(ac: dict) -> pd.DataFrame:
+    meta = _meta(ac)
+    rows = []
+    for key, label, unit, req in ALL_FIELDS:
+        rows.append({"Clé": key, "Paramètre": label + (" *" if req else ""), "Valeur": get_field(ac, key),
+                     "Unité": unit, "Statut": STATUS_LABELS[field_status(ac, key)],
+                     "Source / commentaire": meta["source"].get(key, "")})
+    df = pd.DataFrame(rows)
+    df["Valeur"] = pd.to_numeric(df["Valeur"], errors="coerce")
+    return df.set_index("Clé")
+
+
+def apply_scalar_edits(ac: dict, edited: pd.DataFrame) -> int:
+    """Applique le tableau édité. Une valeur modifiée passe en « Compagnie » (sauf statut choisi par l'utilisateur)."""
+    meta, changed = _meta(ac), 0
+    for key, row in edited.iterrows():
+        new_v, old_v = _num(row["Valeur"]), get_field(ac, key)
+        old_status = field_status(ac, key)
+        chosen = LABEL_TO_STATUS.get(row.get("Statut"), old_status)
+        src, old_src = _txt(row.get("Source / commentaire")), meta["source"].get(key, "")
+        if new_v is None:
+            status = "a_renseigner"
+        elif new_v != old_v:
+            status = chosen if chosen not in (old_status, "a_renseigner") else "compagnie"
+        else:
+            status = chosen if chosen != "a_renseigner" else old_status
+        if (new_v, status, src) != (old_v, old_status, old_src):
+            changed += 1
+        set_field(ac, key, new_v)
+        meta["status"][key] = status
+        meta["source"][key] = src
+    return changed
+
+
+def rows_df(rows: list, name_col: str, cap_col: str, cap_key: str) -> pd.DataFrame:
+    data = [{name_col: r.get("name"), "Bras (m)": r.get("arm_m"), cap_col: r.get(cap_key),
+             "Statut": STATUS_LABELS.get(r.get("status") or "estime", "Estimé"),
+             "Source / commentaire": r.get("source", "")} for r in rows]
+    df = pd.DataFrame(data, columns=[name_col, "Bras (m)", cap_col, "Statut", "Source / commentaire"])
+    for c in ("Bras (m)", cap_col):
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+    return df
+
+
+def apply_rows_edits(ac: dict, list_key: str, df: pd.DataFrame, name_col: str, cap_col: str, cap_key: str) -> int:
+    old_by_name = {r.get("name"): r for r in (ac.get(list_key) or [])}
+    new_rows, changed = [], 0
+    for rec in df.to_dict("records"):
+        name = _txt(rec.get(name_col))
+        if not name:
+            continue
+        arm, cap = _num(rec.get("Bras (m)")), _num(rec.get(cap_col))
+        chosen = LABEL_TO_STATUS.get(rec.get("Statut"))
+        src = _txt(rec.get("Source / commentaire"))
+        old = old_by_name.get(name)
+        if old is None:
+            status = "a_renseigner" if arm is None else (chosen if chosen not in (None, "a_renseigner") else "compagnie")
+            changed += 1
+        else:
+            old_status = old.get("status") or "estime"
+            if arm is None:
+                status = "a_renseigner"
+            elif (arm, cap) != (old.get("arm_m"), old.get(cap_key)):
+                status = chosen if chosen not in (None, old_status, "a_renseigner") else "compagnie"
+            else:
+                status = chosen if chosen not in (None, "a_renseigner") else old_status
+            if (arm, cap, status, src) != (old.get("arm_m"), old.get(cap_key), old_status, old.get("source", "")):
+                changed += 1
+        new_rows.append({"name": name, "arm_m": arm, cap_key: cap, "status": status, "source": src})
+    changed += len(set(old_by_name) - {r["name"] for r in new_rows})
+    ac[list_key] = new_rows
+    return changed
+
+
+def _register_type(new_name: str, rec: dict):
+    name = (new_name or "").strip()
+    if not name:
+        st.error("Saisissez un nom pour le type.")
+        return
+    if name in st.session_state.db:
+        st.error("Ce nom de type existe déjà.")
+        return
+    st.session_state.db[name] = rec
+    st.session_state.dirty = True
+    st.session_state["_pending_select"] = name
+    st.session_state["_flash"] = f"Type « {name} » créé. Renseignez ses données ci-dessous."
+    st.session_state.ed_version = st.session_state.get("ed_version", 0) + 1
+    st.rerun()
+
+
+def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
+    db = st.session_state.db
+    ac = db[selected_ac]
+    ver = st.session_state.get("ed_version", 0)
+
+    flash = st.session_state.pop("_flash", None)
+    if flash:
+        st.success(flash)
+
+    st.subheader("🛠 Données aéronef — entièrement modifiables")
+    st.caption("Chaque valeur porte un statut d'origine : Constructeur, Estimé, Compagnie ou À renseigner. "
+               "Une valeur que vous modifiez passe automatiquement en « Compagnie ». "
+               "Le PDF indique l'origine des données utilisées.")
+    if not can_edit:
+        st.info("Lecture seule : la modification des données est réservée aux profils admin et dispatcher. "
+                "Vous pouvez en revanche importer le profil compagnie.")
+
+    # ── Profil compagnie ──────────────────────────────────────────────────
+    with st.expander("📁 Profil compagnie : importer / exporter", expanded=True):
+        info = st.session_state.get("profile_info")
+        st.markdown("Les modifications sont conservées pendant la session. Pour les retrouver après un redémarrage "
+                    "de l'application : **Exporter mon profil**, puis **Importer mon profil** au prochain démarrage.")
+        up = st.file_uploader("Importer mon profil (fichier .json)", type=["json"], key=f"profile_up_{ver}")
+        if st.button("Charger ce profil", key="btn_load_profile", disabled=up is None):
+            ok, msg, new_db, new_info = import_profile_bytes(up.getvalue())
+            if ok:
+                st.session_state.db = new_db
+                st.session_state.profile_info = new_info
+                st.session_state.dirty = False
+                st.session_state.ed_version = ver + 1
+                st.session_state["_flash"] = f"Profil « {new_info['name']} » chargé : {msg}"
+                st.rerun()
+            else:
+                st.error(msg)
+        if can_edit:
+            pname = st.text_input("Nom du profil à exporter", value=(info or {}).get("name", "Profil compagnie"),
+                                  key="profile_name")
+            st.download_button("⬇ Exporter mon profil",
+                               data=export_profile_bytes(db, pname, user_info.get("nom", "")),
+                               file_name=f"profil_compagnie_{datetime.now().strftime('%Y%m%d')}.json",
+                               mime="application/json", on_click=_mark_exported, key="btn_export_profile")
+        else:
+            st.caption("L'export du profil est réservé aux profils admin et dispatcher.")
+
+    # ── Gestion des types ─────────────────────────────────────────────────
+    if can_edit:
+        with st.expander("➕ Ajouter / dupliquer / supprimer un type"):
+            new_name = st.text_input("Nom du type (ex. : Airbus A320-200 — Compagnie X)", key="new_type_name")
+            b1, b2 = st.columns(2)
+            if b1.button("Créer un type vide", key="btn_new_blank"):
+                _register_type(new_name, new_blank_aircraft(new_name))
+            if b2.button("Dupliquer le type actuel", key="btn_dup"):
+                _register_type(new_name, copy.deepcopy(ac))
+            confirm = st.checkbox(f"Confirmer la suppression de « {selected_ac} »", key=f"del_ok_{selected_ac}")
+            if st.button("Supprimer le type actuel", key="btn_del", disabled=(not confirm or len(db) <= 1)):
+                del st.session_state.db[selected_ac]
+                st.session_state.dirty = True
+                st.session_state["_flash"] = f"Type « {selected_ac} » supprimé."
+                st.session_state.ed_version = ver + 1
+                st.rerun()
+
+    # ── Édition du type sélectionné ───────────────────────────────────────
+    st.markdown("---")
+    txt, certified = origin_summary(ac)
+    st.markdown(f"**Type sélectionné : {selected_ac}** — origine des données critiques : {txt}")
+    miss = missing_fields(ac)
+    if miss:
+        st.warning(f"{len(miss)} donnée(s) à renseigner pour activer les calculs : "
+                   + ", ".join(miss[:6]) + (" …" if len(miss) > 6 else ""))
+    else:
+        st.success("Toutes les données nécessaires aux calculs sont renseignées.")
+    st.caption("* donnée nécessaire aux calculs de masse, centrage, performances et carburant.")
+
+    k = f"{selected_ac}_{ver}"
+    c1, c2 = st.columns(2)
+    type_code = c1.text_input("Code du type", value=ac.get("type", ""), key=f"ed_type_{k}", disabled=not can_edit)
+    typical = c2.text_input("Sièges typiques (texte libre)", value=ac.get("seats_typical", ""),
+                            key=f"ed_typ_{k}", disabled=not can_edit)
+
+    st_opts = list(STATUS_LABELS.values())
+    sdf = scalar_df(ac)
+    zdf = rows_df(ac.get("pax_zones") or [], "Zone", "Capacité (pax)", "max_pax")
+    cdf = rows_df(ac.get("cargo_comps") or [], "Soute", "Capacité (kg)", "max_kg")
+
+    row_cfg = {"Bras (m)": st.column_config.NumberColumn("Bras (m)", format="%.2f"),
+               "Statut": st.column_config.SelectboxColumn("Statut", options=st_opts)}
+
+    st.markdown("**Paramètres généraux, vitesses et performances**")
+    if can_edit:
+        edited_s = st.data_editor(sdf, hide_index=True, use_container_width=True, key=f"ed_scalar_{k}",
+                                  disabled=["Paramètre", "Unité"], num_rows="fixed",
+                                  column_config={"Valeur": st.column_config.NumberColumn("Valeur"),
+                                                 "Statut": st.column_config.SelectboxColumn("Statut", options=st_opts)})
+    else:
+        st.dataframe(sdf, hide_index=True, use_container_width=True)
+
+    st.markdown("**Zones passagers** (bras en mètres, capacité en passagers)")
+    if can_edit:
+        edited_z = st.data_editor(zdf, hide_index=True, use_container_width=True, key=f"ed_zones_{k}",
+                                  num_rows="dynamic", column_config=row_cfg)
+    else:
+        st.dataframe(zdf, hide_index=True, use_container_width=True)
+
+    st.markdown("**Soutes** (bras en mètres, capacité en kg)")
+    if can_edit:
+        edited_c = st.data_editor(cdf, hide_index=True, use_container_width=True, key=f"ed_cargo_{k}",
+                                  num_rows="dynamic", column_config=row_cfg)
+    else:
+        st.dataframe(cdf, hide_index=True, use_container_width=True)
+
+    if can_edit and st.button("💾 Enregistrer les modifications de ce type", key=f"btn_save_{k}",
+                              use_container_width=True):
+        changed = 0
+        if type_code.strip() != (ac.get("type") or "") or typical.strip() != (ac.get("seats_typical") or ""):
+            ac["type"], ac["seats_typical"] = type_code.strip(), typical.strip()
+            changed += 1
+        changed += apply_scalar_edits(ac, edited_s)
+        changed += apply_rows_edits(ac, "pax_zones", edited_z, "Zone", "Capacité (pax)", "max_pax")
+        changed += apply_rows_edits(ac, "cargo_comps", edited_c, "Soute", "Capacité (kg)", "max_kg")
+        if changed:
+            st.session_state.dirty = True
+            st.session_state.ed_version = ver + 1
+            st.session_state["_flash"] = (f"{changed} modification(s) enregistrée(s) pour « {selected_ac} ». "
+                                          "Exportez votre profil pour les conserver.")
+            st.rerun()
+        else:
+            st.info("Aucune modification à enregistrer.")
+
+
+def blocked_message(missing: list):
+    """Message affiché dans les onglets dont les calculs sont impossibles faute de données."""
+    st.warning(f"Calcul indisponible pour ce type : {len(missing)} donnée(s) à renseigner "
+               "(onglet « Données aéronef »).")
+    with st.expander("Voir les données manquantes"):
+        for m in missing:
+            st.markdown(f"- {m}")
+
+
+
+# =============================================================================
 # APPLICATION PRINCIPALE
 # =============================================================================
 
 def main():
     # ── Chargement des données ────────────────────────────────────────────────
     users    = load_json("users.json")
-    db       = load_json("compagnie_db.json")
+    base_db  = load_json("compagnie_db.json")
     airports = load_json("airports_db.json")
 
-    if not db:
+    if not base_db:
         st.error("❌ compagnie_db.json introuvable. Vérifiez le répertoire de déploiement.")
         return
 
@@ -839,6 +1417,14 @@ def main():
         return
 
     user_info = st.session_state.user_info
+    can_edit = user_info.get("role") in ("admin", "dispatcher")
+
+    # Base de travail de la session : modifiable, non persistante (voir profil compagnie)
+    if "db" not in st.session_state:
+        st.session_state.db = {k: normalize_aircraft(v) for k, v in base_db.items()}
+        st.session_state.profile_info = None
+        st.session_state.dirty = False
+    db = st.session_state.db
 
     # ── Sidebar ───────────────────────────────────────────────────────────────
     with st.sidebar:
@@ -847,7 +1433,7 @@ def main():
              border-radius:10px;border:1px solid rgba(0,191,255,0.2);margin-bottom:1rem">
             <div style="font-size:2.5rem">✈</div>
             <div style="font-weight:900;font-size:1.1rem;color:#00BFFF;letter-spacing:3px">AETHERDISPATCH</div>
-            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v2.0 | EG CONSEIL</div>
+            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v3.1 | EG CONSEIL</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -862,26 +1448,33 @@ def main():
 
         # Sélection aéronef
         st.markdown("**🛩 Type d'aéronef**")
-        selected_ac = st.selectbox("Type d'aéronef", list(db.keys()), label_visibility="collapsed")
+        pending = st.session_state.pop("_pending_select", None)
+        if pending in db:
+            st.session_state["sel_ac"] = pending
+        if st.session_state.get("sel_ac") not in db:
+            st.session_state["sel_ac"] = list(db.keys())[0]
+        selected_ac = st.selectbox("Type d'aéronef", list(db.keys()), key="sel_ac", label_visibility="collapsed")
         ac = db[selected_ac]
 
         st.markdown("---")
-        dow_display = ac['oew_kg'] + ac.get('crew_kg', 0)
+        dow_display = (ac["oew_kg"] + ac["crew_kg"]) if ac.get("oew_kg") is not None and ac.get("crew_kg") is not None else None
+        _origin_txt, _ = origin_summary(ac)
         st.markdown(f"""
         <div style="font-size:0.72rem;color:#556688;line-height:1.8">
-        <b style="color:#00BFFF">TYPE :</b> {ac['type']}<br>
-        <b style="color:#00BFFF">DOW :</b> {dow_display:,} kg<br>
-        <b style="color:#00BFFF">MTOW :</b> {ac['max_tow_kg']:,} kg<br>
-        <b style="color:#00BFFF">MZFW :</b> {ac['max_zfw_kg']:,} kg<br>
-        <b style="color:#00BFFF">MLW :</b> {ac['max_lw_kg']:,} kg<br>
-        <b style="color:#00BFFF">SIÈGES :</b> {ac['seats']}<br>
-        <b style="color:#00BFFF">CARBU MAX :</b> {ac['mfuel']:,} kg
+        <b style="color:#00BFFF">TYPE :</b> {ac.get('type') or '—'}<br>
+        <b style="color:#00BFFF">DOW :</b> {fmt_num(dow_display, 'kg')}<br>
+        <b style="color:#00BFFF">MTOW :</b> {fmt_num(ac.get('max_tow_kg'), 'kg')}<br>
+        <b style="color:#00BFFF">MZFW :</b> {fmt_num(ac.get('max_zfw_kg'), 'kg')}<br>
+        <b style="color:#00BFFF">MLW :</b> {fmt_num(ac.get('max_lw_kg'), 'kg')}<br>
+        <b style="color:#00BFFF">SIÈGES MAX :</b> {fmt_num(ac.get('max_seats'))}<br>
+        <b style="color:#00BFFF">CARBU MAX :</b> {fmt_num(ac.get('mfuel'), 'kg')}<br>
+        <b style="color:#00BFFF">DONNÉES :</b> {_origin_txt}
         </div>
         """, unsafe_allow_html=True)
 
         st.markdown("---")
         if st.button("🔓 Déconnexion", use_container_width=True):
-            for key in ["authenticated", "username", "user_info"]:
+            for key in ["authenticated", "username", "user_info", "db", "profile_info", "dirty", "sel_ac", "ed_version", "pax_info"]:
                 st.session_state.pop(key, None)
             st.rerun()
 
@@ -893,15 +1486,21 @@ def main():
     </div>
     """, unsafe_allow_html=True)
 
+    # ── Bandeau d'état du profil compagnie + contrôle des données du type ────
+    render_profile_banner()
+    missing = missing_fields(ac)
+    blocked = bool(missing)
+
     # ── Onglets ───────────────────────────────────────────────────────────────
-    tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+    tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
         "📋 Nouveau vol",
         "📸 OCR Manifest",
         "📈 Performances & V-Speeds",
         "⛽ Carburant & Météo",
         "🧠 Optimisation Cargo",
         "📄 Export PDF",
-        "🗂 Historique"
+        "🗂 Historique",
+        "🛠 Données aéronef"
     ])
 
     # =========================================================================
@@ -948,155 +1547,157 @@ def main():
 
         st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
 
-        # ── PAX par zone ──────────────────────────────────────────────────────
-        st.markdown("**👥 Répartition passagers par zone**")
-        pax_std_weight = st.slider("Masse standard passager (bagages inclus) kg", 75, 100, 84)
-        pax_zone_weights = {}
-        pax_total_pax = 0
-        cols_pax = st.columns(len(ac["pax_zones"]))
-        for i, zone in enumerate(ac["pax_zones"]):
-            with cols_pax[i]:
-                nb = st.number_input(f"{zone['name']}", 0, zone["max_pax"],
-                                     value=min(zone["max_pax"] // 2, zone["max_pax"]),
-                                     key=f"pax_{selected_ac}_{i}")
-                pax_zone_weights[zone["name"]] = nb * pax_std_weight
-                pax_total_pax += nb
-                st.caption(f"Max : {zone['max_pax']} | Bras : {zone['arm_m']} m")
+        # ── Panneau passagers : capacité, PAX prévus, PAX final ───────────────
+        pax = render_pax_panel(ac, selected_ac)
+        pax_std_weight = pax["pax_std_weight"]
+        pax_total_pax = pax["active"]
+        pax_zone_weights = {z["name"]: n * pax_std_weight
+                            for z, n in zip(ac.get("pax_zones") or [], pax["zone_counts"])}
 
         st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
 
-        # ── Cargo ─────────────────────────────────────────────────────────────
-        st.markdown("**📦 Chargement cargo**")
-        cargo_weights = {}
-        cols_cargo = st.columns(len(ac["cargo_comps"]))
-        for i, comp in enumerate(ac["cargo_comps"]):
-            with cols_cargo[i]:
-                w = st.number_input(f"{comp['name']} (kg)", 0, comp["max_kg"],
-                                    value=min(500, comp["max_kg"]),
-                                    key=f"cargo_{selected_ac}_{i}", step=50)
-                cargo_weights[comp["name"]] = w
-                st.caption(f"Max : {comp['max_kg']:,} kg | Bras : {comp['arm_m']} m")
+        if blocked:
+            blocked_message(missing)
+        else:
+            # ── Cargo ─────────────────────────────────────────────────────────────
+            st.markdown("**📦 Chargement cargo**")
+            cargo_weights = {}
+            cols_cargo = st.columns(len(ac["cargo_comps"]))
+            for i, comp in enumerate(ac["cargo_comps"]):
+                with cols_cargo[i]:
+                    w = st.number_input(f"{comp['name']} (kg)", 0, comp["max_kg"],
+                                        value=min(500, comp["max_kg"]),
+                                        key=f"cargo_{selected_ac}_{i}", step=50)
+                    cargo_weights[comp["name"]] = w
+                    st.caption(f"Max : {comp['max_kg']:,} kg | Bras : {comp['arm_m']} m")
 
-        st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
 
-        # ── Carburant ─────────────────────────────────────────────────────────
-        col_f1, col_f2 = st.columns(2)
-        with col_f1:
-            fuel_kg = st.number_input("⛽ Carburant embarqué (kg)", 1000, ac["mfuel"],
-                                      value=min(int(ac["mfuel"] * 0.40), ac["mfuel"]), step=100)
-        with col_f2:
-            trip_fuel = st.number_input("✈ Trip fuel estimé (kg)", 500, ac["mfuel"],
-                                        value=max(500, min(
-                                int(dist_nm / ac["perf"].get("cruise_tas_kt", 450)
-                                    * ac["perf"]["fuel_flow_cruise"]),
-                                ac["mfuel"] - 1000)), step=100)
+            # ── Carburant ─────────────────────────────────────────────────────────
+            col_f1, col_f2 = st.columns(2)
+            with col_f1:
+                fuel_kg = st.number_input("⛽ Carburant embarqué (kg)", 1000, ac["mfuel"],
+                                          value=min(int(ac["mfuel"] * 0.40), ac["mfuel"]), step=100)
+            with col_f2:
+                trip_fuel = st.number_input("✈ Trip fuel estimé (kg)", 500, ac["mfuel"],
+                                            value=max(500, min(
+                                    int(dist_nm / ac["perf"].get("cruise_tas_kt", 450)
+                                        * ac["perf"]["fuel_flow_cruise"]),
+                                    ac["mfuel"] - 1000)), step=100)
 
-        # ── Calcul M&C ────────────────────────────────────────────────────────
-        result = compute_mc(ac, pax_zone_weights, cargo_weights, fuel_kg)
-        lw = result["tow"] - trip_fuel
+            # ── Calcul M&C ────────────────────────────────────────────────────────
+            result = compute_mc(ac, pax_zone_weights, cargo_weights, fuel_kg)
+            lw = result["tow"] - trip_fuel
 
-        # Limites
-        zfw_ok  = result["zfw"] <= ac["max_zfw_kg"]
-        tow_ok  = result["tow"] <= ac["max_tow_kg"]
-        lw_ok   = lw           <= ac["max_lw_kg"]
-        cg_ok   = ac["cg_min_m"] <= result["tow_cg"] <= ac["cg_max_m"]
+            # Limites
+            zfw_ok  = result["zfw"] <= ac["max_zfw_kg"]
+            tow_ok  = result["tow"] <= ac["max_tow_kg"]
+            lw_ok   = lw           <= ac["max_lw_kg"]
+            cg_ok   = ac["cg_min_m"] <= result["tow_cg"] <= ac["cg_max_m"]
 
-        # ── Métriques M&C ─────────────────────────────────────────────────────
-        st.markdown("### ⚖ Résultats Masse & Centrage")
+            # ── Métriques M&C ─────────────────────────────────────────────────────
+            st.markdown("### ⚖ Résultats Masse & Centrage")
 
-        def badge(cond): return '<span class="badge-ok">✓ DANS LIMITES</span>' if cond else '<span class="badge-nok">✗ HORS LIMITES</span>'
+            def badge(cond): return '<span class="badge-ok">✓ DANS LIMITES</span>' if cond else '<span class="badge-nok">✗ HORS LIMITES</span>'
 
-        cols_m = st.columns(4)
-        metrics = [
-            ("ZFW", result["zfw"], "kg", f"Max {ac['max_zfw_kg']:,} kg", zfw_ok),
-            ("TOW", result["tow"], "kg", f"Max {ac['max_tow_kg']:,} kg", tow_ok),
-            ("LW",  lw,            "kg", f"Max {ac['max_lw_kg']:,} kg",  lw_ok),
-            ("CG TOW", result["tow_cg"], "m", f"FWD {ac['cg_min_m']} m / AFT {ac['cg_max_m']} m", cg_ok),
-        ]
-        for i, (label, val, unit, limit, ok) in enumerate(metrics):
-            with cols_m[i]:
-                color = "#00FF88" if ok else "#FF4444"
-                st.markdown(f"""
-                <div class="metric-card">
-                    <div class="label">{label}</div>
-                    <div class="value" style="color:{color}">{val:,.1f}</div>
-                    <div class="unit">{unit}</div>
-                    <div style="font-size:0.68rem;color:#556688;margin-top:4px">{limit}</div>
+            cols_m = st.columns(4)
+            metrics = [
+                ("ZFW", result["zfw"], "kg", f"Max {ac['max_zfw_kg']:,} kg", zfw_ok),
+                ("TOW", result["tow"], "kg", f"Max {ac['max_tow_kg']:,} kg", tow_ok),
+                ("LW",  lw,            "kg", f"Max {ac['max_lw_kg']:,} kg",  lw_ok),
+                ("CG TOW", result["tow_cg"], "m", f"FWD {ac['cg_min_m']} m / AFT {ac['cg_max_m']} m", cg_ok),
+            ]
+            for i, (label, val, unit, limit, ok) in enumerate(metrics):
+                with cols_m[i]:
+                    color = "#00FF88" if ok else "#FF4444"
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <div class="label">{label}</div>
+                        <div class="value" style="color:{color}">{val:,.1f}</div>
+                        <div class="unit">{unit}</div>
+                        <div style="font-size:0.68rem;color:#556688;margin-top:4px">{limit}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            # ── Comparaison PAX prévus / PAX final ────────────────────────────────
+            st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+            render_pax_comparison(ac, pax, cargo_weights, fuel_kg)
+
+            # ── Graphique enveloppe ───────────────────────────────────────────────
+            st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+            st.plotly_chart(plot_cg_envelope(ac, result, trip_fuel), use_container_width=True)
+
+            # ── ZFW CG ───────────────────────────────────────────────────────────
+            st.markdown(f"""
+            <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:0.5rem">
+                <div class="metric-card" style="flex:1">
+                    <div class="label">ZFW CG</div>
+                    <div class="value">{result['zfw_mac']:.1f}</div>
+                    <div class="unit">% MAC</div>
                 </div>
-                """, unsafe_allow_html=True)
-
-        # ── Graphique enveloppe ───────────────────────────────────────────────
-        st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
-        st.plotly_chart(plot_cg_envelope(ac, result, trip_fuel), use_container_width=True)
-
-        # ── ZFW CG ───────────────────────────────────────────────────────────
-        st.markdown(f"""
-        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:0.5rem">
-            <div class="metric-card" style="flex:1">
-                <div class="label">ZFW CG</div>
-                <div class="value">{result['zfw_mac']:.1f}</div>
-                <div class="unit">% MAC</div>
+                <div class="metric-card" style="flex:1">
+                    <div class="label">PAX total</div>
+                    <div class="value">{pax_total_pax}</div>
+                    <div class="unit">passagers</div>
+                </div>
+                <div class="metric-card" style="flex:1">
+                    <div class="label">Payload</div>
+                    <div class="value">{result['pax_total_kg'] + result['cargo_total_kg']:,}</div>
+                    <div class="unit">kg</div>
+                </div>
+                <div class="metric-card" style="flex:1">
+                    <div class="label">Carburant</div>
+                    <div class="value">{fuel_kg:,}</div>
+                    <div class="unit">kg ({round(fuel_kg/ac['mfuel']*100)}%)</div>
+                </div>
             </div>
-            <div class="metric-card" style="flex:1">
-                <div class="label">PAX total</div>
-                <div class="value">{pax_total_pax}</div>
-                <div class="unit">passagers</div>
-            </div>
-            <div class="metric-card" style="flex:1">
-                <div class="label">Payload</div>
-                <div class="value">{result['pax_total_kg'] + result['cargo_total_kg']:,}</div>
-                <div class="unit">kg</div>
-            </div>
-            <div class="metric-card" style="flex:1">
-                <div class="label">Carburant</div>
-                <div class="value">{fuel_kg:,}</div>
-                <div class="unit">kg ({round(fuel_kg/ac['mfuel']*100)}%)</div>
-            </div>
-        </div>
-        """, unsafe_allow_html=True)
+            """, unsafe_allow_html=True)
 
-        # ── Sauvegarde vol ────────────────────────────────────────────────────
-        st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
-        col_save1, col_save2 = st.columns([2, 1])
-        with col_save1:
-            if not all([zfw_ok, tow_ok, lw_ok, cg_ok]):
-                st.warning("⚠ Certaines limites sont dépassées. Corrigez avant de sauvegarder.")
+            # ── Sauvegarde vol ────────────────────────────────────────────────────
+            st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+            col_save1, col_save2 = st.columns([2, 1])
+            with col_save1:
+                if not all([zfw_ok, tow_ok, lw_ok, cg_ok]):
+                    st.warning("⚠ Certaines limites sont dépassées. Corrigez avant de sauvegarder.")
 
-        with col_save2:
-            if st.button("💾 Sauvegarder le vol", use_container_width=True):
-                flight_record = {
-                    "flight_number": flight_number,
-                    "aircraft": selected_ac,
-                    "origin": origin, "dest": dest, "alternate": alternate,
-                    "dist_nm": dist_nm,
-                    "datetime": f"{flight_date.strftime('%d/%m/%Y')} {flight_time.strftime('%H:%M')} UTC",
-                    "pax_total_pax": pax_total_pax,
-                    "oew": ac["oew_kg"],
-                    **result,
-                    "lw": lw,
-                    "trip_fuel": trip_fuel,
-                    "crew_kg": ac.get("crew_kg", 0),
-                    "fuel_plan": st.session_state.get("fuel_plan", {}),
-                    "vspeeds": st.session_state.get("vspeeds", {}),
-                    "status_ok": all([zfw_ok, tow_ok, lw_ok, cg_ok])
-                }
-                st.session_state.current_flight = flight_record
-                save_flight(flight_record)
-                st.success(f"✅ Vol {flight_number} sauvegardé dans l'historique.")
+            with col_save2:
+                if st.button("💾 Sauvegarder le vol", use_container_width=True):
+                    flight_record = {
+                        "flight_number": flight_number,
+                        "aircraft": selected_ac,
+                        "origin": origin, "dest": dest, "alternate": alternate,
+                        "dist_nm": dist_nm,
+                        "datetime": f"{flight_date.strftime('%d/%m/%Y')} {flight_time.strftime('%H:%M')} UTC",
+                        "pax_total_pax": pax_total_pax,
+                        "oew": ac["oew_kg"],
+                        **result,
+                        "lw": lw,
+                        "trip_fuel": trip_fuel,
+                        "crew_kg": ac.get("crew_kg", 0),
+                        "pax_prevus": pax["pax_prevus"], "pax_final": pax["pax_final"],
+                        "ls_status": pax["status"], "pax_max": pax["max_seats"],
+                        "fuel_plan": st.session_state.get("fuel_plan", {}),
+                        "vspeeds": st.session_state.get("vspeeds", {}),
+                        "status_ok": all([zfw_ok, tow_ok, lw_ok, cg_ok])
+                    }
+                    st.session_state.current_flight = flight_record
+                    save_flight(flight_record)
+                    st.success(f"✅ Vol {flight_number} sauvegardé dans l'historique.")
 
-        # Stocker en session pour les autres onglets
-        st.session_state.mc_result = result
-        st.session_state.dist_nm   = dist_nm
-        st.session_state.ac        = ac
-        st.session_state.lw        = lw
-        st.session_state.trip_fuel = trip_fuel
-        st.session_state.flight_info = {
-            "flight_number": flight_number, "origin": origin,
-            "dest": dest, "alternate": alternate,
-            "aircraft": selected_ac,
-            "datetime": f"{flight_date.strftime('%d/%m/%Y')} {flight_time.strftime('%H:%M')} UTC",
-            "dist_nm": dist_nm
-        }
+            # Stocker en session pour les autres onglets
+            st.session_state.mc_result = result
+            st.session_state.pax_info  = pax
+            st.session_state.dist_nm   = dist_nm
+            st.session_state.ac        = ac
+            st.session_state.lw        = lw
+            st.session_state.trip_fuel = trip_fuel
+            st.session_state.flight_info = {
+                "flight_number": flight_number, "origin": origin,
+                "dest": dest, "alternate": alternate,
+                "aircraft": selected_ac,
+                "datetime": f"{flight_date.strftime('%d/%m/%Y')} {flight_time.strftime('%H:%M')} UTC",
+                "dist_nm": dist_nm
+            }
 
     # =========================================================================
     # ONGLET 2 : OCR MANIFEST
@@ -1139,194 +1740,201 @@ def main():
     # =========================================================================
     with tab3:
         st.subheader("📈 Performances & V-Speeds opérationnels")
+        if blocked:
+            blocked_message(missing)
+        else:
 
-        mc  = st.session_state.get("mc_result", {})
-        tow = mc.get("tow", ac["max_tow_kg"])
-        lw  = st.session_state.get("lw", ac["max_lw_kg"])
-        dist_nm_perf = st.session_state.get("dist_nm", 1000)
+            mc  = st.session_state.get("mc_result", {})
+            tow = mc.get("tow", ac["max_tow_kg"])
+            lw  = st.session_state.get("lw", ac["max_lw_kg"])
+            dist_nm_perf = st.session_state.get("dist_nm", 1000)
 
-        col_p1, col_p2, col_p3 = st.columns(3)
-        with col_p1:
-            dep_airport_perf = st.selectbox("Aéroport de départ", list(airports.keys()), key="perf_dep")
-            dep_data = airports[dep_airport_perf]
-            elev_ft  = dep_data["elev_ft"]
-            rwy_m    = dep_data["rwy_length_m"]
-            st.caption(f"Élévation : {elev_ft} ft | Piste : {rwy_m} m")
-        with col_p2:
-            oat_c = st.number_input("OAT (°C)", -40, 60, 15)
-            flap_conf = st.selectbox("Configuration volets décollage",
-                                     ["CONF 1+F", "CONF 2", "CONF 3", "CONF FULL"])
-        with col_p3:
-            wind_dir_perf = st.number_input("Vent direction (°)", 0, 360, 270)
-            wind_kt_perf  = st.number_input("Vent vitesse (kts)", 0, 60, 10)
-            wind_note = "Vent arrière ✓" if wind_kt_perf > 0 else "Vent debout ✓"
+            col_p1, col_p2, col_p3 = st.columns(3)
+            with col_p1:
+                dep_airport_perf = st.selectbox("Aéroport de départ", list(airports.keys()), key="perf_dep")
+                dep_data = airports[dep_airport_perf]
+                elev_ft  = dep_data["elev_ft"]
+                rwy_m    = dep_data["rwy_length_m"]
+                st.caption(f"Élévation : {elev_ft} ft | Piste : {rwy_m} m")
+            with col_p2:
+                oat_c = st.number_input("OAT (°C)", -40, 60, 15)
+                flap_conf = st.selectbox("Configuration volets décollage",
+                                         ["CONF 1+F", "CONF 2", "CONF 3", "CONF FULL"])
+            with col_p3:
+                wind_dir_perf = st.number_input("Vent direction (°)", 0, 360, 270)
+                wind_kt_perf  = st.number_input("Vent vitesse (kts)", 0, 60, 10)
+                wind_note = "Vent arrière ✓" if wind_kt_perf > 0 else "Vent debout ✓"
 
-        vs = compute_vspeeds(ac, tow, lw, elev_ft, oat_c, rwy_m, flap_conf)
+            vs = compute_vspeeds(ac, tow, lw, elev_ft, oat_c, rwy_m, flap_conf)
 
-        st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
-        st.markdown("### ⚡ V-Speeds calculés")
+            st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+            st.markdown("### ⚡ V-Speeds calculés")
 
-        v_cols = st.columns(5)
-        v_data = [
-            ("V1", vs["v1"], "kts", "Décision décollage"),
-            ("VR", vs["vr"], "kts", "Rotation"),
-            ("V2", vs["v2"], "kts", "Sécurité 2nd segment"),
-            ("VREF", vs["vref"], "kts", "Approche finale"),
-            ("VAPP", vs["vapp"], "kts", "Approche stabilisée"),
-        ]
-        for i, (label, val, unit, desc) in enumerate(v_data):
-            with v_cols[i]:
+            v_cols = st.columns(5)
+            v_data = [
+                ("V1", vs["v1"], "kts", "Décision décollage"),
+                ("VR", vs["vr"], "kts", "Rotation"),
+                ("V2", vs["v2"], "kts", "Sécurité 2nd segment"),
+                ("VREF", vs["vref"], "kts", "Approche finale"),
+                ("VAPP", vs["vapp"], "kts", "Approche stabilisée"),
+            ]
+            for i, (label, val, unit, desc) in enumerate(v_data):
+                with v_cols[i]:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <div class="label">{label}</div>
+                        <div class="value" style="color:#00BFFF">{val}</div>
+                        <div class="unit">{unit}</div>
+                        <div style="font-size:0.65rem;color:#556688;margin-top:3px">{desc}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            # ── ISA & gradient ────────────────────────────────────────────────────
+            st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+            col_g1, col_g2, col_g3, col_g4 = st.columns(4)
+            with col_g1:
+                st.metric("Déviation ISA", f"{vs['isa_dev']:+.1f} °C")
+            with col_g2:
+                st.metric("Gradient montée (2nd seg.)", f"{vs['climb_gradient']:.2f} %")
+            with col_g3:
+                grad_ok = vs["obstacle_ok"]
                 st.markdown(f"""
                 <div class="metric-card">
-                    <div class="label">{label}</div>
-                    <div class="value" style="color:#00BFFF">{val}</div>
-                    <div class="unit">{unit}</div>
-                    <div style="font-size:0.65rem;color:#556688;margin-top:3px">{desc}</div>
+                    <div class="label">Obstacle clearance</div>
+                    <div style="margin-top:6px">
+                        <span class="{'badge-ok' if grad_ok else 'badge-nok'}">
+                            {'✓ CONFORME' if grad_ok else '✗ NON CONFORME'}
+                        </span>
+                    </div>
                 </div>
                 """, unsafe_allow_html=True)
+            with col_g4:
+                st.metric("VMO", f"{vs['vmo']} kts")
 
-        # ── ISA & gradient ────────────────────────────────────────────────────
-        st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
-        col_g1, col_g2, col_g3, col_g4 = st.columns(4)
-        with col_g1:
-            st.metric("Déviation ISA", f"{vs['isa_dev']:+.1f} °C")
-        with col_g2:
-            st.metric("Gradient montée (2nd seg.)", f"{vs['climb_gradient']:.2f} %")
-        with col_g3:
-            grad_ok = vs["obstacle_ok"]
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="label">Obstacle clearance</div>
-                <div style="margin-top:6px">
-                    <span class="{'badge-ok' if grad_ok else 'badge-nok'}">
-                        {'✓ CONFORME' if grad_ok else '✗ NON CONFORME'}
-                    </span>
-                </div>
-            </div>
-            """, unsafe_allow_html=True)
-        with col_g4:
-            st.metric("VMO", f"{vs['vmo']} kts")
+            # ── Détail corrections ────────────────────────────────────────────────
+            with st.expander("🔍 Détail des corrections appliquées"):
+                corr = vs["corrections"]
+                st.markdown(f"""
+                | Facteur | Correction |
+                |---------|-----------|
+                | Altitude aéroport | {corr['altitude']:+.1f} kts |
+                | Déviation ISA | {corr['isa']:+.1f} kts |
+                | Longueur piste | {corr['rwy']:+.1f} kts |
+                | Configuration volets | {corr['flap']:+.0f} kts |
+                """)
+                st.caption("Note : corrections paramétriques basées sur les données constructeur. "
+                           "Toujours vérifier les QRH/FPM officiels.")
 
-        # ── Détail corrections ────────────────────────────────────────────────
-        with st.expander("🔍 Détail des corrections appliquées"):
-            corr = vs["corrections"]
-            st.markdown(f"""
-            | Facteur | Correction |
-            |---------|-----------|
-            | Altitude aéroport | {corr['altitude']:+.1f} kts |
-            | Déviation ISA | {corr['isa']:+.1f} kts |
-            | Longueur piste | {corr['rwy']:+.1f} kts |
-            | Configuration volets | {corr['flap']:+.0f} kts |
-            """)
-            st.caption("Note : corrections paramétriques basées sur les données constructeur. "
-                       "Toujours vérifier les QRH/FPM officiels.")
+            # ── Graphique V-speeds ────────────────────────────────────────────────
+            fig_vs = go.Figure()
+            v_labels = ["VS1", "V1", "VR", "V2", "VREF", "VAPP", "VMO"]
+            v_values = [vs["vs1_tow"], vs["v1"], vs["vr"], vs["v2"],
+                        vs["vref"], vs["vapp"], vs["vmo"]]
+            v_colors = ["#556688", "#FFD700", "#00FF88", "#00BFFF", "#7B2FBE", "#FF8C00", "#FF4444"]
 
-        # ── Graphique V-speeds ────────────────────────────────────────────────
-        fig_vs = go.Figure()
-        v_labels = ["VS1", "V1", "VR", "V2", "VREF", "VAPP", "VMO"]
-        v_values = [vs["vs1_tow"], vs["v1"], vs["vr"], vs["v2"],
-                    vs["vref"], vs["vapp"], vs["vmo"]]
-        v_colors = ["#556688", "#FFD700", "#00FF88", "#00BFFF", "#7B2FBE", "#FF8C00", "#FF4444"]
+            fig_vs.add_trace(go.Bar(
+                x=v_labels, y=v_values,
+                marker_color=v_colors,
+                text=[f"{v} kts" for v in v_values],
+                textposition='outside',
+            ))
+            fig_vs.update_layout(
+                title="Tableau récapitulatif des vitesses opérationnelles",
+                plot_bgcolor='#0D1F3C', paper_bgcolor='#0A0A1A',
+                font=dict(color='#E0E8FF'),
+                yaxis=dict(title="Vitesse (kts)", gridcolor='#1A3A5C'),
+                xaxis=dict(gridcolor='#1A3A5C'),
+                height=320
+            )
+            st.plotly_chart(fig_vs, use_container_width=True)
 
-        fig_vs.add_trace(go.Bar(
-            x=v_labels, y=v_values,
-            marker_color=v_colors,
-            text=[f"{v} kts" for v in v_values],
-            textposition='outside',
-        ))
-        fig_vs.update_layout(
-            title="Tableau récapitulatif des vitesses opérationnelles",
-            plot_bgcolor='#0D1F3C', paper_bgcolor='#0A0A1A',
-            font=dict(color='#E0E8FF'),
-            yaxis=dict(title="Vitesse (kts)", gridcolor='#1A3A5C'),
-            xaxis=dict(gridcolor='#1A3A5C'),
-            height=320
-        )
-        st.plotly_chart(fig_vs, use_container_width=True)
-
-        # Stocker pour PDF
-        st.session_state.vspeeds = vs
+            # Stocker pour PDF
+            st.session_state.vspeeds = vs
 
     # =========================================================================
     # ONGLET 4 : CARBURANT & MÉTÉO LIVE
     # =========================================================================
     with tab4:
         st.subheader("⛽ Plan carburant OACI & Météo METAR live")
-
-        col_f1, col_f2, col_f3 = st.columns(3)
-        with col_f1:
-            wind_kt_fuel  = st.number_input("Composante vent croisière (kts, + = AR)", -80, 80, 0)
-            cargo_tot_est = st.session_state.get("mc_result", {}).get("cargo_total_kg", 0)
-            pax_tot_est   = st.session_state.get("mc_result", {}).get("pax_total_kg", 0)
-        with col_f2:
-            rwy_alt_ft    = airports[st.session_state.get("dest", list(airports.keys())[1])]["elev_ft"] \
-                            if "dest" in st.session_state else 0
-            oat_fuel      = st.number_input("OAT destination (°C)", -40, 60, 20)
-        with col_f3:
-            dist_nm_fuel  = st.session_state.get("dist_nm", 1000)
-            st.metric("Distance route", f"{dist_nm_fuel:.0f} NM")
-
-        fp = compute_fuel_plan(dist_nm_fuel, ac, pax_tot_est // 84, cargo_tot_est,
-                               wind_kt_fuel, rwy_alt_ft, oat_fuel)
-
-        # ── Tableau carburant ─────────────────────────────────────────────────
-        st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
-        st.markdown("### ⛽ Plan carburant détaillé")
-
-        fuel_items = [
-            ("Trip Fuel", fp["trip_fuel_kg"], "Carburant de route"),
-            ("Contingence (5%)", fp["contingency_kg"], "Marge réglementaire"),
-            ("Alternate Fuel", fp["alt_fuel_kg"], f"≈ 200 NM – {fp['trip_time_str']}"),
-            ("Final Reserve (30 min)", fp["final_reserve_kg"], "Minimum réglementaire OACI"),
-            ("Taxi Fuel", fp["taxi_kg"], "Roulage estimé"),
-        ]
-        cols_fuel = st.columns(len(fuel_items))
-        for i, (label, val, note) in enumerate(fuel_items):
-            with cols_fuel[i]:
-                st.markdown(f"""
-                <div class="metric-card">
-                    <div class="label">{label}</div>
-                    <div class="value">{val:,}</div>
-                    <div class="unit">kg</div>
-                    <div style="font-size:0.65rem;color:#556688;margin-top:3px">{note}</div>
-                </div>
-                """, unsafe_allow_html=True)
-
-        fuel_ok_color = "#00FF88" if fp["fuel_ok"] else "#FF4444"
-        st.markdown(f"""
-        <div class="metric-card" style="margin-top:12px;border-color:{fuel_ok_color}">
-            <div class="label">BLOCK FUEL TOTAL</div>
-            <div class="value" style="color:{fuel_ok_color};font-size:2rem">{fp['block_fuel_kg']:,}</div>
-            <div class="unit">kg — {fp['fuel_pct']:.1f}% réservoir | GS croisière : {fp['gs_kt']} kts</div>
-            {'<span class="badge-ok">✓ DANS CAPACITÉ RÉSERVOIR</span>' if fp["fuel_ok"]
-             else f'<span class="badge-nok">✗ DÉPASSE CAPACITÉ MAX {fp["max_fuel"]:,} kg</span>'}
-        </div>
-        """, unsafe_allow_html=True)
-
-        # ── Contrôle : carburant embarqué (onglet 1) vs block fuel requis ────────
-        fuel_loaded = st.session_state.get("mc_result", {}).get("fuel_kg", 0)
-        fuel_margin = fuel_loaded - fp["block_fuel_kg"]
-        if fuel_margin >= 0:
-            st.success(f"Carburant embarqué ({fuel_loaded:,} kg) supérieur au block fuel requis "
-                       f"({fp['block_fuel_kg']:,} kg) : marge de {fuel_margin:,} kg.")
+        if blocked:
+            blocked_message(missing)
         else:
-            st.error(f"Carburant embarqué ({fuel_loaded:,} kg) INSUFFISANT : il manque "
-                     f"{-fuel_margin:,} kg par rapport au block fuel requis ({fp['block_fuel_kg']:,} kg).")
 
-        # ── Graphique carburant ────────────────────────────────────────────────
-        fig_fuel = go.Figure(go.Pie(
-            labels=["Trip", "Contingence", "Alternate", "Réserve finale", "Taxi"],
-            values=[fp["trip_fuel_kg"], fp["contingency_kg"], fp["alt_fuel_kg"],
-                    fp["final_reserve_kg"], fp["taxi_kg"]],
-            hole=0.55,
-            marker=dict(colors=["#00BFFF", "#7B2FBE", "#FFD700", "#00FF88", "#556688"]),
-        ))
-        fig_fuel.update_layout(
-            title="Répartition du block fuel",
-            plot_bgcolor='#0D1F3C', paper_bgcolor='#0A0A1A',
-            font=dict(color='#E0E8FF'), height=320
-        )
-        st.plotly_chart(fig_fuel, use_container_width=True)
+            col_f1, col_f2, col_f3 = st.columns(3)
+            with col_f1:
+                wind_kt_fuel  = st.number_input("Composante vent croisière (kts, + = AR)", -80, 80, 0)
+                cargo_tot_est = st.session_state.get("mc_result", {}).get("cargo_total_kg", 0)
+                pax_tot_est   = st.session_state.get("mc_result", {}).get("pax_total_kg", 0)
+            with col_f2:
+                rwy_alt_ft    = airports[st.session_state.get("dest", list(airports.keys())[1])]["elev_ft"] \
+                                if "dest" in st.session_state else 0
+                oat_fuel      = st.number_input("OAT destination (°C)", -40, 60, 20)
+            with col_f3:
+                dist_nm_fuel  = st.session_state.get("dist_nm", 1000)
+                st.metric("Distance route", f"{dist_nm_fuel:.0f} NM")
+
+            fp = compute_fuel_plan(dist_nm_fuel, ac, pax_tot_est // 84, cargo_tot_est,
+                                   wind_kt_fuel, rwy_alt_ft, oat_fuel)
+
+            # ── Tableau carburant ─────────────────────────────────────────────────
+            st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+            st.markdown("### ⛽ Plan carburant détaillé")
+
+            fuel_items = [
+                ("Trip Fuel", fp["trip_fuel_kg"], "Carburant de route"),
+                ("Contingence (5%)", fp["contingency_kg"], "Marge réglementaire"),
+                ("Alternate Fuel", fp["alt_fuel_kg"], f"≈ 200 NM – {fp['trip_time_str']}"),
+                ("Final Reserve (30 min)", fp["final_reserve_kg"], "Minimum réglementaire OACI"),
+                ("Taxi Fuel", fp["taxi_kg"], "Roulage estimé"),
+            ]
+            cols_fuel = st.columns(len(fuel_items))
+            for i, (label, val, note) in enumerate(fuel_items):
+                with cols_fuel[i]:
+                    st.markdown(f"""
+                    <div class="metric-card">
+                        <div class="label">{label}</div>
+                        <div class="value">{val:,}</div>
+                        <div class="unit">kg</div>
+                        <div style="font-size:0.65rem;color:#556688;margin-top:3px">{note}</div>
+                    </div>
+                    """, unsafe_allow_html=True)
+
+            fuel_ok_color = "#00FF88" if fp["fuel_ok"] else "#FF4444"
+            st.markdown(f"""
+            <div class="metric-card" style="margin-top:12px;border-color:{fuel_ok_color}">
+                <div class="label">BLOCK FUEL TOTAL</div>
+                <div class="value" style="color:{fuel_ok_color};font-size:2rem">{fp['block_fuel_kg']:,}</div>
+                <div class="unit">kg — {fp['fuel_pct']:.1f}% réservoir | GS croisière : {fp['gs_kt']} kts</div>
+                {'<span class="badge-ok">✓ DANS CAPACITÉ RÉSERVOIR</span>' if fp["fuel_ok"]
+                 else f'<span class="badge-nok">✗ DÉPASSE CAPACITÉ MAX {fp["max_fuel"]:,} kg</span>'}
+            </div>
+            """, unsafe_allow_html=True)
+
+            # ── Contrôle : carburant embarqué (onglet 1) vs block fuel requis ────────
+            fuel_loaded = st.session_state.get("mc_result", {}).get("fuel_kg", 0)
+            fuel_margin = fuel_loaded - fp["block_fuel_kg"]
+            if fuel_margin >= 0:
+                st.success(f"Carburant embarqué ({fuel_loaded:,} kg) supérieur au block fuel requis "
+                           f"({fp['block_fuel_kg']:,} kg) : marge de {fuel_margin:,} kg.")
+            else:
+                st.error(f"Carburant embarqué ({fuel_loaded:,} kg) INSUFFISANT : il manque "
+                         f"{-fuel_margin:,} kg par rapport au block fuel requis ({fp['block_fuel_kg']:,} kg).")
+
+            # ── Graphique carburant ────────────────────────────────────────────────
+            fig_fuel = go.Figure(go.Pie(
+                labels=["Trip", "Contingence", "Alternate", "Réserve finale", "Taxi"],
+                values=[fp["trip_fuel_kg"], fp["contingency_kg"], fp["alt_fuel_kg"],
+                        fp["final_reserve_kg"], fp["taxi_kg"]],
+                hole=0.55,
+                marker=dict(colors=["#00BFFF", "#7B2FBE", "#FFD700", "#00FF88", "#556688"]),
+            ))
+            fig_fuel.update_layout(
+                title="Répartition du block fuel",
+                plot_bgcolor='#0D1F3C', paper_bgcolor='#0A0A1A',
+                font=dict(color='#E0E8FF'), height=320
+            )
+            st.plotly_chart(fig_fuel, use_container_width=True)
+            st.session_state.fuel_plan = fp
 
         # ── METAR Live ────────────────────────────────────────────────────────
         st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
@@ -1377,8 +1985,6 @@ def main():
         else:
             st.info("👆 Cliquez sur 'Actualiser METARs' pour récupérer les données météo en temps réel.")
 
-        # Stocker fuel plan
-        st.session_state.fuel_plan = fp
 
     # =========================================================================
     # ONGLET 5 : OPTIMISATION CARGO (PuLP)
@@ -1386,7 +1992,9 @@ def main():
     with tab5:
         st.subheader("🧠 Optimisation cargo par programmation linéaire (PuLP)")
 
-        if not PULP_OK:
+        if blocked:
+            blocked_message(missing)
+        elif not PULP_OK:
             st.warning("⚠ PuLP non installé. Ajoutez `PuLP` à requirements.txt.")
         else:
             mc = st.session_state.get("mc_result", {})
@@ -1469,69 +2077,78 @@ def main():
     # =========================================================================
     with tab6:
         st.subheader("📄 Export Load & Trim Sheet officielle PDF")
+        if blocked:
+            blocked_message(missing)
+        else:
 
-        mc   = st.session_state.get("mc_result", {})
-        vs   = st.session_state.get("vspeeds", {})
-        fp   = st.session_state.get("fuel_plan", {})
-        info = st.session_state.get("flight_info", {})
+            mc   = st.session_state.get("mc_result", {})
+            vs   = st.session_state.get("vspeeds", {})
+            fp   = st.session_state.get("fuel_plan", {})
+            info = st.session_state.get("flight_info", {})
 
-        # Prévisualisation des données
-        col_prev1, col_prev2 = st.columns(2)
-        with col_prev1:
-            st.markdown("**Données intégrées dans le PDF**")
-            st.markdown(f"""
-            <div style="background:#0D1F3C;border-radius:8px;padding:12px;font-size:0.82rem;line-height:2">
-            ✈ <b>Vol</b> : {info.get('flight_number','—')}<br>
-            🛩 <b>Aéronef</b> : {info.get('aircraft','—')}<br>
-            🛫 <b>Route</b> : {info.get('origin','—')} → {info.get('dest','—')}<br>
-            📏 <b>Distance</b> : {info.get('dist_nm',0):.0f} NM<br>
-            ⚖ <b>ZFW</b> : {mc.get('zfw',0):,} kg<br>
-            ⚖ <b>TOW</b> : {mc.get('tow',0):,} kg<br>
-            ⚖ <b>LW</b> : {st.session_state.get('lw',0):,} kg<br>
-            ⛽ <b>Block fuel</b> : {fp.get('block_fuel_kg',0):,} kg
-            </div>
-            """, unsafe_allow_html=True)
+            # Prévisualisation des données
+            col_prev1, col_prev2 = st.columns(2)
+            with col_prev1:
+                st.markdown("**Données intégrées dans le PDF**")
+                st.markdown(f"""
+                <div style="background:#0D1F3C;border-radius:8px;padding:12px;font-size:0.82rem;line-height:2">
+                ✈ <b>Vol</b> : {info.get('flight_number','—')}<br>
+                🛩 <b>Aéronef</b> : {info.get('aircraft','—')}<br>
+                🛫 <b>Route</b> : {info.get('origin','—')} → {info.get('dest','—')}<br>
+                📏 <b>Distance</b> : {info.get('dist_nm',0):.0f} NM<br>
+                ⚖ <b>ZFW</b> : {mc.get('zfw',0):,} kg<br>
+                ⚖ <b>TOW</b> : {mc.get('tow',0):,} kg<br>
+                ⚖ <b>LW</b> : {st.session_state.get('lw',0):,} kg<br>
+                ⛽ <b>Block fuel</b> : {fp.get('block_fuel_kg',0):,} kg
+                </div>
+                """, unsafe_allow_html=True)
 
-        with col_prev2:
-            st.markdown("**V-Speeds & Carburant**")
-            st.markdown(f"""
-            <div style="background:#0D1F3C;border-radius:8px;padding:12px;font-size:0.82rem;line-height:2">
-            ⚡ <b>V1</b> : {vs.get('v1','—')} kts<br>
-            ⚡ <b>VR</b> : {vs.get('vr','—')} kts<br>
-            ⚡ <b>V2</b> : {vs.get('v2','—')} kts<br>
-            ⚡ <b>VREF</b> : {vs.get('vref','—')} kts<br>
-            ✈ <b>Trip</b> : {fp.get('trip_fuel_kg',0):,} kg<br>
-            ⚡ <b>Contingence</b> : {fp.get('contingency_kg',0):,} kg<br>
-            🛬 <b>Alternate</b> : {fp.get('alt_fuel_kg',0):,} kg<br>
-            🔒 <b>Réserve finale</b> : {fp.get('final_reserve_kg',0):,} kg
-            </div>
-            """, unsafe_allow_html=True)
+            with col_prev2:
+                st.markdown("**V-Speeds & Carburant**")
+                st.markdown(f"""
+                <div style="background:#0D1F3C;border-radius:8px;padding:12px;font-size:0.82rem;line-height:2">
+                ⚡ <b>V1</b> : {vs.get('v1','—')} kts<br>
+                ⚡ <b>VR</b> : {vs.get('vr','—')} kts<br>
+                ⚡ <b>V2</b> : {vs.get('v2','—')} kts<br>
+                ⚡ <b>VREF</b> : {vs.get('vref','—')} kts<br>
+                ✈ <b>Trip</b> : {fp.get('trip_fuel_kg',0):,} kg<br>
+                ⚡ <b>Contingence</b> : {fp.get('contingency_kg',0):,} kg<br>
+                🛬 <b>Alternate</b> : {fp.get('alt_fuel_kg',0):,} kg<br>
+                🔒 <b>Réserve finale</b> : {fp.get('final_reserve_kg',0):,} kg
+                </div>
+                """, unsafe_allow_html=True)
 
-        st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+            st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
 
-        if st.button("📄 GÉNÉRER LA LOAD & TRIM SHEET PDF", use_container_width=True):
-            flight_data_pdf = {
-                **info,
-                "oew": ac["oew_kg"],
-                "crew_kg": ac.get("crew_kg", 0),
-                **mc,
-                "lw": st.session_state.get("lw", 0),
-                "trip_fuel": st.session_state.get("trip_fuel", 0),
-                "vspeeds": vs,
-                "fuel_plan": fp,
-            }
-            with st.spinner("⚙ Génération du PDF en cours..."):
-                pdf_bytes = generate_pdf(flight_data_pdf)
+            if st.button("📄 GÉNÉRER LA LOAD & TRIM SHEET PDF", use_container_width=True):
+                flight_data_pdf = {
+                    **info,
+                    "oew": ac["oew_kg"],
+                    "crew_kg": ac.get("crew_kg", 0),
+                    "ls_status": (st.session_state.get("pax_info") or {}).get("status", "Préliminaire").upper(),
+                    "pax_prevus": (st.session_state.get("pax_info") or {}).get("pax_prevus"),
+                    "pax_final": (st.session_state.get("pax_info") or {}).get("pax_final"),
+                    "pax_max": ac.get("max_seats"),
+                    "origin_text": origin_summary(ac)[0],
+                    "data_certified": origin_summary(ac)[1],
+                    **mc,
+                    "lw": st.session_state.get("lw", 0),
+                    "trip_fuel": st.session_state.get("trip_fuel", 0),
+                    "vspeeds": vs,
+                    "fuel_plan": fp,
+                }
+                with st.spinner("⚙ Génération du PDF en cours..."):
+                    pdf_bytes = generate_pdf(flight_data_pdf)
 
-            fname = f"AETHERDISPATCH_{info.get('flight_number','VOL')}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
-            st.download_button(
-                label="⬇ Télécharger la Load & Trim Sheet",
-                data=pdf_bytes,
-                file_name=fname,
-                mime="application/pdf",
-                use_container_width=True
-            )
-            st.success(f"✅ PDF généré : {fname}")
+                fname = f"AETHERDISPATCH_{info.get('flight_number','VOL')}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
+                st.download_button(
+                    label="⬇ Télécharger la Load & Trim Sheet",
+                    data=pdf_bytes,
+                    file_name=fname,
+                    mime="application/pdf",
+                    use_container_width=True
+                )
+                st.success(f"✅ PDF généré : {fname}")
 
     # =========================================================================
     # ONGLET 7 : HISTORIQUE VOLS
@@ -1558,6 +2175,9 @@ def main():
                 "Aéronef": h.get("aircraft", "—"),
                 "Route": f"{h.get('origin','?')} → {h.get('dest','?')}",
                 "Date": h.get("datetime", "—"),
+                "Loadsheet": h.get("ls_status", "—"),
+                "PAX prévus": h.get("pax_prevus", "—"),
+                "PAX final": h.get("pax_final", "—"),
                 "TOW (kg)": h.get("tow", 0),
                 "ZFW (kg)": h.get("zfw", 0),
                 "CG TOW (%MAC)": h.get("tow_mac", 0),
@@ -1605,10 +2225,16 @@ def main():
                 "text/csv"
             )
 
+    # =========================================================================
+    # ONGLET 8 : DONNÉES AÉRONEF MODIFIABLES · PROFIL COMPAGNIE
+    # =========================================================================
+    with tab8:
+        render_data_tab(selected_ac, can_edit, user_info)
+
     # ── Footer ─────────────────────────────────────────────────────────────────
     st.markdown("""
     <div class="aether-footer">
-        AETHERDISPATCH v2.0 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
+        AETHERDISPATCH v3.1 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
         Données à usage opérationnel restreint — Vérification obligatoire par le commandant de bord
     </div>
     """, unsafe_allow_html=True)
