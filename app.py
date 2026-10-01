@@ -635,7 +635,7 @@ def generate_pdf(flight_data: dict) -> bytes:
     Génère une Load & Trim Sheet officielle AETHERDISPATCH en PDF.
     """
     pdf = FPDF(orientation='P', unit='mm', format='A4')
-        pdf.normalize_text = lambda t: str(t).replace('→', '->').replace('—', '-').replace('–', '-').replace('─', '-').replace('€', 'EUR').encode('latin-1', 'replace').decode('latin-1')
+    pdf.normalize_text = lambda t: str(t).replace('→', '->').replace('—', '-').replace('–', '-').replace('─', '-').replace('€', 'EUR').encode('latin-1', 'replace').decode('latin-1')
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
 
