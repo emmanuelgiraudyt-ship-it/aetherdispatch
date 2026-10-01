@@ -22,8 +22,7 @@ import re
 
 # ─── Tentative d'import PuLP (optionnel) ──────────────────────────────────────
 try:
-    from pulp import (LpProblem, LpVariable, LpMaximize, lpSum,
-                      LpStatus, value, PULP_CBC_CMD)
+    from pulp import LpProblem, LpVariable, LpMaximize, lpSum, LpStatus, value
     PULP_OK = True
 except Exception:
         PULP_OK = False
@@ -631,7 +630,7 @@ def optimize_cargo_pulp(ac: dict, cargo_offers: list, max_payload_kg: float) -> 
     prob += lpSum(vars_[o["name"]] * o["weight_kg"] for o in cargo_offers) <= max_payload_kg
 
     # Résolution silencieuse
-    prob.solve(PULP_CBC_CMD(msg=0))
+    prob.solve()
 
     selected = [o for o in cargo_offers if value(vars_[o["name"]]) == 1]
     total_weight = sum(o["weight_kg"] for o in selected)
