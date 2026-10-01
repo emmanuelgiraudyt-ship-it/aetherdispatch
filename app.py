@@ -625,7 +625,6 @@ def optimize_cargo_pulp(ac: dict, cargo_offers: list, max_payload_kg: float) -> 
         "total_revenue": sum(o["revenue"] for o in selected),
         "payload_remaining": max_payload_kg - sum(o["weight_kg"] for o in selected)
     }
-    }
 
 # =============================================================================
 # MODULE 6 : EXPORT PDF
