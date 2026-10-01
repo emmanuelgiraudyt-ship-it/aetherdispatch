@@ -608,13 +608,21 @@ def flight_cat_color(cat: str) -> str:
 # =============================================================================
 
 def optimize_cargo_pulp(ac: dict, cargo_offers: list, max_payload_kg: float) -> dict:
+    """
+    Optimisation linéaire du chargement cargo par PuLP.
+    cargo_offers: liste de dicts {name, weight_kg, revenue, priority}
+    Objectif : maximiser le revenu dans la limite du payload disponible.
+    """
     if not PULP_OK:
         return {"error": "PuLP non installé"}
     prob = _pulp.LpProblem("Cargo", _pulp.LpMaximize)
+    # Variables binaires : on prend ou non chaque offre
     vars_ = {o["name"]: _pulp.LpVariable(f"x_{i}", cat="Binary")
              for i, o in enumerate(cargo_offers)}
+    # Objectif : maximiser le revenu pondéré par la priorité
     prob += _pulp.lpSum(vars_[o["name"]] * o["revenue"] * o.get("priority", 1.0)
                         for o in cargo_offers)
+    # Contrainte de masse
     prob += _pulp.lpSum(vars_[o["name"]] * o["weight_kg"] for o in cargo_offers) <= max_payload_kg
     prob.solve()
     selected = [o for o in cargo_offers if _pulp.value(vars_[o["name"]]) == 1]
@@ -635,6 +643,7 @@ def generate_pdf(flight_data: dict) -> bytes:
     Génère une Load & Trim Sheet officielle AETHERDISPATCH en PDF.
     """
     pdf = FPDF(orientation='P', unit='mm', format='A4')
+    # La police standard ne gère que le latin-1 : on remplace les symboles non supportés
     pdf.normalize_text = lambda t: str(t).replace('→', '->').replace('—', '-').replace('–', '-').replace('─', '-').replace('€', 'EUR').encode('latin-1', 'replace').decode('latin-1')
     pdf.add_page()
     pdf.set_auto_page_break(auto=True, margin=15)
@@ -658,7 +667,7 @@ def generate_pdf(flight_data: dict) -> bytes:
     pdf.set_fill_color(13, 31, 60)
     pdf.set_text_color(0, 191, 255)
     pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(190, 8, "INFORMATIONS VOL", fill=True, align='C')
+    pdf.cell(190, 8, "INFORMATIONS VOL", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
 
     pdf.set_text_color(30, 30, 30)
@@ -674,8 +683,8 @@ def generate_pdf(flight_data: dict) -> bytes:
     for i, (label, val) in enumerate(rows):
         fill_color = (230, 240, 255) if i % 2 == 0 else (245, 248, 255)
         pdf.set_fill_color(*fill_color)
-        pdf.cell(80, 7, label, fill=True, border=1)
-        pdf.cell(110, 7, str(val), fill=True, border=1)
+        pdf.cell(80, 6, label, fill=True, border=1)
+        pdf.cell(110, 6, str(val), fill=True, border=1)
         pdf.ln()
 
     # ── Masses ────────────────────────────────────────────────────────────────
@@ -683,13 +692,14 @@ def generate_pdf(flight_data: dict) -> bytes:
     pdf.set_fill_color(13, 31, 60)
     pdf.set_text_color(0, 191, 255)
     pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(190, 8, "MASSES & CENTRAGE", fill=True, align='C')
+    pdf.cell(190, 8, "MASSES & CENTRAGE", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
 
     pdf.set_text_color(30, 30, 30)
     pdf.set_font("Helvetica", "", 10)
     mc_rows = [
         ("OEW (Masse à vide exploitée)", f"{flight_data.get('oew', 0):,} kg", "RÉFÉRENCE"),
+        ("Équipage", f"{flight_data.get('crew_kg', 0):,} kg", ""),
         ("Passagers + Bagages", f"{flight_data.get('pax_total_kg', 0):,} kg", ""),
         ("Cargo total", f"{flight_data.get('cargo_total_kg', 0):,} kg", ""),
         ("ZERO FUEL WEIGHT (ZFW)", f"{flight_data.get('zfw', 0):,} kg", f"CG {flight_data.get('zfw_mac', 0):.1f}% MAC"),
@@ -699,14 +709,14 @@ def generate_pdf(flight_data: dict) -> bytes:
         ("LANDING WEIGHT (LW)", f"{flight_data.get('lw', 0):,} kg", f"CG estimé"),
     ]
     for i, (label, val, note) in enumerate(mc_rows):
-        bold_rows = {3, 5, 7}
+        bold_rows = {4, 6, 8}
         fill_color = (210, 230, 255) if i in bold_rows else ((230, 240, 255) if i % 2 == 0 else (245, 248, 255))
         pdf.set_fill_color(*fill_color)
         font_style = "B" if i in bold_rows else ""
         pdf.set_font("Helvetica", font_style, 10)
-        pdf.cell(90, 7, label, fill=True, border=1)
-        pdf.cell(55, 7, val, fill=True, border=1, align='R')
-        pdf.cell(45, 7, note, fill=True, border=1, align='C')
+        pdf.cell(90, 6, label, fill=True, border=1)
+        pdf.cell(55, 6, val, fill=True, border=1, align='R')
+        pdf.cell(45, 6, note, fill=True, border=1, align='C')
         pdf.ln()
 
     # ── V-Speeds ──────────────────────────────────────────────────────────────
@@ -714,7 +724,7 @@ def generate_pdf(flight_data: dict) -> bytes:
     pdf.set_fill_color(13, 31, 60)
     pdf.set_text_color(0, 191, 255)
     pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(190, 8, "V-SPEEDS OPÉRATIONNELS", fill=True, align='C')
+    pdf.cell(190, 8, "V-SPEEDS OPÉRATIONNELS", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
 
     pdf.set_text_color(30, 30, 30)
@@ -731,9 +741,9 @@ def generate_pdf(flight_data: dict) -> bytes:
         fill_color = (240, 248, 255) if i % 2 == 0 else (250, 252, 255)
         pdf.set_fill_color(*fill_color)
         pdf.set_font("Helvetica", "", 10)
-        pdf.cell(100, 7, label, fill=True, border=1)
+        pdf.cell(100, 6, label, fill=True, border=1)
         pdf.set_font("Helvetica", "B", 10)
-        pdf.cell(90, 7, val, fill=True, border=1, align='C')
+        pdf.cell(90, 6, val, fill=True, border=1, align='C')
         pdf.ln()
 
     # ── Carburant ─────────────────────────────────────────────────────────────
@@ -741,7 +751,7 @@ def generate_pdf(flight_data: dict) -> bytes:
     pdf.set_fill_color(13, 31, 60)
     pdf.set_text_color(0, 191, 255)
     pdf.set_font("Helvetica", "B", 11)
-    pdf.cell(190, 8, "PLAN CARBURANT OACI", fill=True, align='C')
+    pdf.cell(190, 8, "PLAN CARBURANT OACI", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.ln(1)
 
     fp = flight_data.get("fuel_plan", {})
@@ -752,15 +762,20 @@ def generate_pdf(flight_data: dict) -> bytes:
         ("Carburant Alternate", f"{fp.get('alt_fuel_kg', 0):,} kg"),
         ("Réserve finale (30 min)", f"{fp.get('final_reserve_kg', 0):,} kg"),
         ("Taxi fuel", f"{fp.get('taxi_kg', 0):,} kg"),
-        ("BLOCK FUEL TOTAL", f"{fp.get('block_fuel_kg', 0):,} kg"),
+        ("BLOCK FUEL REQUIS (plan OACI)", f"{fp.get('block_fuel_kg', 0):,} kg"),
+        ("Carburant embarqué (saisi)", f"{flight_data.get('fuel_kg', 0):,} kg"),
+        ("Marge embarqué - requis",
+         f"{flight_data.get('fuel_kg', 0) - fp.get('block_fuel_kg', 0):+,} kg  "
+         + ("SUFFISANT" if flight_data.get('fuel_kg', 0) >= fp.get('block_fuel_kg', 0) else "INSUFFISANT")),
     ]
     for i, (label, val) in enumerate(fp_rows):
-        fill_color = (210, 230, 255) if i == len(fp_rows)-1 else ((230, 240, 255) if i % 2 == 0 else (245, 248, 255))
+        is_bold = i in (5, 7)
+        fill_color = (210, 230, 255) if is_bold else ((230, 240, 255) if i % 2 == 0 else (245, 248, 255))
         pdf.set_fill_color(*fill_color)
-        font_style = "B" if i == len(fp_rows)-1 else ""
+        font_style = "B" if is_bold else ""
         pdf.set_font("Helvetica", font_style, 10)
-        pdf.cell(100, 7, label, fill=True, border=1)
-        pdf.cell(90, 7, val, fill=True, border=1, align='R')
+        pdf.cell(100, 6, label, fill=True, border=1)
+        pdf.cell(90, 6, val, fill=True, border=1, align='R')
         pdf.ln()
 
     # ── Signatures ────────────────────────────────────────────────────────────
@@ -972,9 +987,9 @@ def main():
         with col_f2:
             trip_fuel = st.number_input("✈ Trip fuel estimé (kg)", 500, ac["mfuel"],
                                         value=max(500, min(
-    int(dist_nm / ac["perf"].get("cruise_tas_kt", 450)
-        * ac["perf"]["fuel_flow_cruise"]),
-    ac["mfuel"] - 1000)), step=100)
+                                int(dist_nm / ac["perf"].get("cruise_tas_kt", 450)
+                                    * ac["perf"]["fuel_flow_cruise"]),
+                                ac["mfuel"] - 1000)), step=100)
 
         # ── Calcul M&C ────────────────────────────────────────────────────────
         result = compute_mc(ac, pax_zone_weights, cargo_weights, fuel_kg)
@@ -1060,8 +1075,9 @@ def main():
                     **result,
                     "lw": lw,
                     "trip_fuel": trip_fuel,
-                    "fuel_plan": {},
-                    "vspeeds": {},
+                    "crew_kg": ac.get("crew_kg", 0),
+                    "fuel_plan": st.session_state.get("fuel_plan", {}),
+                    "vspeeds": st.session_state.get("vspeeds", {}),
                     "status_ok": all([zfw_ok, tow_ok, lw_ok, cg_ok])
                 }
                 st.session_state.current_flight = flight_record
@@ -1077,7 +1093,8 @@ def main():
         st.session_state.flight_info = {
             "flight_number": flight_number, "origin": origin,
             "dest": dest, "alternate": alternate,
-            "aircraft": selected_ac, "datetime": f"{flight_date} {flight_time}",
+            "aircraft": selected_ac,
+            "datetime": f"{flight_date.strftime('%d/%m/%Y')} {flight_time.strftime('%H:%M')} UTC",
             "dist_nm": dist_nm
         }
 
@@ -1286,6 +1303,16 @@ def main():
         </div>
         """, unsafe_allow_html=True)
 
+        # ── Contrôle : carburant embarqué (onglet 1) vs block fuel requis ────────
+        fuel_loaded = st.session_state.get("mc_result", {}).get("fuel_kg", 0)
+        fuel_margin = fuel_loaded - fp["block_fuel_kg"]
+        if fuel_margin >= 0:
+            st.success(f"Carburant embarqué ({fuel_loaded:,} kg) supérieur au block fuel requis "
+                       f"({fp['block_fuel_kg']:,} kg) : marge de {fuel_margin:,} kg.")
+        else:
+            st.error(f"Carburant embarqué ({fuel_loaded:,} kg) INSUFFISANT : il manque "
+                     f"{-fuel_margin:,} kg par rapport au block fuel requis ({fp['block_fuel_kg']:,} kg).")
+
         # ── Graphique carburant ────────────────────────────────────────────────
         fig_fuel = go.Figure(go.Pie(
             labels=["Trip", "Contingence", "Alternate", "Réserve finale", "Taxi"],
@@ -1341,7 +1368,7 @@ def main():
                             <span>🌡 {temp_str}</span>
                             <span>💨 {wind_str}</span>
                             <span>👁 {vis_str}</span>
-                            <span> {str(metar.get('obs_time') or '')[:5] or 'N/D'}Z</span>
+                            <span>🕐 {str(metar.get('obs_time') or '')[:5] or 'N/D'}Z</span>
                         </div>
                     </div>
                     """, unsafe_allow_html=True)
@@ -1486,6 +1513,7 @@ def main():
             flight_data_pdf = {
                 **info,
                 "oew": ac["oew_kg"],
+                "crew_kg": ac.get("crew_kg", 0),
                 **mc,
                 "lw": st.session_state.get("lw", 0),
                 "trip_fuel": st.session_state.get("trip_fuel", 0),
@@ -1515,7 +1543,8 @@ def main():
         if not isinstance(history, list) or len(history) == 0:
             st.info("📭 Aucun vol sauvegardé. Remplissez l'onglet 'Nouveau vol' et cliquez sur 'Sauvegarder le vol'.")
         else:
-            st.markdown(f"**{len(history)} vols enregistrés**")
+            _n = len(history)
+            st.markdown(f"**{_n} vol{'s' if _n > 1 else ''} enregistré{'s' if _n > 1 else ''}**")
 
             # ── Filtres ───────────────────────────────────────────────────────
             col_f1, col_f2 = st.columns(2)
