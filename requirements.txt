@@ -4,6 +4,6 @@ numpy
 requests
 fpdf2
 Pillow
-pulp
+pulP
 plotly
 matplotlib
