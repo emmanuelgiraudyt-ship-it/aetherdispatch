@@ -862,7 +862,7 @@ def main():
 
         # Sélection aéronef
         st.markdown("**🛩 Type d'aéronef**")
-        selected_ac = st.selectbox("", list(db.keys()), label_visibility="collapsed")
+        selected_ac = st.selectbox("Type d'aéronef", list(db.keys()), label_visibility="collapsed")
         ac = db[selected_ac]
 
         st.markdown("---")
@@ -958,7 +958,7 @@ def main():
             with cols_pax[i]:
                 nb = st.number_input(f"{zone['name']}", 0, zone["max_pax"],
                                      value=min(zone["max_pax"] // 2, zone["max_pax"]),
-                                     key=f"pax_{i}")
+                                     key=f"pax_{selected_ac}_{i}")
                 pax_zone_weights[zone["name"]] = nb * pax_std_weight
                 pax_total_pax += nb
                 st.caption(f"Max : {zone['max_pax']} | Bras : {zone['arm_m']} m")
@@ -973,7 +973,7 @@ def main():
             with cols_cargo[i]:
                 w = st.number_input(f"{comp['name']} (kg)", 0, comp["max_kg"],
                                     value=min(500, comp["max_kg"]),
-                                    key=f"cargo_{i}", step=50)
+                                    key=f"cargo_{selected_ac}_{i}", step=50)
                 cargo_weights[comp["name"]] = w
                 st.caption(f"Max : {comp['max_kg']:,} kg | Bras : {comp['arm_m']} m")
 
@@ -1424,10 +1424,10 @@ def main():
             for i in range(n_offers):
                 d = default_offers[i] if i < len(default_offers) else (f"Offre {i+1}", 200, 800, 1.0)
                 col1, col2, col3, col4 = st.columns([2, 1, 1, 1])
-                name = col1.text_input(f"", value=d[0], key=f"offer_name_{i}", label_visibility="collapsed")
-                mass = col2.number_input(f"", 10, 5000, d[1], key=f"offer_mass_{i}", label_visibility="collapsed")
-                rev  = col3.number_input(f"", 0, 50000, d[2], key=f"offer_rev_{i}", label_visibility="collapsed")
-                prio = col4.number_input(f"", 0.1, 5.0, float(d[3]), step=0.1, key=f"offer_prio_{i}", label_visibility="collapsed")
+                name = col1.text_input("Désignation", value=d[0], key=f"offer_name_{i}", label_visibility="collapsed")
+                mass = col2.number_input("Masse (kg)", 10, 5000, d[1], key=f"offer_mass_{i}", label_visibility="collapsed")
+                rev  = col3.number_input("Revenu (EUR)", 0, 50000, d[2], key=f"offer_rev_{i}", label_visibility="collapsed")
+                prio = col4.number_input("Priorité", 0.1, 5.0, float(d[3]), step=0.1, key=f"offer_prio_{i}", label_visibility="collapsed")
                 cargo_offers.append({"name": name, "weight_kg": mass, "revenue": rev, "priority": prio})
 
             if st.button("🚀 Lancer l'optimisation PuLP", use_container_width=True):
