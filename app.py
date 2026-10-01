@@ -611,7 +611,7 @@ def optimize_cargo_pulp(ac: dict, cargo_offers: list, max_payload_kg: float) -> 
     if not PULP_OK:
         return {"error": "PuLP non installé"}
     prob = _pulp.LpProblem("Cargo", _pulp.LpMaximize)
-    vars_ = {o["name"]: _pulp.LpVariable(f"x_{i}", 0, 1, cat='Binary')
+    vars_ = {o["name"]: _pulp.LpVariable(f"x_{i}", cat="Binary")
              for i, o in enumerate(cargo_offers)}
     prob += _pulp.lpSum(vars_[o["name"]] * o["revenue"] * o.get("priority", 1.0)
                         for o in cargo_offers)
