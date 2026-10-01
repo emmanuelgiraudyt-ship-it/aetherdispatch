@@ -22,10 +22,10 @@ import re
 
 # ─── Tentative d'import PuLP (optionnel) ──────────────────────────────────────
 try:
-    from pulp import LpProblem, LpVariable, LpMaximize, lpSum, LpStatus, value
+    import pulp as _pulp
     PULP_OK = True
 except Exception:
-        PULP_OK = False
+    PULP_OK = False
 
 # ─── Tentative d'import EasyOCR (optionnel, lourd) ────────────────────────────
 try:
@@ -608,40 +608,23 @@ def flight_cat_color(cat: str) -> str:
 # =============================================================================
 
 def optimize_cargo_pulp(ac: dict, cargo_offers: list, max_payload_kg: float) -> dict:
-    """
-    Optimisation linéaire du chargement cargo par PuLP.
-    cargo_offers: liste de dicts {name, weight_kg, revenue, priority}
-    Objectif : maximiser le revenu dans la limite du payload disponible.
-    """
     if not PULP_OK:
         return {"error": "PuLP non installé"}
-
-    prob = LpProblem("OptimisationCargo_AETHERDISPATCH", LpMaximize)
-
-    # Variables binaires : on prend ou non chaque offre
-    vars_ = {o["name"]: LpVariable(f"x_{i}", 0, 1, cat='Binary')
+    prob = _pulp.LpProblem("Cargo", _pulp.LpMaximize)
+    vars_ = {o["name"]: _pulp.LpVariable(f"x_{i}", 0, 1, cat='Binary')
              for i, o in enumerate(cargo_offers)}
-
-    # Objectif : maximiser revenu pondéré par priorité
-    prob += lpSum(vars_[o["name"]] * o["revenue"] * o.get("priority", 1.0)
-                  for o in cargo_offers)
-
-    # Contrainte masse
-    prob += lpSum(vars_[o["name"]] * o["weight_kg"] for o in cargo_offers) <= max_payload_kg
-
-    # Résolution silencieuse
+    prob += _pulp.lpSum(vars_[o["name"]] * o["revenue"] * o.get("priority", 1.0)
+                        for o in cargo_offers)
+    prob += _pulp.lpSum(vars_[o["name"]] * o["weight_kg"] for o in cargo_offers) <= max_payload_kg
     prob.solve()
-
-    selected = [o for o in cargo_offers if value(vars_[o["name"]]) == 1]
-    total_weight = sum(o["weight_kg"] for o in selected)
-    total_revenue = sum(o["revenue"] for o in selected)
-
+    selected = [o for o in cargo_offers if _pulp.value(vars_[o["name"]]) == 1]
     return {
-        "status": LpStatus[prob.status],
+        "status": _pulp.LpStatus[prob.status],
         "selected": selected,
-        "total_weight_kg": total_weight,
-        "total_revenue": total_revenue,
-        "payload_remaining": max_payload_kg - total_weight
+        "total_weight_kg": sum(o["weight_kg"] for o in selected),
+        "total_revenue": sum(o["revenue"] for o in selected),
+        "payload_remaining": max_payload_kg - sum(o["weight_kg"] for o in selected)
+    }
     }
 
 # =============================================================================
