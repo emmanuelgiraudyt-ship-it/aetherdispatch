@@ -13,5 +13,10 @@
     "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
     "role": "dispatcher",
     "nom": "Dispatcher OPS"
+  },
+  "testeur": {
+    "password_hash": "09f7863cb25ccc4ece9f2b82364a9a8c7a1dc57cc2baa582168a09046873c292",
+    "role": "dispatcher",
+    "nom": "Testeur dispatcher"
   }
 }
