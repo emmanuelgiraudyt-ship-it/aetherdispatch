@@ -72,7 +72,8 @@
         "max_seats": "Airbus — brochure A220, 2022 (aircraft.airbus.com)",
         "max_tow_kg": "Airbus — brochure A220, 2022 (aircraft.airbus.com) ; le tableau fourni indique 63 700 kg (écart non résolu)"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Airbus A220-300": {
     "type": "A220-300",
@@ -147,7 +148,8 @@
         "max_seats": "Airbus — brochure A220, 2022 (aircraft.airbus.com) ; sous réserve de certification",
         "max_tow_kg": "Airbus — brochure A220, 2022 (aircraft.airbus.com)"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Airbus A319-100": {
     "type": "A319",
@@ -194,21 +196,24 @@
         "arm_m": 11.0,
         "max_kg": 3200,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": 3
       },
       {
         "name": "AFT",
         "arm_m": 18.5,
         "max_kg": 3200,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": 1
       },
       {
         "name": "Bulk",
         "arm_m": 25.5,
         "max_kg": 1497,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": 2
       }
     ],
     "vspeeds": {
@@ -259,7 +264,8 @@
         "perf.climb_gradient_min": "estime",
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
-        "max_seats": "estime"
+        "max_seats": "estime",
+        "bag_rank": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -289,10 +295,12 @@
         "perf.climb_gradient_min": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
-        "max_seats": "Configuration modèle AETHERDISPATCH"
+        "max_seats": "Configuration modèle AETHERDISPATCH",
+        "bag_rank": "Retour d'expérience terrain (dispatcher), à confirmer par le manuel de masse et centrage"
       }
     },
-    "max_seats": 144
+    "max_seats": 144,
+    "loading_mode": "vrac"
   },
   "Airbus A319neo": {
     "type": "A319neo",
@@ -369,7 +377,8 @@
         "max_lw_kg": "Tableau fourni par l'utilisateur — non vérifié",
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Airbus A320-200": {
     "type": "A320",
@@ -416,21 +425,24 @@
         "arm_m": 12.0,
         "max_kg": 3400,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": 1
       },
       {
         "name": "AFT",
         "arm_m": 20.0,
         "max_kg": 5000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": 2
       },
       {
         "name": "Bulk",
         "arm_m": 28.0,
         "max_kg": 1500,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": 3
       }
     ],
     "vspeeds": {
@@ -481,7 +493,8 @@
         "perf.climb_gradient_min": "estime",
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
-        "max_seats": "estime"
+        "max_seats": "estime",
+        "bag_rank": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -511,10 +524,12 @@
         "perf.climb_gradient_min": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
-        "max_seats": "Configuration modèle AETHERDISPATCH"
+        "max_seats": "Configuration modèle AETHERDISPATCH",
+        "bag_rank": "Retour d'expérience terrain (dispatcher), à confirmer par le manuel de masse et centrage"
       }
     },
-    "max_seats": 174
+    "max_seats": 174,
+    "loading_mode": "vrac"
   },
   "Airbus A320neo": {
     "type": "A320neo",
@@ -591,7 +606,8 @@
         "max_lw_kg": "Tableau fourni par l'utilisateur — non vérifié",
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Airbus A321-200": {
     "type": "A321",
@@ -638,28 +654,32 @@
         "arm_m": 12.5,
         "max_kg": 5000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "AFT 1",
         "arm_m": 22.0,
         "max_kg": 5000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "AFT 2",
         "arm_m": 31.0,
         "max_kg": 2000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "Bulk",
         "arm_m": 35.5,
         "max_kg": 1500,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       }
     ],
     "vspeeds": {
@@ -743,7 +763,8 @@
         "max_seats": "Configuration modèle AETHERDISPATCH"
       }
     },
-    "max_seats": 220
+    "max_seats": 220,
+    "loading_mode": "vrac"
   },
   "Airbus A321neo": {
     "type": "A321neo",
@@ -820,7 +841,8 @@
         "max_lw_kg": "Tableau fourni par l'utilisateur — non vérifié ; concordant avec une source technique non Airbus",
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié ; concordant avec une source technique non Airbus"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Airbus A321XLR": {
     "type": "A321XLR",
@@ -895,7 +917,8 @@
         "max_seats": "Tableau fourni par l'utilisateur — non vérifié",
         "max_tow_kg": "À lire sur le certificat de l'appareil : 97 t (certification AESA initiale) ou 101 t selon la version. La valeur 101,5 t du tableau fourni n'est pas confirmée."
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Airbus A330-200": {
     "type": "A330-200",
@@ -970,7 +993,8 @@
         "max_seats": "Tableau fourni par l'utilisateur — non vérifié",
         "max_tow_kg": "Ligne du tableau fourni identique à l'A330-800 : non retenue. À lire dans les données de la compagnie."
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Airbus A330-300": {
     "type": "A330-300",
@@ -1047,7 +1071,8 @@
         "max_lw_kg": "Tableau fourni par l'utilisateur — non vérifié",
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Airbus A330-800": {
     "type": "A330-800",
@@ -1124,7 +1149,8 @@
         "max_lw_kg": "Airbus — A330 Facts and Figures, janvier 2026",
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Airbus A330-900": {
     "type": "A330-900",
@@ -1201,7 +1227,8 @@
         "max_lw_kg": "Airbus — A330 Facts and Figures, janvier 2026",
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Airbus A350-900": {
     "type": "A350-900",
@@ -1248,28 +1275,32 @@
         "arm_m": 22.0,
         "max_kg": 10000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "AFT 1",
         "arm_m": 40.0,
         "max_kg": 10000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "AFT 2",
         "arm_m": 52.0,
         "max_kg": 6000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "Bulk",
         "arm_m": 58.0,
         "max_kg": 3400,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       }
     ],
     "vspeeds": {
@@ -1353,7 +1384,8 @@
         "max_seats": "Airbus — A350 Family Facts and Figures, octobre 2024"
       }
     },
-    "max_seats": 440
+    "max_seats": 440,
+    "loading_mode": "uld"
   },
   "Airbus A350-1000": {
     "type": "A350-1000",
@@ -1430,7 +1462,8 @@
         "max_lw_kg": "Source secondaire (2019)",
         "max_zfw_kg": "Source secondaire"
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Boeing B737-700": {
     "type": "B737-700",
@@ -1505,7 +1538,8 @@
         "max_seats": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)",
         "max_tow_kg": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Boeing B737-800": {
     "type": "B737-800",
@@ -1552,21 +1586,24 @@
         "arm_m": 8.2,
         "max_kg": 4400,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "AFT",
         "arm_m": 23.5,
         "max_kg": 5400,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "Bulk",
         "arm_m": 27.8,
         "max_kg": 1497,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       }
     ],
     "vspeeds": {
@@ -1650,7 +1687,8 @@
         "max_seats": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)"
       }
     },
-    "max_seats": 189
+    "max_seats": 189,
+    "loading_mode": "vrac"
   },
   "Boeing B737-900ER": {
     "type": "B737-900ER",
@@ -1697,21 +1735,24 @@
         "arm_m": 8.2,
         "max_kg": 4400,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "AFT",
         "arm_m": 25.0,
         "max_kg": 6500,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "Bulk",
         "arm_m": 30.0,
         "max_kg": 1497,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       }
     ],
     "vspeeds": {
@@ -1795,7 +1836,8 @@
         "max_seats": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)"
       }
     },
-    "max_seats": 220
+    "max_seats": 220,
+    "loading_mode": "vrac"
   },
   "Boeing B737-7 (MAX 7)": {
     "type": "B737-7",
@@ -1870,7 +1912,8 @@
         "max_seats": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)",
         "max_tow_kg": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Boeing B737-8 (MAX 8)": {
     "type": "B737-8",
@@ -1945,7 +1988,8 @@
         "max_seats": "Airways Magazine (737-8 standard). 210 sièges = variante 737-8-200",
         "max_tow_kg": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Boeing B737-8-200": {
     "type": "B737-8-200",
@@ -2020,7 +2064,8 @@
         "max_seats": "Boeing — fiche technique 737 MAX (boeing.com/737MAX) (variante 737-8-200)",
         "max_tow_kg": "Valeur du 737-8, à confirmer pour la variante -200"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Boeing B737-9 (MAX 9)": {
     "type": "B737-9",
@@ -2095,7 +2140,8 @@
         "max_seats": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)",
         "max_tow_kg": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Boeing B737-10 (MAX 10)": {
     "type": "B737-10",
@@ -2170,7 +2216,8 @@
         "max_seats": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)",
         "max_tow_kg": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)"
       }
-    }
+    },
+    "loading_mode": "vrac"
   },
   "Boeing B787-8": {
     "type": "B787-8",
@@ -2245,7 +2292,8 @@
         "max_tow_kg": "Boeing — page 787 (boeing.com/787)",
         "max_seats": "Capacité maximale certifiée non vérifiée : à renseigner (configuration de la compagnie)"
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Boeing B787-9": {
     "type": "B787-9",
@@ -2320,7 +2368,8 @@
         "max_tow_kg": "Boeing — page 787 (boeing.com/787) ; option de masse augmentée (FAA). Version standard ≈ 254 t : à confirmer par appareil",
         "max_seats": "Capacité maximale certifiée non vérifiée : à renseigner (configuration de la compagnie)"
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Boeing B787-10": {
     "type": "B787-10",
@@ -2395,7 +2444,8 @@
         "max_tow_kg": "Boeing — page 787 (boeing.com/787) ; option de masse augmentée (FAA). À confirmer par appareil",
         "max_seats": "Capacité maximale certifiée non vérifiée : à renseigner (configuration de la compagnie)"
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Boeing B777-200ER": {
     "type": "B777-200ER",
@@ -2470,7 +2520,8 @@
         "max_seats": "Caractéristiques techniques Boeing 777 (via GlobalSecurity) : jusqu'à 440 passagers (777-200 / -200ER)",
         "max_tow_kg": "Valeur maximale (option de masse brute augmentée) ; plusieurs variantes de masse : lire le certificat de l'appareil"
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Boeing B777-200LR": {
     "type": "B777-200LR",
@@ -2545,7 +2596,8 @@
         "max_tow_kg": "Caractéristiques techniques Boeing 777 (via GlobalSecurity)",
         "max_seats": "Capacité maximale certifiée non vérifiée : à renseigner (configuration de la compagnie)"
       }
-    }
+    },
+    "loading_mode": "uld"
   },
   "Boeing B777-300ER": {
     "type": "B777-300ER",
@@ -2592,28 +2644,32 @@
         "arm_m": 24.0,
         "max_kg": 12000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "FWD 2",
         "arm_m": 32.0,
         "max_kg": 10000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "AFT",
         "arm_m": 52.0,
         "max_kg": 12000,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "Bulk",
         "arm_m": 60.0,
         "max_kg": 5100,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       }
     ],
     "vspeeds": {
@@ -2697,7 +2753,8 @@
         "max_seats": "Configuration modèle AETHERDISPATCH"
       }
     },
-    "max_seats": 396
+    "max_seats": 396,
+    "loading_mode": "uld"
   },
   "ATR 42-600": {
     "type": "ATR42",
@@ -2737,14 +2794,16 @@
         "arm_m": 4.5,
         "max_kg": 700,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "AFT",
         "arm_m": 18.5,
         "max_kg": 900,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       }
     ],
     "vspeeds": {
@@ -2828,7 +2887,8 @@
         "max_seats": "Configuration modèle AETHERDISPATCH"
       }
     },
-    "max_seats": 48
+    "max_seats": 48,
+    "loading_mode": "vrac"
   },
   "ATR 72-600": {
     "type": "ATR72",
@@ -2868,14 +2928,16 @@
         "arm_m": 5.2,
         "max_kg": 900,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       },
       {
         "name": "AFT",
         "arm_m": 22.8,
         "max_kg": 1200,
         "status": "estime",
-        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX"
+        "source": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
+        "bag_rank": null
       }
     ],
     "vspeeds": {
@@ -2959,6 +3021,7 @@
         "max_seats": "Configuration modèle AETHERDISPATCH"
       }
     },
-    "max_seats": 70
+    "max_seats": 70,
+    "loading_mode": "vrac"
   }
 }
