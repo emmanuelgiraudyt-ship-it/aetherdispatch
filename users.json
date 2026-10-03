@@ -1,22 +1,35 @@
 {
   "admin": {
-    "password_hash": "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918",
+    "algo": "pbkdf2_sha256",
+    "iterations": 200000,
+    "salt": "09c3d3b1ec8ce3404ec6eaf88e43e83c",
+    "password_hash": "2ed8a4a55db471a4f96423da90b132360e8618b2ee49d57f88979ae432993416",
     "role": "admin",
-    "nom": "Administrateur AETHERDISPATCH"
+    "nom": "Administrateur AETHERDISPATCH",
+    "type": "individuel"
   },
   "handling1": {
-    "password_hash": "a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3",
+    "algo": "pbkdf2_sha256",
+    "iterations": 200000,
+    "salt": "75f123993596ef6b699848eb40b96104",
+    "password_hash": "959bb040eb573c2119a2b3b35ed4b8d73669a2270217dc7b47ff6cc470e98dd8",
     "role": "agent",
-    "nom": "Agent Handling Alpha"
+    "nom": "Agent Handling Alpha",
+    "type": "partagé"
   },
   "dispatcher": {
-    "password_hash": "5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8",
+    "algo": "pbkdf2_sha256",
+    "iterations": 200000,
+    "salt": "a7ea28650b0a97e498fcbe5cc496f12b",
+    "password_hash": "6cc667e0856c1407799a94dfae4955a9019b6cfee7df16f4da4828cf98f40ec0",
     "role": "dispatcher",
-    "nom": "Dispatcher OPS"
+    "nom": "Dispatcher OPS",
+    "type": "partagé"
   },
   "testeur": {
     "password_hash": "09f7863cb25ccc4ece9f2b82364a9a8c7a1dc57cc2baa582168a09046873c292",
     "role": "dispatcher",
-    "nom": "Testeur dispatcher"
+    "nom": "Testeur dispatcher",
+    "type": "individuel"
   }
 }
