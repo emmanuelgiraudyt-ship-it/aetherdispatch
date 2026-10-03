@@ -66,14 +66,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Airbus — brochure A220, 2022 (aircraft.airbus.com)",
         "max_tow_kg": "Airbus — brochure A220, 2022 (aircraft.airbus.com) ; le tableau fourni indique 63 700 kg (écart non résolu)"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A220-300": {
     "type": "A220-300",
@@ -142,14 +146,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Airbus — brochure A220, 2022 (aircraft.airbus.com) ; sous réserve de certification",
         "max_tow_kg": "Airbus — brochure A220, 2022 (aircraft.airbus.com)"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A319-100": {
     "type": "A319",
@@ -265,7 +273,9 @@
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
         "max_seats": "estime",
-        "bag_rank": "estime"
+        "bag_rank": "estime",
+        "crew_std_flight": "estime",
+        "crew_std_cabin": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -296,11 +306,15 @@
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "max_seats": "Configuration modèle AETHERDISPATCH",
-        "bag_rank": "Retour d'expérience terrain (dispatcher), à confirmer par le manuel de masse et centrage"
+        "bag_rank": "Retour d'expérience terrain (dispatcher), à confirmer par le manuel de masse et centrage",
+        "crew_std_flight": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie",
+        "crew_std_cabin": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie"
       }
     },
     "max_seats": 144,
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": 2,
+    "crew_std_cabin": 3
   },
   "Airbus A319neo": {
     "type": "A319neo",
@@ -369,7 +383,9 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Tableau fourni par l'utilisateur — non vérifié",
@@ -378,7 +394,9 @@
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A320-200": {
     "type": "A320",
@@ -494,7 +512,9 @@
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
         "max_seats": "estime",
-        "bag_rank": "estime"
+        "bag_rank": "estime",
+        "crew_std_flight": "estime",
+        "crew_std_cabin": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -525,11 +545,15 @@
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "max_seats": "Configuration modèle AETHERDISPATCH",
-        "bag_rank": "Retour d'expérience terrain (dispatcher), à confirmer par le manuel de masse et centrage"
+        "bag_rank": "Retour d'expérience terrain (dispatcher), à confirmer par le manuel de masse et centrage",
+        "crew_std_flight": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie",
+        "crew_std_cabin": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie"
       }
     },
     "max_seats": 174,
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": 2,
+    "crew_std_cabin": 4
   },
   "Airbus A320neo": {
     "type": "A320neo",
@@ -598,7 +622,9 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Tableau fourni par l'utilisateur — non vérifié",
@@ -607,7 +633,9 @@
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A321-200": {
     "type": "A321",
@@ -730,7 +758,9 @@
         "perf.climb_gradient_min": "estime",
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
-        "max_seats": "estime"
+        "max_seats": "estime",
+        "crew_std_flight": "estime",
+        "crew_std_cabin": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -760,11 +790,15 @@
         "perf.climb_gradient_min": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
-        "max_seats": "Configuration modèle AETHERDISPATCH"
+        "max_seats": "Configuration modèle AETHERDISPATCH",
+        "crew_std_flight": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie",
+        "crew_std_cabin": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie"
       }
     },
     "max_seats": 220,
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": 2,
+    "crew_std_cabin": 5
   },
   "Airbus A321neo": {
     "type": "A321neo",
@@ -833,7 +867,9 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Tableau fourni par l'utilisateur — non vérifié",
@@ -842,7 +878,9 @@
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié ; concordant avec une source technique non Airbus"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A321XLR": {
     "type": "A321XLR",
@@ -911,14 +949,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Tableau fourni par l'utilisateur — non vérifié",
         "max_tow_kg": "À lire sur le certificat de l'appareil : 97 t (certification AESA initiale) ou 101 t selon la version. La valeur 101,5 t du tableau fourni n'est pas confirmée."
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A330-200": {
     "type": "A330-200",
@@ -987,14 +1029,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Tableau fourni par l'utilisateur — non vérifié",
         "max_tow_kg": "Ligne du tableau fourni identique à l'A330-800 : non retenue. À lire dans les données de la compagnie."
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A330-300": {
     "type": "A330-300",
@@ -1063,7 +1109,9 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Tableau fourni par l'utilisateur — non vérifié",
@@ -1072,7 +1120,9 @@
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A330-800": {
     "type": "A330-800",
@@ -1141,7 +1191,9 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Airbus — A330 Facts and Figures, janvier 2026",
@@ -1150,7 +1202,9 @@
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A330-900": {
     "type": "A330-900",
@@ -1219,7 +1273,9 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Airbus — A330 Facts and Figures, janvier 2026",
@@ -1228,7 +1284,9 @@
         "max_zfw_kg": "Tableau fourni par l'utilisateur — non vérifié"
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Airbus A350-900": {
     "type": "A350-900",
@@ -1351,7 +1409,9 @@
         "perf.climb_gradient_min": "estime",
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
-        "max_seats": "constructeur"
+        "max_seats": "constructeur",
+        "crew_std_flight": "estime",
+        "crew_std_cabin": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -1381,11 +1441,15 @@
         "perf.climb_gradient_min": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
-        "max_seats": "Airbus — A350 Family Facts and Figures, octobre 2024"
+        "max_seats": "Airbus — A350 Family Facts and Figures, octobre 2024",
+        "crew_std_flight": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie",
+        "crew_std_cabin": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie"
       }
     },
     "max_seats": 440,
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": 2,
+    "crew_std_cabin": 8
   },
   "Airbus A350-1000": {
     "type": "A350-1000",
@@ -1454,7 +1518,9 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Airbus — A350 Family Facts and Figures, octobre 2024",
@@ -1463,7 +1529,9 @@
         "max_zfw_kg": "Source secondaire"
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B737-700": {
     "type": "B737-700",
@@ -1532,14 +1600,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)",
         "max_tow_kg": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B737-800": {
     "type": "B737-800",
@@ -1654,7 +1726,9 @@
         "perf.climb_gradient_min": "estime",
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
-        "max_seats": "constructeur"
+        "max_seats": "constructeur",
+        "crew_std_flight": "estime",
+        "crew_std_cabin": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -1684,11 +1758,15 @@
         "perf.climb_gradient_min": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
-        "max_seats": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)"
+        "max_seats": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)",
+        "crew_std_flight": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie",
+        "crew_std_cabin": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie"
       }
     },
     "max_seats": 189,
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": 2,
+    "crew_std_cabin": 4
   },
   "Boeing B737-900ER": {
     "type": "B737-900ER",
@@ -1803,7 +1881,9 @@
         "perf.climb_gradient_min": "estime",
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
-        "max_seats": "constructeur"
+        "max_seats": "constructeur",
+        "crew_std_flight": "estime",
+        "crew_std_cabin": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -1833,11 +1913,15 @@
         "perf.climb_gradient_min": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
-        "max_seats": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)"
+        "max_seats": "Boeing — fiche technique 737NG (boeing.com/commercial/737ng)",
+        "crew_std_flight": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie",
+        "crew_std_cabin": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie"
       }
     },
     "max_seats": 220,
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": 2,
+    "crew_std_cabin": 5
   },
   "Boeing B737-7 (MAX 7)": {
     "type": "B737-7",
@@ -1906,14 +1990,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)",
         "max_tow_kg": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B737-8 (MAX 8)": {
     "type": "B737-8",
@@ -1982,14 +2070,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Airways Magazine (737-8 standard). 210 sièges = variante 737-8-200",
         "max_tow_kg": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B737-8-200": {
     "type": "B737-8-200",
@@ -2058,14 +2150,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Boeing — fiche technique 737 MAX (boeing.com/737MAX) (variante 737-8-200)",
         "max_tow_kg": "Valeur du 737-8, à confirmer pour la variante -200"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B737-9 (MAX 9)": {
     "type": "B737-9",
@@ -2134,14 +2230,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)",
         "max_tow_kg": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B737-10 (MAX 10)": {
     "type": "B737-10",
@@ -2210,14 +2310,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)",
         "max_tow_kg": "Boeing — fiche technique 737 MAX (boeing.com/737MAX)"
       }
     },
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B787-8": {
     "type": "B787-8",
@@ -2286,14 +2390,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_tow_kg": "Boeing — page 787 (boeing.com/787)",
         "max_seats": "Capacité maximale certifiée non vérifiée : à renseigner (configuration de la compagnie)"
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B787-9": {
     "type": "B787-9",
@@ -2362,14 +2470,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_tow_kg": "Boeing — page 787 (boeing.com/787) ; option de masse augmentée (FAA). Version standard ≈ 254 t : à confirmer par appareil",
         "max_seats": "Capacité maximale certifiée non vérifiée : à renseigner (configuration de la compagnie)"
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B787-10": {
     "type": "B787-10",
@@ -2438,14 +2550,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_tow_kg": "Boeing — page 787 (boeing.com/787) ; option de masse augmentée (FAA). À confirmer par appareil",
         "max_seats": "Capacité maximale certifiée non vérifiée : à renseigner (configuration de la compagnie)"
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B777-200ER": {
     "type": "B777-200ER",
@@ -2514,14 +2630,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_seats": "Caractéristiques techniques Boeing 777 (via GlobalSecurity) : jusqu'à 440 passagers (777-200 / -200ER)",
         "max_tow_kg": "Valeur maximale (option de masse brute augmentée) ; plusieurs variantes de masse : lire le certificat de l'appareil"
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B777-200LR": {
     "type": "B777-200LR",
@@ -2590,14 +2710,18 @@
         "perf.rwy_correction_per_100m": "a_renseigner",
         "perf.climb_gradient_min": "a_renseigner",
         "perf.fuel_flow_cruise": "a_renseigner",
-        "perf.cruise_tas_kt": "a_renseigner"
+        "perf.cruise_tas_kt": "a_renseigner",
+        "crew_std_flight": "a_renseigner",
+        "crew_std_cabin": "a_renseigner"
       },
       "source": {
         "max_tow_kg": "Caractéristiques techniques Boeing 777 (via GlobalSecurity)",
         "max_seats": "Capacité maximale certifiée non vérifiée : à renseigner (configuration de la compagnie)"
       }
     },
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": null,
+    "crew_std_cabin": null
   },
   "Boeing B777-300ER": {
     "type": "B777-300ER",
@@ -2720,7 +2844,9 @@
         "perf.climb_gradient_min": "estime",
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
-        "max_seats": "estime"
+        "max_seats": "estime",
+        "crew_std_flight": "estime",
+        "crew_std_cabin": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -2750,11 +2876,15 @@
         "perf.climb_gradient_min": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
-        "max_seats": "Configuration modèle AETHERDISPATCH"
+        "max_seats": "Configuration modèle AETHERDISPATCH",
+        "crew_std_flight": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie",
+        "crew_std_cabin": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie"
       }
     },
     "max_seats": 396,
-    "loading_mode": "uld"
+    "loading_mode": "uld",
+    "crew_std_flight": 2,
+    "crew_std_cabin": 8
   },
   "ATR 42-600": {
     "type": "ATR42",
@@ -2854,7 +2984,9 @@
         "perf.climb_gradient_min": "estime",
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
-        "max_seats": "estime"
+        "max_seats": "estime",
+        "crew_std_flight": "estime",
+        "crew_std_cabin": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -2884,11 +3016,15 @@
         "perf.climb_gradient_min": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
-        "max_seats": "Configuration modèle AETHERDISPATCH"
+        "max_seats": "Configuration modèle AETHERDISPATCH",
+        "crew_std_flight": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie",
+        "crew_std_cabin": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie"
       }
     },
     "max_seats": 48,
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": 2,
+    "crew_std_cabin": 1
   },
   "ATR 72-600": {
     "type": "ATR72",
@@ -2988,7 +3124,9 @@
         "perf.climb_gradient_min": "estime",
         "perf.fuel_flow_cruise": "estime",
         "perf.cruise_tas_kt": "estime",
-        "max_seats": "estime"
+        "max_seats": "estime",
+        "crew_std_flight": "estime",
+        "crew_std_cabin": "estime"
       },
       "source": {
         "seats": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
@@ -3018,10 +3156,14 @@
         "perf.climb_gradient_min": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.fuel_flow_cruise": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
         "perf.cruise_tas_kt": "Estimation AETHERDISPATCH — valeur de démonstration, non issue du MANEX",
-        "max_seats": "Configuration modèle AETHERDISPATCH"
+        "max_seats": "Configuration modèle AETHERDISPATCH",
+        "crew_std_flight": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie",
+        "crew_std_cabin": "Estimation AETHERDISPATCH : composition indicative, à remplacer par celle de la compagnie"
       }
     },
     "max_seats": 70,
-    "loading_mode": "vrac"
+    "loading_mode": "vrac",
+    "crew_std_flight": 2,
+    "crew_std_cabin": 2
   }
 }

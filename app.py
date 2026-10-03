@@ -1,5 +1,5 @@
 # =============================================================================
-# AETHERDISPATCH v4.0 — Agent IA Handling Aérien
+# AETHERDISPATCH v5.0 — Agent IA Handling Aérien
 # Développé par EG Conseil & Lobbying | Mars 2026
 # Modules : Masse & Centrage | Performances | V-Speeds | METAR Live
 #           Carburant | Optimisation PuLP | Référentiel compagnie | Export PDF | PWA
@@ -19,6 +19,10 @@ from fpdf import FPDF
 import io
 import re
 import copy
+import hmac
+import secrets
+import time
+import html as _html
 import zlib
 
 # ─── Tentative d'import PuLP (optionnel) ──────────────────────────────────────
@@ -41,14 +45,6 @@ st.set_page_config(
 # ─── Injection HTML/CSS futuriste + PWA hooks ─────────────────────────────────
 def inject_pwa_and_styles():
     st.markdown("""
-    <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#00BFFF">
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="AETHERDISPATCH">
-    <link rel="apple-touch-icon" href="/icon-192.png">
-
     <style>
     /* ── Variables chromatiques AETHERDISPATCH ── */
     :root {
@@ -203,17 +199,6 @@ def inject_pwa_and_styles():
         margin-top: 2rem;
     }
     </style>
-
-    <script>
-    // Enregistrement du Service Worker PWA
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', () => {
-            navigator.serviceWorker.register('/sw.js')
-                .then(reg => console.log('[AETHER] Service Worker enregistré:', reg.scope))
-                .catch(err => console.warn('[AETHER] SW non enregistré:', err));
-        });
-    }
-    </script>
     """, unsafe_allow_html=True)
 
 inject_pwa_and_styles()
@@ -231,9 +216,39 @@ def load_json(filepath: str) -> dict | list:
     return {}
 
 def save_json(filepath: str, data):
-    """Sauvegarde un fichier JSON."""
-    with open(filepath, "w", encoding="utf-8") as f:
+    """Sauvegarde atomique d'un fichier JSON (écriture temporaire puis remplacement)."""
+    tmp = f"{filepath}.tmp"
+    with open(tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(tmp, filepath)
+
+
+def read_json_fresh(filepath: str, default=None):
+    """Lecture sans mémoire tampon : pour les fichiers que plusieurs sessions modifient (historique, journal)."""
+    try:
+        with open(filepath, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (FileNotFoundError, ValueError):
+        return [] if default is None else default
+
+
+AUDIT_FILE = "audit_log.json"
+
+
+def audit(event: str, detail: str = "", user: str = None):
+    """Journal des actions (qui, quand, quoi). Ne bloque jamais l'application en cas d'échec d'écriture."""
+    try:
+        info = st.session_state.get("user_info") or {}
+        entry = {"t": datetime.now(timezone.utc).strftime("%Y-%m-%d %H:%M:%S"),
+                 "user": user or st.session_state.get("username", "-"), "name": info.get("nom", ""),
+                 "event": event, "detail": detail}
+        entries = read_json_fresh(AUDIT_FILE)
+        if not isinstance(entries, list):
+            entries = []
+        entries.insert(0, entry)
+        save_json(AUDIT_FILE, entries[:2000])
+    except Exception:
+        pass
 
 def hash_password(pwd: str) -> str:
     return hashlib.sha256(pwd.encode()).hexdigest()
@@ -254,9 +269,40 @@ def cg_to_mac(cg_m: float, lemac: float, mac_length: float) -> float:
 # AUTHENTIFICATION MULTI-UTILISATEURS
 # =============================================================================
 
+PBKDF2_ITERATIONS = 200_000
+
+
+def hash_password_pbkdf2(pwd: str, salt: str = None, iterations: int = PBKDF2_ITERATIONS) -> dict:
+    """Haché salé (PBKDF2-SHA256) : entrée à placer dans users.json."""
+    salt = salt or os.urandom(16).hex()
+    dk = hashlib.pbkdf2_hmac("sha256", pwd.encode("utf-8"), bytes.fromhex(salt), iterations).hex()
+    return {"algo": "pbkdf2_sha256", "iterations": iterations, "salt": salt, "password_hash": dk}
+
+
+def verify_password(pwd: str, entry: dict) -> bool:
+    """Vérifie un mot de passe : PBKDF2 salé, ou ancien SHA-256 non salé (comptes existants)."""
+    if entry.get("algo") == "pbkdf2_sha256":
+        try:
+            dk = hashlib.pbkdf2_hmac("sha256", pwd.encode("utf-8"), bytes.fromhex(entry["salt"]),
+                                     int(entry["iterations"])).hex()
+        except (KeyError, ValueError):
+            return False
+        return hmac.compare_digest(dk, str(entry.get("password_hash", "")))
+    return hmac.compare_digest(hash_password(pwd), str(entry.get("password_hash", "")))
+
+
+def generate_password(length: int = 14) -> str:
+    """Mot de passe aléatoire sans caractères ambigus, avec majuscule, minuscule et chiffre."""
+    alphabet = "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789"
+    while True:
+        pwd = "".join(secrets.choice(alphabet) for _ in range(length))
+        if any(c.islower() for c in pwd) and any(c.isupper() for c in pwd) and any(c.isdigit() for c in pwd):
+            return pwd
+
+
 def authenticate(username: str, password: str, users: dict) -> bool:
     if username in users:
-        return users[username]["password_hash"] == hash_password(password)
+        return verify_password(password, users[username])
     return False
 
 def login_page(users: dict):
@@ -275,19 +321,30 @@ def login_page(users: dict):
         password = st.text_input("Mot de passe", type="password", placeholder="••••••••")
 
         if st.button("✈ CONNEXION", use_container_width=True):
-            if authenticate(username, password, users):
+            wait = st.session_state.get("login_wait_until", 0) - time.time()
+            if wait > 0:
+                st.error(f"Trop de tentatives : réessayez dans {int(wait) + 1} s.")
+            elif authenticate(username, password, users):
                 st.session_state.authenticated = True
                 st.session_state.username = username
                 st.session_state.user_info = users[username]
+                st.session_state.pop("login_fails", None)
+                st.session_state.pop("login_wait_until", None)
+                audit("login_ok", "", user=username)
                 st.rerun()
             else:
+                fails = st.session_state.get("login_fails", 0) + 1
+                st.session_state["login_fails"] = fails
+                if fails >= 3:
+                    st.session_state["login_wait_until"] = time.time() + min(2 ** (fails - 2), 30)
+                audit("login_fail", f"tentative {fails}", user=username or "-")
                 st.error("❌ Identifiants incorrects. Contactez votre administrateur OPS.")
 
         st.markdown("---")
         st.markdown("""
         <div style="text-align:center;font-size:0.72rem;color:#556688;letter-spacing:1px">
         ACCÈS RESTREINT — Équipe Handling & Dispatch autorisée uniquement<br>
-        AETHERDISPATCH v4.0 | EG Conseil & Lobbying © 2026
+        AETHERDISPATCH v5.0 | EG Conseil & Lobbying © 2026
         </div>
         """, unsafe_allow_html=True)
 
@@ -295,142 +352,135 @@ def login_page(users: dict):
 # MODULE 1 : MASSE & CENTRAGE (M&C)
 # =============================================================================
 
-def compute_mc(ac: dict, pax_zone_weights: dict, cargo_weights: dict, fuel_kg: float) -> dict:
-    """
-    Calcul complet masse & centrage conforme JAR/CS-25.
-    Retourne ZFW, TOW, LW, CG et MAC% à chaque étape.
-    """
-    oew      = ac["oew_kg"]
-    crew_kg  = ac.get("crew_kg", 0)
-    crew_arm = ac.get("crew_arm_m", ac["oew_arm_m"])
-    # Dry Operating Weight = OEW + équipage
-    dow        = oew + crew_kg
-    dow_moment = oew * ac["oew_arm_m"] + crew_kg * crew_arm
+def _interp(points: list, x: float, xkey: str, ykey: str):
+    """Interpolation linéaire par morceaux, bornée aux extrémités du tableau."""
+    pts = sorted((float(p[xkey]), float(p[ykey])) for p in points
+                 if p.get(xkey) is not None and p.get(ykey) is not None)
+    if not pts:
+        return None
+    if x <= pts[0][0]:
+        return pts[0][1]
+    if x >= pts[-1][0]:
+        return pts[-1][1]
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        if x0 <= x <= x1:
+            return y0 if x1 == x0 else y0 + (y1 - y0) * (x - x0) / (x1 - x0)
+    return pts[-1][1]
 
-    # ── Moment total PAX ──────────────────────────────────────────────────────
-    pax_total_kg = 0
-    pax_moment = 0
+
+def _valid_pts(points, *keys) -> list:
+    return [p for p in (points or []) if all(p.get(k) is not None for k in keys)]
+
+
+def fuel_arm_at(ac: dict, fuel_kg: float) -> float:
+    """Bras du carburant : table (quantité -> bras) si elle est renseignée, sinon bras unique."""
+    tbl = _valid_pts(ac.get("fuel_arm_table"), "fuel_kg", "arm_m")
+    if len(tbl) >= 2:
+        return _interp(tbl, fuel_kg, "fuel_kg", "arm_m")
+    return ac["fuel_arm_m"]
+
+
+def cg_limits_at(ac: dict, weight: float):
+    """Limites de centrage (avant, arrière) à une masse donnée : enveloppe si elle est renseignée, sinon limites constantes."""
+    env = _valid_pts(ac.get("cg_envelope"), "weight_kg", "fwd_m", "aft_m")
+    if len(env) >= 2:
+        return _interp(env, weight, "weight_kg", "fwd_m"), _interp(env, weight, "weight_kg", "aft_m")
+    return ac["cg_min_m"], ac["cg_max_m"]
+
+
+def compute_mc(ac: dict, pax_zone_weights: dict, cargo_weights: dict, fuel_kg: float,
+               extra_items=None, crew_delta_kg: float = 0.0, trip_kg: float = 0.0) -> dict:
+    """
+    Masse et centrage : DOW, ZFW, TOW et LW, avec le centrage de chacun (en mètres).
+    - fuel_kg : carburant au décollage ; trip_kg : carburant consommé en vol (pour la masse à l'atterrissage).
+    - extra_items : autres masses (lest, consommables) sous la forme [(masse_kg, bras_m), ...], incluses dans le ZFW.
+    - crew_delta_kg : écart d'équipage par rapport à la composition standard (appliqué au bras de l'équipage).
+    - Le bras du carburant dépend de la quantité lorsqu'une table est renseignée (sinon bras unique).
+    """
+    oew = ac["oew_kg"]
+    crew_kg = (ac.get("crew_kg") or 0) + crew_delta_kg
+    crew_arm = ac["crew_arm_m"] if ac.get("crew_arm_m") is not None else ac["oew_arm_m"]
+    dow = oew + crew_kg
+    dow_moment = oew * ac["oew_arm_m"] + crew_kg * crew_arm
+    dow_cg = dow_moment / dow if dow > 0 else 0
+
+    pax_total_kg = pax_moment = 0
     for zone in ac["pax_zones"]:
         w = pax_zone_weights.get(zone["name"], 0)
         pax_total_kg += w
         pax_moment += w * zone["arm_m"]
 
-    # ── Moment total Cargo ────────────────────────────────────────────────────
-    cargo_total_kg = 0
-    cargo_moment = 0
+    cargo_total_kg = cargo_moment = 0
     for comp in ac["cargo_comps"]:
         w = cargo_weights.get(comp["name"], 0)
         cargo_total_kg += w
         cargo_moment += w * comp["arm_m"]
 
-    # ── Zero Fuel Weight (DOW + payload) ─────────────────────────────────────
-    zfw = dow + pax_total_kg + cargo_total_kg
-    zfw_moment = dow_moment + pax_moment + cargo_moment
+    extra_kg = sum(m for m, _ in (extra_items or []))
+    extra_moment = sum(m * a for m, a in (extra_items or []))
+
+    zfw = dow + pax_total_kg + cargo_total_kg + extra_kg
+    zfw_moment = dow_moment + pax_moment + cargo_moment + extra_moment
     zfw_cg = zfw_moment / zfw if zfw > 0 else 0
     zfw_mac = cg_to_mac(zfw_cg, ac["lemac"], ac["mac_length"])
 
-    # ── Moment carburant (bras unique défini dans la DB) ──────────────────────
-    fuel_arm    = ac["fuel_arm_m"]
-    fuel_moment = fuel_kg * fuel_arm
-
-    # ── Take-Off Weight ───────────────────────────────────────────────────────
+    fuel_arm = fuel_arm_at(ac, fuel_kg)
     tow = zfw + fuel_kg
-    tow_moment = zfw_moment + fuel_moment
+    tow_moment = zfw_moment + fuel_kg * fuel_arm
     tow_cg = tow_moment / tow if tow > 0 else 0
     tow_mac = cg_to_mac(tow_cg, ac["lemac"], ac["mac_length"])
 
-    # ── Landing Weight (fuel consommé en vol = trip fuel à saisir séparément) ─
-    # On expose LW sans trip fuel ici (trip fuel déduit dans l'onglet vol)
+    rem_fuel = max(fuel_kg - trip_kg, 0)
+    lw = tow - trip_kg
+    lw_moment = zfw_moment + rem_fuel * fuel_arm_at(ac, rem_fuel)
+    lw_cg = lw_moment / (zfw + rem_fuel) if (zfw + rem_fuel) > 0 else 0
+    lw_mac = cg_to_mac(lw_cg, ac["lemac"], ac["mac_length"])
 
     return {
-        "pax_total_kg": pax_total_kg,
-        "cargo_total_kg": cargo_total_kg,
-        "zfw": round(zfw),
-        "zfw_cg": round(zfw_cg, 3),
-        "zfw_mac": zfw_mac,
-        "tow": round(tow),
-        "tow_cg": round(tow_cg, 3),
-        "tow_mac": tow_mac,
-        "fuel_arm": round(fuel_arm, 2),
-        "fuel_kg": fuel_kg,
+        "dow": round(dow), "dow_cg": round(dow_cg, 3),
+        "pax_total_kg": pax_total_kg, "cargo_total_kg": cargo_total_kg, "extra_kg": extra_kg,
+        "zfw": round(zfw), "zfw_cg": round(zfw_cg, 3), "zfw_mac": zfw_mac,
+        "tow": round(tow), "tow_cg": round(tow_cg, 3), "tow_mac": tow_mac,
+        "lw": round(lw), "lw_cg": round(lw_cg, 3), "lw_mac": lw_mac,
+        "fuel_arm": round(fuel_arm, 2), "fuel_kg": fuel_kg,
     }
 
-def plot_cg_envelope(ac: dict, result: dict, trip_fuel: float = 0) -> go.Figure:
-    """Trace l'enveloppe CG (x = mètres) avec points ZFW, TOW, LW."""
-    lim_fwd = ac["cg_min_m"]   # mètres
-    lim_aft = ac["cg_max_m"]   # mètres
-    mzfw = ac["max_zfw_kg"]
-    mtow = ac["max_tow_kg"]
-    mlw  = ac["max_lw_kg"]
-    dow  = ac["oew_kg"] + ac.get("crew_kg", 0)
-    margin = (lim_aft - lim_fwd) * 0.15
 
-    # Enveloppe simplifiée (sommets en mètres)
-    env_w  = [dow, mzfw, mtow, mtow, mzfw, dow, dow]
-    env_cg = [lim_fwd, lim_fwd, lim_fwd + margin, lim_aft - margin, lim_aft, lim_aft, lim_fwd]
+def plot_cg_envelope(ac: dict, result: dict, trip_fuel: float = 0) -> go.Figure:
+    """Enveloppe masse-centrage (x = mètres) avec les points ZFW, TOW et LW."""
+    env = sorted(_valid_pts(ac.get("cg_envelope"), "weight_kg", "fwd_m", "aft_m"), key=lambda p: p["weight_kg"])
+    if len(env) >= 2:
+        ws = [p["weight_kg"] for p in env]
+        xs = [p["fwd_m"] for p in env] + [p["aft_m"] for p in reversed(env)]
+        ys = ws + list(reversed(ws))
+        xs.append(xs[0]); ys.append(ys[0])
+        lo, hi = min(p["fwd_m"] for p in env), max(p["aft_m"] for p in env)
+        title = "Enveloppe Masse & Centrage"
+    else:
+        lo, hi = ac["cg_min_m"], ac["cg_max_m"]
+        dow = ac["oew_kg"] + (ac.get("crew_kg") or 0)
+        xs = [lo, lo, hi, hi, lo]
+        ys = [dow, ac["max_tow_kg"], ac["max_tow_kg"], dow, dow]
+        title = "Masse & Centrage (limites constantes : enveloppe non renseignée)"
 
     fig = go.Figure()
-
-    # Zone enveloppe
-    fig.add_trace(go.Scatter(
-        x=env_cg, y=env_w,
-        fill='toself',
-        fillcolor='rgba(0, 191, 255, 0.08)',
-        line=dict(color='#00BFFF', width=2),
-        name='Enveloppe CG',
-        hoverinfo='skip'
-    ))
-
-    # Limites CG
-    fig.add_vline(x=lim_fwd, line=dict(color='#FF4444', dash='dash', width=1.5), annotation_text="FWD LIM")
-    fig.add_vline(x=lim_aft, line=dict(color='#FF4444', dash='dash', width=1.5), annotation_text="AFT LIM")
-
-    # Point ZFW (x = CG en mètres)
-    fig.add_trace(go.Scatter(
-        x=[result["zfw_cg"]], y=[result["zfw"]],
-        mode='markers+text',
-        marker=dict(size=14, color='#FFD700', symbol='diamond', line=dict(color='white', width=2)),
-        text=["ZFW"], textposition="top center",
-        name=f"ZFW : {result['zfw']:,} kg"
-    ))
-
-    # Point TOW (x = CG en mètres)
-    fig.add_trace(go.Scatter(
-        x=[result["tow_cg"]], y=[result["tow"]],
-        mode='markers+text',
-        marker=dict(size=14, color='#00FF88', symbol='circle', line=dict(color='white', width=2)),
-        text=["TOW"], textposition="top center",
-        name=f"TOW : {result['tow']:,} kg"
-    ))
-
-    # Point LW (si trip fuel renseigné)
-    if trip_fuel > 0:
-        lw = result["tow"] - trip_fuel
-        lw_fuel = result["fuel_kg"] - trip_fuel
-        lw_fuel_arm = ac["fuel_arm_m"]
-        zfw_moment = result["zfw_cg"] * result["zfw"]
-        lw_moment = zfw_moment + lw_fuel * lw_fuel_arm
-        lw_cg = lw_moment / lw if lw > 0 else 0
-
-        fig.add_trace(go.Scatter(
-            x=[lw_cg], y=[lw],
-            mode='markers+text',
-            marker=dict(size=14, color='#7B2FBE', symbol='triangle-down', line=dict(color='white', width=2)),
-            text=["LW"], textposition="bottom center",
-            name=f"LW : {lw:,} kg"
-        ))
-
+    fig.add_trace(go.Scatter(x=xs, y=ys, fill='toself', fillcolor='rgba(0, 191, 255, 0.08)',
+                             line=dict(color='#00BFFF', width=2), name='Limites de centrage', hoverinfo='skip'))
+    pts = [("ZFW", result["zfw_cg"], result["zfw"], '#FFD700', 'diamond', "top center"),
+           ("TOW", result["tow_cg"], result["tow"], '#00FF88', 'circle', "top center")]
+    if trip_fuel > 0 and result.get("lw_cg") is not None:
+        pts.append(("LW", result["lw_cg"], result["lw"], '#7B2FBE', 'triangle-down', "bottom center"))
+    for label, cg, w, color, symbol, pos in pts:
+        fig.add_trace(go.Scatter(x=[cg], y=[w], mode='markers+text', text=[label], textposition=pos,
+                                 marker=dict(size=14, color=color, symbol=symbol, line=dict(color='white', width=2)),
+                                 name=f"{label} : {w:,} kg"))
     fig.update_layout(
-        title=dict(text="Enveloppe Masse & Centrage", font=dict(color='#00BFFF', size=16)),
-        plot_bgcolor='#0D1F3C',
-        paper_bgcolor='#0A0A1A',
-        font=dict(color='#E0E8FF'),
-        xaxis=dict(title="CG (mètres)", gridcolor='#1A3A5C', range=[lim_fwd - 1, lim_aft + 1]),
+        title=dict(text=title, font=dict(color='#00BFFF', size=16)),
+        plot_bgcolor='#0D1F3C', paper_bgcolor='#0A0A1A', font=dict(color='#E0E8FF'),
+        xaxis=dict(title="CG (mètres)", gridcolor='#1A3A5C', range=[lo - 1, hi + 1]),
         yaxis=dict(title="Masse (kg)", gridcolor='#1A3A5C'),
-        legend=dict(bgcolor='#0D1F3C', bordercolor='#00BFFF22'),
-        height=420,
-        margin=dict(l=40, r=40, t=50, b=40)
-    )
+        legend=dict(bgcolor='#0D1F3C', bordercolor='#00BFFF22'), height=420,
+        margin=dict(l=40, r=40, t=50, b=40))
     return fig
 
 # =============================================================================
@@ -508,7 +558,7 @@ def compute_vspeeds(ac: dict, tow: float, lw: float, elev_ft: int,
 
 def compute_fuel_plan(dist_nm: float, ac: dict, pax_total: int,
                       cargo_total_kg: float, wind_kt: int,
-                      rwy_alt_dest_ft: int, oat_c: float) -> dict:
+                      rwy_alt_dest_ft: int, oat_c: float, alt_dist_nm: float = 200.0) -> dict:
     """
     Plan carburant OACI : Trip + Contingence (5%) + Alternate + Final Reserve + Taxi.
     Basé sur la consommation horaire constructeur.
@@ -526,8 +576,8 @@ def compute_fuel_plan(dist_nm: float, ac: dict, pax_total: int,
     # ── Carburant contingence (5% du trip, min 5 min) ─────────────────────────
     contingency_kg = round(max(trip_fuel_kg * 0.05, perf["fuel_flow_cruise"] * 5/60))
 
-    # ── Alternate fuel (200 NM par défaut) ────────────────────────────────────
-    alt_dist = 200
+    # ── Alternate fuel (distance du dégagement le plus éloigné ; 200 NM par défaut) ──
+    alt_dist = alt_dist_nm
     alt_time_h = alt_dist / max(gs, 200)
     alt_fuel_kg = round(perf["fuel_flow_cruise"] * alt_time_h)
 
@@ -547,7 +597,7 @@ def compute_fuel_plan(dist_nm: float, ac: dict, pax_total: int,
     return {
         "trip_fuel_kg": trip_fuel_kg,
         "contingency_kg": contingency_kg,
-        "alt_fuel_kg": alt_fuel_kg,
+        "alt_fuel_kg": alt_fuel_kg, "alt_dist_nm": alt_dist,
         "final_reserve_kg": final_reserve_kg,
         "taxi_kg": taxi_kg,
         "block_fuel_kg": block_fuel_kg,
@@ -563,39 +613,136 @@ def compute_fuel_plan(dist_nm: float, ac: dict, pax_total: int,
 # MODULE 4 : METAR LIVE
 # =============================================================================
 
+AWC_URL = "https://aviationweather.gov/api/data/{kind}"
+CAT_COLORS = {"VFR": "#00FF88", "MVFR": "#00BFFF", "IFR": "#FF4444", "LIFR": "#FF00FF", "INCONNUE": "#888888"}
+
+
+@st.cache_data(ttl=60, show_spinner=False)
+def _awc_text(kind: str, icao: str) -> str:
+    """Texte brut d'un message METAR ou TAF (Aviation Weather Center, NOAA). Mémorisé 60 s ; les échecs ne le sont pas."""
+    r = requests.get(AWC_URL.format(kind=kind), params={"ids": icao, "format": "raw"}, timeout=8)
+    r.raise_for_status()
+    return r.text or ""
+
+
+def wx_error_text(e: Exception) -> str:
+    """Cause lisible d'un échec d'appel au service météo."""
+    if isinstance(e, requests.exceptions.Timeout):
+        return "délai dépassé (8 s) : le service météo ne répond pas"
+    if isinstance(e, requests.exceptions.ConnectionError):
+        return "connexion impossible au service météo"
+    if isinstance(e, requests.exceptions.HTTPError):
+        code = getattr(getattr(e, "response", None), "status_code", None)
+        if code == 429:
+            return "quota du service atteint (HTTP 429) : réessayez dans une minute"
+        return f"réponse du service météo en erreur (HTTP {code})"
+    return f"erreur inattendue ({type(e).__name__})"
+
+
+def parse_metar(raw: str) -> dict:
+    """Décode un METAR au format OACI ou américain : vent, visibilité (m), plafond (ft), température, QNH, heure."""
+    t = " ".join(str(raw).upper().replace("=", " ").split())
+    out = {"raw": str(raw).strip(), "vis_m": None, "ceiling_ft": None, "cavok": False,
+           "wind": None, "temp": None, "qnh": None, "obs_time": None}
+    m = re.search(r"\b(\d{2})(\d{2})(\d{2})Z\b", t)
+    if m:
+        out["obs_time"] = f"{m.group(1)} à {m.group(2)}:{m.group(3)} UTC"
+    w = re.search(r"\b(VRB|\d{3})(\d{2,3})(?:G(\d{2,3}))?(KT|MPS)\b", t)
+    if w:
+        out["wind"] = (f"{w.group(1)}°/{int(w.group(2))} {w.group(4).lower()}" if w.group(1) != "VRB"
+                       else f"variable/{int(w.group(2))} {w.group(4).lower()}") + (f" rafales {int(w.group(3))}" if w.group(3) else "")
+    if "CAVOK" in t.split():
+        out["cavok"], out["vis_m"] = True, 9999
+    else:
+        mm = re.search(r"(?:KT|MPS)(?:\s\d{3}V\d{3})?\s(\d{4})\b", t)
+        if mm:
+            out["vis_m"] = int(mm.group(1))
+        else:
+            frac = re.search(r"\bM?(?:(\d+)\s)?(\d)/(\d)SM\b", t)
+            whole = re.search(r"\b(\d+)SM\b", t)
+            miles = None
+            if frac:
+                miles = int(frac.group(1) or 0) + int(frac.group(2)) / int(frac.group(3))
+            elif whole:
+                miles = int(whole.group(1))
+            if miles is not None:
+                out["vis_m"] = round(miles * 1609.34)
+        bases = [int(b) * 100 for cov, b in re.findall(r"\b(BKN|OVC|VV)(\d{3})\b", t)]
+        out["ceiling_ft"] = min(bases) if bases else None
+    tt = re.search(r"\s(M?\d{2})/(M?\d{2})\s", t + " ")
+    if tt:
+        out["temp"] = int(tt.group(1).replace("M", "-"))
+    q = re.search(r"\bQ(\d{4})\b", t)
+    a_ = re.search(r"\bA(\d{4})\b", t)
+    if q:
+        out["qnh"] = int(q.group(1))
+    elif a_:
+        out["qnh"] = round(int(a_.group(1)) / 100 * 33.8639)
+    return out
+
+
+def flight_category(vis_m, ceiling_ft, cavok: bool = False) -> str:
+    """Catégorie de vol (VFR, MVFR, IFR, LIFR) d'après la visibilité et le plafond ; « INCONNUE » si elle ne peut pas être établie."""
+    if cavok:
+        return "VFR"
+    if vis_m is None:
+        return "INCONNUE"
+    ceil = ceiling_ft if ceiling_ft is not None else 99999
+    sm = vis_m / 1609.34
+    if sm < 1 or ceil < 500:
+        return "LIFR"
+    if sm < 3 or ceil < 1000:
+        return "IFR"
+    if sm <= 5 or ceil <= 3000:
+        return "MVFR"
+    return "VFR"
+
+
 def fetch_metar(icao: str) -> dict:
-    """
-    Récupère le METAR via l'API publique aviationweather.gov (NOAA).
-    Retourne le METAR brut et les données décodées principales.
-    """
-    url = f"https://aviationweather.gov/api/data/metar?ids={icao}&format=json"
     try:
-        r = requests.get(url, timeout=8)
-        data = r.json()
-        if data and len(data) > 0:
-            m = data[0]
-            return {
-                "raw": m.get("rawOb", "METAR non disponible"),
-                "temp": m.get("temp"),
-                "dewpoint": m.get("dewp"),
-                "wind_dir": m.get("wdir"),
-                "wind_kt": m.get("wspd"),
-                "visibility_m": m.get("visib"),
-                "altimeter_hpa": round(m.get("altim", 1013) * 33.8639 / 1000 * 1000 / 33.8639, 1)
-                    if m.get("altim") else None,
-                "sky": m.get("sky", []),
-                "wx": m.get("wxString", ""),
-                "flight_cat": m.get("flightCategory", "VFR"),
-                "obs_time": m.get("obsTime", ""),
-                "ok": True
-            }
+        txt = _awc_text("metar", icao)
     except Exception as e:
-        pass
-    return {"raw": f"METAR non disponible pour {icao}", "ok": False, "flight_cat": "UNKN"}
+        return {"ok": False, "raw": "", "category": "INCONNUE", "error": wx_error_text(e)}
+    lines = [l.strip() for l in txt.strip().splitlines() if l.strip()]
+    if not lines:
+        return {"ok": False, "raw": "", "category": "INCONNUE", "error": "aucun METAR publié pour cette station"}
+    d = parse_metar(lines[0])
+    d["ok"] = True
+    d["category"] = flight_category(d["vis_m"], d["ceiling_ft"], d["cavok"])
+    return d
+
+
+def fetch_taf(icao: str) -> dict:
+    try:
+        txt = _awc_text("taf", icao)
+    except Exception as e:
+        return {"ok": False, "raw": "", "error": wx_error_text(e)}
+    lines = [l.strip() for l in txt.strip().splitlines() if l.strip()]
+    if not lines:
+        return {"ok": False, "raw": "", "error": "aucun TAF publié pour cette station (normal pour certains aérodromes)"}
+    return {"ok": True, "raw": "\n".join(lines)}
+
 
 def flight_cat_color(cat: str) -> str:
-    return {"VFR": "#00FF88", "MVFR": "#00BFFF", "IFR": "#FF4444",
-            "LIFR": "#FF00FF", "UNKN": "#888888"}.get(cat, "#888888")
+    return CAT_COLORS.get(cat, "#888888")
+
+
+def wx_decoded_line(m: dict) -> str:
+    parts = []
+    if m.get("wind"):
+        parts.append(f"vent {m['wind']}")
+    if m.get("vis_m") is not None:
+        parts.append("CAVOK" if m.get("cavok") else f"visibilité {m['vis_m']} m")
+    if not m.get("cavok"):
+        parts.append(f"plafond {m['ceiling_ft']} ft" if m.get("ceiling_ft") is not None else "pas de plafond (BKN/OVC)")
+    if m.get("temp") is not None:
+        parts.append(f"T {m['temp']} °C")
+    if m.get("qnh"):
+        parts.append(f"QNH {m['qnh']}")
+    if m.get("obs_time"):
+        parts.append(f"observé le {m['obs_time']}")
+    return " · ".join(parts)
+
 
 # =============================================================================
 # MODULE 5 : OPTIMISATION CARGO (PuLP)
@@ -634,32 +781,37 @@ def optimize_cargo_pulp(ac: dict, cargo_offers: list, max_payload_kg: float) -> 
 
 def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     """
-    Load & Trim Sheet A4, une page, simple et opérationnelle pour le dispatcher et le commandant de bord.
-    Ordre : vol, trafic, soutes, carburant, calcul des masses, (vitesses), avion et commandant de bord.
+    Load & Trim Sheet A4, simple et opérationnelle pour le dispatcher et le commandant de bord.
+    Ordre : vol, trafic (passagers, zones, bagages, fret, courrier), soutes, carburant, calcul des masses,
+    chargements spéciaux et dernières modifications, (vitesses), avion et commandant de bord
+    (maxima, centrages, contrôles). Une page dans le cas courant ; la suite passe à la page suivante.
     """
     pdf = FPDF(orientation='P', unit='mm', format='A4')
-    pdf.set_auto_page_break(auto=False)
+    pdf.set_auto_page_break(auto=True, margin=31)
     pdf.add_page()
     # La police standard ne gère que le latin-1 : remplacement des symboles non supportés
     pdf.normalize_text = lambda t: str(t).replace('→', '->').replace('—', '-').replace('–', '-').replace('─', '-').replace('−', '-').replace('€', 'EUR').replace('×', 'x').encode('latin-1', 'replace').decode('latin-1')
 
     NAVY, CYAN = (13, 31, 60), (0, 191, 255)
     HEAD, ZEBRA = (214, 228, 244), (244, 247, 252)
-    GREEN, RED, TEXT = (0, 130, 70), (190, 30, 30), (30, 30, 30)
-    H = 5.2
+    GREEN, RED, TEXT, GREY = (0, 130, 70), (190, 30, 30), (30, 30, 30), (110, 110, 110)
+    H = 4.6
 
     def n(v):
-        return f"{int(round(v)):,}".replace(",", " ")
+        try:
+            return f"{int(round(float(v))):,}".replace(",", " ")
+        except (TypeError, ValueError):
+            return str(v)
 
     def section(title):
         pdf.set_x(10)
         pdf.set_fill_color(*NAVY)
         pdf.set_text_color(*CYAN)
-        pdf.set_font("Helvetica", "B", 9)
-        pdf.cell(190, 5.8, title, fill=True, new_x="LMARGIN", new_y="NEXT")
-        pdf.ln(0.6)
+        pdf.set_font("Helvetica", "B", 8.6)
+        pdf.cell(190, 5.4, title, fill=True, new_x="LMARGIN", new_y="NEXT")
+        pdf.ln(0.5)
 
-    def grid(rows, widths, header=False, bold_rows=(), bold_cols=(), aligns=None, colors=None, gap=1.6):
+    def grid(rows, widths, header=False, bold_rows=(), bold_cols=(), aligns=None, colors=None, gap=1.4):
         for r, row in enumerate(rows):
             is_head = header and r == 0
             pdf.set_x(10)
@@ -667,14 +819,22 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
                 if is_head:
                     pdf.set_fill_color(*HEAD)
                     pdf.set_text_color(*NAVY)
-                    pdf.set_font("Helvetica", "B", 8)
+                    pdf.set_font("Helvetica", "B", 7.8)
                 else:
                     pdf.set_fill_color(*(ZEBRA if r % 2 else (255, 255, 255)))
                     pdf.set_text_color(*(colors or {}).get((r, c), TEXT))
-                    pdf.set_font("Helvetica", "B" if (r in bold_rows or c in bold_cols) else "", 8.5)
+                    pdf.set_font("Helvetica", "B" if (r in bold_rows or c in bold_cols) else "", 8.2)
                 pdf.cell(w, H, str(txt), border=1, align=(aligns[c] if aligns else "L"), fill=True)
             pdf.ln(H)
         pdf.ln(gap)
+
+    def band(text, color=TEXT, gap=1.4, bold=True):
+        pdf.set_x(10)
+        pdf.set_fill_color(255, 255, 255)
+        pdf.set_text_color(*color)
+        pdf.set_font("Helvetica", "B" if bold else "", 8.2)
+        pdf.cell(190, H, text, border=1, align='C', fill=True)
+        pdf.ln(H + gap)
 
     def state(ok, yes="OK", no="DÉPASSÉ"):
         return (yes if ok else no), (GREEN if ok else RED)
@@ -689,16 +849,18 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     pdf.set_xy(10, 15)
     pdf.set_text_color(200, 215, 230)
     pdf.set_font("Helvetica", "", 8.5)
-    pdf.cell(190, 5, f"AETHERDISPATCH  |  LOADSHEET {fs.get('ls_status', 'PRÉLIMINAIRE')}  |  "
+    pdf.cell(190, 5, f"AETHERDISPATCH  |  LOADSHEET {fs.get('ls_status', 'PRÉLIMINAIRE')}  |  Édition n°{fs.get('edition', 1)}  |  "
                      f"Généré le {datetime.now().strftime('%d/%m/%Y à %H:%M')} UTC", align='C')
-    pdf.set_y(29)
+    pdf.set_y(28.5)
 
     # ── Vol ───────────────────────────────────────────────────────────────
     section("VOL")
+    alts = fs.get("alternates") or []
+    alt_txt = ", ".join(f"{a_['icao']} ({a_['dist_nm']:.0f} NM)" for a_ in alts) or fs.get("alternate") or "-"
     grid([("Vol", fs.get("flight_number") or "-", "Date / heure (UTC)", fs.get("datetime", "-")),
           ("Départ", fs.get("origin", "-"), "Arrivée", fs.get("dest", "-")),
-          ("Dégagement", fs.get("alternate", "-"), "Distance", f"{fs.get('dist_nm', 0):.0f} NM")],
-         [30, 65, 30, 65], bold_cols=(0, 2))
+          ("Dégagements", alt_txt, "Distance", f"{fs.get('dist_nm', 0):.0f} NM")],
+         [28, 82, 32, 48], bold_cols=(0, 2))
 
     # ── Trafic ────────────────────────────────────────────────────────────
     section("TRAFIC")
@@ -708,7 +870,15 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
           ("Nombre", *[counts.get(k, 0) for k in keys], fs.get("seated", 0)),
           ("Masse unitaire (kg)", *[masses.get(k, 0) for k in keys], ""),
           ("Masse totale (kg)", *[n(counts.get(k, 0) * masses.get(k, 0)) for k in keys], n(fs.get("pax_mass_kg", 0)))],
-         [34, 31, 31, 31, 31, 32], header=True, bold_cols=(0,), aligns=["L", "C", "C", "C", "C", "C"], gap=1.2)
+         [34, 31, 31, 31, 31, 32], header=True, bold_cols=(0,), aligns=["L", "C", "C", "C", "C", "C"], gap=1.0)
+    zones = fs.get("zones") or []
+    if zones:
+        wz = (190 - 34) / (len(zones) + 1)
+        zrows = [("Répartition par zone", *[z["name"][:26] for z in zones], "Total"),
+                 ("Sièges occupés", *[z["count"] for z in zones], sum(z["count"] for z in zones))]
+        zcol = {(1, i + 1): RED for i, z in enumerate(zones) if z.get("max") is not None and z["count"] > z["max"]}
+        grid(zrows, [34] + [wz] * (len(zones) + 1), header=True, bold_cols=(0,),
+             aligns=["L"] + ["C"] * (len(zones) + 1), colors=zcol, gap=1.0)
     bag_lab = (f"Bagages ({fs.get('bag_pieces', 0)} x {fs.get('bag_std')} kg)"
                if fs.get("bag_mode") == "Masse forfaitaire" else "Bagages (pesée)")
     grid([("Passagers (kg)", bag_lab, "Fret (kg)", "Courrier (kg)", "CHARGE PAYANTE (kg)"),
@@ -741,18 +911,35 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
 
     # ── Calcul des masses ─────────────────────────────────────────────────
     section("CALCUL DES MASSES (kg)")
-    grid([("DOW", "+ Charge payante", "= ZFW", "+ Carb. décollage", "= TOW", "- Trip fuel", "= LW"),
-          (n(fs.get("dow", 0)), n(fs.get("payload", 0)), n(fs.get("zfw", 0)), n(fuel.get("tof", 0)),
-           n(fs.get("tow", 0)), n(fuel.get("trip", 0)), n(fs.get("lw", 0)))],
-         [27.2, 27.2, 27.2, 27.2, 27.2, 27.2, 26.8], header=True, aligns=["C"] * 7, bold_rows=(1,), gap=0.8)
-    cg_txt, cg_col = state(fs.get("cg_ok", False), "OK", "HORS LIMITES")
-    pdf.set_x(10)
-    pdf.set_fill_color(255, 255, 255)
-    pdf.set_text_color(*cg_col)
-    pdf.set_font("Helvetica", "B", 8.5)
-    pdf.cell(190, H, f"Centrage au décollage : {fs.get('tow_cg', 0):.2f} m   (limites {fs.get('cg_min', 0):.2f} à "
-                     f"{fs.get('cg_max', 0):.2f} m)   -   {cg_txt}", border=1, align='C', fill=True)
-    pdf.ln(H + 1.6)
+    grid([("DOW", "+ Charge payante", "+ Autres masses", "= ZFW", "+ Carb. décollage", "= TOW", "- Trip fuel", "= LW"),
+          (n(fs.get("dow", 0)), n(fs.get("payload", 0)), n((fs.get("extra") or {}).get("total", 0)), n(fs.get("zfw", 0)),
+           n(fuel.get("tof", 0)), n(fs.get("tow", 0)), n(fuel.get("trip", 0)), n(fs.get("lw", 0)))],
+         [23, 26, 24, 22, 27, 22, 23, 23], header=True, aligns=["C"] * 8, bold_rows=(1,))
+
+    # ── Chargements spéciaux et dernières modifications ───────────────────
+    sp, lmc = fs.get("special") or [], fs.get("lmc") or []
+    if sp:
+        section("CHARGEMENTS SPÉCIAUX" + ("  -  NOTOC REQUIS" if fs.get("notoc_required") else ""))
+        rows = [("Type", "N° ONU", "Classe", "Masse (kg)", "Soute", "Observations")]
+        rows += [(r["type"], r["un"], r["cls"], n(r["kg"]) if r["kg"] is not None else "", r["hold"], r["obs"][:38]) for r in sp]
+        grid(rows, [44, 24, 24, 24, 28, 46], header=True, aligns=["L", "L", "L", "R", "L", "L"], gap=0.8)
+        if fs.get("notoc_required"):
+            band("NOTOC requis : à remettre au commandant de bord, avec la confirmation signée du chargement.", RED)
+    if lmc:
+        section(f"DERNIÈRES MODIFICATIONS (LMC) - ÉDITION n°{fs.get('edition', 1)}")
+        rows = [("Heure (UTC)", "Nature", "Description", "Variation (kg)")]
+        rows += [(r["time"], r["nature"], r["desc"][:68], f"{r['kg']:+,.0f}".replace(",", " ") if r["kg"] is not None else "")
+                 for r in lmc]
+        grid(rows, [26, 30, 104, 30], header=True, aligns=["L", "L", "L", "R"], gap=0.8)
+        if fs.get("lmc_max"):
+            band(f"Nombre de modifications : {len(lmc)} (maximum : {fs['lmc_max']})"
+                 + ("  -  NOUVELLE ÉDITION À ÉTABLIR" if fs.get("lmc_over") else ""), RED if fs.get("lmc_over") else TEXT)
+    if not sp and not lmc:
+        grid([("Chargements spéciaux", "AUCUN", "Dernières modifications (LMC)", "AUCUNE")], [48, 47, 48, 47], bold_cols=(0, 2))
+    elif not sp:
+        grid([("Chargements spéciaux", "AUCUN")], [48, 142], bold_cols=(0,))
+    elif not lmc:
+        grid([("Dernières modifications (LMC)", "AUCUNE")], [58, 132], bold_cols=(0,))
 
     # ── Vitesses (facultatif) ─────────────────────────────────────────────
     vs = fs.get("vspeeds") or {}
@@ -763,25 +950,51 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
                f"{vs.get('vref', '-')} kts", f"{vs.get('vapp', '-')} kts")],
              [38] * 5, header=True, aligns=["C"] * 5, bold_rows=(1,))
 
-    # ── Avion et commandant de bord (en fin de document) ──────────────────
+    # ── Avion et commandant de bord (en fin de document, d'un seul tenant) ─
+    if pdf.get_y() > 297 - 31 - 84:
+        pdf.add_page()
+        pdf.set_y(12)
+        pdf.set_font("Helvetica", "B", 8)
+        pdf.set_text_color(*GREY)
+        pdf.cell(190, 5, f"LOAD & TRIM SHEET - Vol {fs.get('flight_number') or '-'} - Édition n°{fs.get('edition', 1)} (suite)",
+                 align='C', new_x="LMARGIN", new_y="NEXT")
+        pdf.ln(1)
     section("AVION ET COMMANDANT DE BORD")
+    crew = fs.get("crew") or {}
+    std = f"standard {crew.get('std_flight', '-') if crew.get('std_flight') is not None else '-'}/" \
+          f"{crew.get('std_cabin', '-') if crew.get('std_cabin') is not None else '-'}"
     grid([("Immatriculation", fs.get("registration") or "-", "Type", fs.get("type") or "-"),
-          ("Commandant de bord", fs.get("cdb_name") or "", "Préparé par", fs.get("prepared_by") or "")],
+          ("Commandant de bord", fs.get("cdb_name") or "", "Préparé par", fs.get("prepared_by") or ""),
+          ("Équipage", f"conduite {crew.get('flight', '-')} / cabine {crew.get('cabin', '-')}", "Écart d'équipage",
+           f"{crew.get('delta_kg', 0):+,.0f} kg ({std})".replace(",", " "))],
          [40, 55, 32, 63], bold_cols=(0, 2), gap=1.2)
-    rows, colors = [("Masse (kg)", "Calculée", "Maximum", "Marge", "État")], {}
-    for i, (lab, val, mx, ok) in enumerate([("ZFW", fs.get("zfw", 0), fs.get("max_zfw", 0), fs.get("zfw_ok")),
-                                           ("TOW", fs.get("tow", 0), fs.get("max_tow", 0), fs.get("tow_ok")),
-                                           ("LW", fs.get("lw", 0), fs.get("max_lw", 0), fs.get("lw_ok"))], start=1):
+    rows, colors = [("Masse (kg)", "Calculée", "Maximum", "Marge", "Limite", "État")], {}
+    for i, (lab, val, mx, ok, basis) in enumerate([
+            ("ZFW", fs.get("zfw", 0), fs.get("max_zfw", 0), fs.get("zfw_ok"), "structure"),
+            ("TOW", fs.get("tow", 0), fs.get("max_tow", 0), fs.get("tow_ok"), fs.get("tow_basis", "structure")),
+            ("LW", fs.get("lw", 0), fs.get("max_lw", 0), fs.get("lw_ok"), fs.get("lw_basis", "structure"))], start=1):
         txt, col = state(bool(ok))
-        rows.append((lab, n(val), n(mx), n(mx - val), txt))
-        colors[(i, 4)] = col
-    txt, col = state(bool(fs.get("cg_ok")), "OK", "HORS LIMITES")
-    rows.append(("Centrage (m)", f"{fs.get('tow_cg', 0):.2f}", f"{fs.get('cg_min', 0):.2f} à {fs.get('cg_max', 0):.2f}", "", txt))
-    colors[(4, 4)] = col
-    txt, col = state(bool(fs.get("stock_ok", True)), "OK", "DÉPASSÉE")
-    rows.append(("Capacité des soutes", "", "", "", txt))
-    colors[(5, 4)] = col
-    grid(rows, [40, 38, 38, 38, 36], header=True, bold_cols=(0,), aligns=["L", "R", "R", "R", "C"], colors=colors, gap=2.2)
+        rows.append((lab, n(val), n(mx), n(mx - val), basis, txt))
+        colors[(i, 5)] = col
+    grid(rows, [34, 32, 32, 32, 32, 28], header=True, bold_cols=(0,), aligns=["L", "R", "R", "R", "C", "C"],
+         colors=colors, gap=1.0)
+    lims = fs.get("cg_lims") or {}
+    crows, ccol = [("Centrage", "Masse (kg)", "Centrage (m)", "Limite avant (m)", "Limite arrière (m)", "État")], {}
+    crows.append(("DOW", n(fs.get("dow", 0)), f"{fs.get('dow_cg', 0):.2f}", "-", "-", "-"))
+    for i, (lab, w, cg, key, ok) in enumerate([("ZFW", fs.get("zfw", 0), fs.get("zfw_cg", 0), "zfw", fs.get("zfw_cg_ok")),
+                                               ("TOW", fs.get("tow", 0), fs.get("tow_cg", 0), "tow", fs.get("tow_cg_ok")),
+                                               ("LW", fs.get("lw", 0), fs.get("lw_cg", 0), "lw", fs.get("lw_cg_ok"))], start=2):
+        lo, hi = (lims.get(key) or [fs.get("cg_min", 0), fs.get("cg_max", 0)])
+        txt, col = state(bool(ok), "OK", "HORS LIMITES")
+        crows.append((lab, n(w), f"{cg:.2f}", f"{lo:.2f}", f"{hi:.2f}", txt))
+        ccol[(i, 5)] = col
+    grid(crows, [34, 32, 32, 32, 32, 28], header=True, bold_cols=(0,), aligns=["L", "R", "R", "R", "R", "C"],
+         colors=ccol, gap=1.0)
+    ctl = [("limites de masse", all(bool(fs.get(k, True)) for k in ("zfw_ok", "tow_ok", "lw_ok"))),
+           ("centrage", bool(fs.get("cg_ok", True))), ("soutes", bool(fs.get("stock_ok", True))),
+           ("zones passagers", bool(fs.get("zones_ok", True))), ("LMC", bool(fs.get("lmc_ok", True)))]
+    band("Contrôles : " + " | ".join(f"{lab} {'OK' if ok else 'A CORRIGER'}" for lab, ok in ctl),
+         GREEN if all(ok for _, ok in ctl) else RED, gap=1.8)
 
     pdf.set_x(10)
     pdf.set_text_color(70, 70, 70)
@@ -790,23 +1003,108 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     pdf.cell(2)
     pdf.cell(63, 9, f"Dispatcher : {fs.get('prepared_by') or ''}", border=1, align='L')
     pdf.cell(2)
-    pdf.cell(60, 9, "Agent handling :", border=1, align='L')
+    pdf.cell(60, 9, "Supervision du chargement :", border=1, align='L')
 
-    # ── Pied de page : origine des données ────────────────────────────────
+    # ── Pied de page : édition, origine des données ───────────────────────
+    pdf.set_auto_page_break(auto=False)
+    lk = fs.get("lock") or {}
+    if lk.get("state") == "locked":
+        lock_txt, lock_col = (f"Édition n°{lk.get('edition')} VERROUILLÉE le {lk.get('at')} UTC par {lk.get('by')} "
+                              f"- empreinte {lk.get('hash')}"), GREEN
+    elif lk.get("state") == "modified":
+        lock_txt, lock_col = "Édition MODIFIÉE depuis son verrouillage - NOUVELLE ÉDITION À ÉTABLIR", RED
+    else:
+        lock_txt, lock_col = f"Édition n°{fs.get('edition', 1)} - non verrouillée (empreinte {lk.get('hash', '-')})", GREY
     certified = bool(fs.get("data_certified"))
-    pdf.set_y(-27)
+    pdf.set_y(-31)
     pdf.set_x(10)
     pdf.set_font("Helvetica", "B", 7.6)
+    pdf.set_text_color(*lock_col)
+    pdf.cell(190, 3.9, lock_txt, align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.set_text_color(*(GREEN if certified else RED))
-    pdf.cell(190, 4, f"Origine des données : {fs.get('origin_text', '-')}"
+    pdf.cell(190, 3.9, f"Origine des données : {fs.get('origin_text', '-')}"
              + ("" if certified else "   -   DONNÉES NON CERTIFIÉES"), align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "", 7.4)
     pdf.set_text_color(90, 90, 90)
     pdf.cell(190, 3.8, f"Référentiel : {fs.get('referentiel_text', '-')}", align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "I", 7)
     pdf.set_text_color(130, 130, 130)
-    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v4.0. Vérification obligatoire par le commandant de bord.",
+    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v5.0. Vérification obligatoire par le commandant de bord.",
              align='C')
+    return bytes(pdf.output())
+
+
+def generate_wx_pdf(wx: dict, ctx: dict) -> bytes:
+    """Briefing météo (METAR et TAF des aéroports interrogés), A4."""
+    pdf = FPDF(orientation='P', unit='mm', format='A4')
+    pdf.set_auto_page_break(auto=True, margin=18)
+    pdf.add_page()
+    pdf.normalize_text = lambda t: str(t).replace('→', '->').replace('—', '-').replace('–', '-').replace('─', '-').replace('−', '-').replace('€', 'EUR').replace('×', 'x').replace('°', ' deg').encode('latin-1', 'replace').decode('latin-1')
+    NAVY, CYAN, TEXT = (13, 31, 60), (0, 191, 255), (30, 30, 30)
+    pdf.set_fill_color(*NAVY)
+    pdf.rect(0, 0, 210, 24, "F")
+    pdf.set_xy(10, 4.5)
+    pdf.set_text_color(*CYAN)
+    pdf.set_font("Helvetica", "B", 17)
+    pdf.cell(190, 9, "BRIEFING MÉTÉO", align='C')
+    pdf.set_xy(10, 15)
+    pdf.set_text_color(200, 215, 230)
+    pdf.set_font("Helvetica", "", 8.5)
+    pdf.cell(190, 5, f"AETHERDISPATCH  |  Interrogé le {wx.get('fetched_at', '-')} UTC", align='C')
+    pdf.set_y(28)
+    pdf.set_text_color(*TEXT)
+    pdf.set_font("Helvetica", "", 9)
+    if ctx:
+        line = " | ".join(x for x in (f"Vol {ctx.get('flight_number')}" if ctx.get("flight_number") else "",
+                                      f"{ctx.get('origin', '')} -> {ctx.get('dest', '')}" if ctx.get("origin") else "",
+                                      ctx.get("datetime", "")) if x)
+        if line:
+            pdf.multi_cell(190, 5, line, new_x="LMARGIN", new_y="NEXT")
+            pdf.ln(1)
+    for it in wx.get("items", []):
+        mt, tf = it["metar"], it["taf"]
+        cat = mt.get("category", "INCONNUE")
+        hexcol = CAT_COLORS.get(cat, "#888888").lstrip("#")
+        rgb = tuple(int(hexcol[i:i + 2], 16) for i in (0, 2, 4))
+        if pdf.get_y() > 240:
+            pdf.add_page()
+        pdf.set_x(10)
+        pdf.set_fill_color(*NAVY)
+        pdf.set_text_color(*CYAN)
+        pdf.set_font("Helvetica", "B", 9.5)
+        pdf.cell(150, 6.5, f"{it['icao']}  -  {it['name']}", fill=True)
+        pdf.set_fill_color(*rgb)
+        pdf.set_text_color(0, 0, 0)
+        pdf.cell(40, 6.5, f"Catégorie : {cat}", fill=True, align='C', new_x="LMARGIN", new_y="NEXT")
+        pdf.set_text_color(*TEXT)
+        pdf.set_font("Helvetica", "B", 8)
+        pdf.cell(190, 5, "METAR", new_x="LMARGIN", new_y="NEXT")
+        if mt.get("ok"):
+            pdf.set_font("Courier", "", 8.5)
+            pdf.multi_cell(190, 4.2, mt["raw"], new_x="LMARGIN", new_y="NEXT")
+            pdf.set_font("Helvetica", "", 8)
+            pdf.set_text_color(80, 80, 80)
+            pdf.multi_cell(190, 4.2, wx_decoded_line(mt), new_x="LMARGIN", new_y="NEXT")
+            pdf.set_text_color(*TEXT)
+        else:
+            pdf.set_font("Helvetica", "I", 8.5)
+            pdf.multi_cell(190, 4.5, f"METAR indisponible : {mt.get('error', '')}", new_x="LMARGIN", new_y="NEXT")
+        pdf.set_font("Helvetica", "B", 8)
+        pdf.cell(190, 5, "TAF", new_x="LMARGIN", new_y="NEXT")
+        if tf.get("ok"):
+            pdf.set_font("Courier", "", 8.2)
+            for l in tf["raw"].splitlines():
+                pdf.multi_cell(190, 4.0, l, new_x="LMARGIN", new_y="NEXT")
+        else:
+            pdf.set_font("Helvetica", "I", 8.5)
+            pdf.multi_cell(190, 4.5, f"TAF indisponible : {tf.get('error', '')}", new_x="LMARGIN", new_y="NEXT")
+        pdf.ln(3)
+    pdf.set_font("Helvetica", "I", 7.4)
+    pdf.set_text_color(110, 110, 110)
+    pdf.multi_cell(190, 3.8, "Source : NOAA / NWS Aviation Weather Center (aviationweather.gov). Source non contractuelle : "
+                             "les messages ci-dessus sont reproduits tels que reçus à l'heure d'interrogation et ne sont pas actualisés. "
+                             "À vérifier auprès du service météorologique compétent avant toute décision opérationnelle.",
+                   new_x="LMARGIN", new_y="NEXT")
     return bytes(pdf.output())
 
 
@@ -816,7 +1114,7 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
 
 def save_flight(flight_data: dict):
     """Sauvegarde un vol dans l'historique JSON."""
-    history = load_json("flight_history.json")
+    history = read_json_fresh("flight_history.json")
     if not isinstance(history, list):
         history = []
     flight_data["saved_at"] = datetime.now(timezone.utc).isoformat()
@@ -824,8 +1122,9 @@ def save_flight(flight_data: dict):
     history.insert(0, flight_data)
     history = history[:200]  # Garder les 200 derniers vols
     save_json("flight_history.json", history)
-    # Invalider le cache pour la prochaine lecture
     load_json.clear()
+    audit("flight_saved", f"{flight_data.get('flight_number', '-')} · édition {flight_data.get('edition', 1)} · "
+                          f"{flight_data.get('ls_status', '-')}")
 
 # =============================================================================
 # MODULE 8 : DONNÉES AÉRONEF MODIFIABLES · STATUTS D'ORIGINE · PROFIL COMPAGNIE
@@ -849,6 +1148,8 @@ SCALAR_FIELDS = [
     ("oew_arm_m",  "Bras de l'OEW",                             "m",      True),
     ("crew_kg",    "Équipage (masse)",                          "kg",     True),
     ("crew_arm_m", "Équipage (bras)",                           "m",      True),
+    ("crew_std_flight", "Équipage de conduite standard (nombre)", "pers.", False),
+    ("crew_std_cabin",  "Équipage de cabine standard (nombre)",   "pers.", False),
     ("max_zfw_kg", "MZFW (masse maximale sans carburant)",      "kg",     True),
     ("max_tow_kg", "MTOW (masse maximale au décollage)",        "kg",     True),
     ("max_lw_kg",  "MLW (masse maximale à l'atterrissage)",     "kg",     True),
@@ -961,6 +1262,10 @@ def origin_counts(ac: dict) -> dict:
     for row in (ac.get("pax_zones") or []) + (ac.get("cargo_comps") or []):
         s = "a_renseigner" if row.get("arm_m") is None else (row.get("status") or "estime")
         counts[s if s in counts else "estime"] += 1
+    for key in ("cg_envelope", "fuel_arm_table"):          # tables facultatives : comptées si elles sont renseignées
+        if ac.get(key):
+            s = _meta(ac)["status"].get(key) or "estime"
+            counts[s if s in counts else "estime"] += 1
     return counts
 
 
@@ -991,7 +1296,7 @@ def normalize_aircraft(rec: dict) -> dict:
     r.setdefault("seats_typical", "")
     r.setdefault("fuel_density", 0.8)
     r.setdefault("loading_mode", "vrac")
-    for k in ("pax_zones", "cargo_comps"):
+    for k in ("pax_zones", "cargo_comps", "cg_envelope", "fuel_arm_table"):
         if not isinstance(r.get(k), list):
             r[k] = []
     _meta(r)
@@ -1032,6 +1337,7 @@ def import_profile_bytes(raw: bytes):
 
 
 def _mark_exported():
+    audit("profile_exported", st.session_state.get("profile_name") or "profil compagnie")
     st.session_state.dirty = False
     if not st.session_state.get("profile_info"):
         st.session_state.profile_info = {"name": st.session_state.get("profile_name") or "Profil compagnie"}
@@ -1056,6 +1362,8 @@ SRC_EASA_INF = ("AMC1 CAT.POL.MAB.100(e) : nourrisson porté par un adulte inclu
                 "un nourrisson occupant un siège est traité comme un enfant. 10 kg si le GOM de la compagnie le prévoit.")
 SRC_BAG = ("Masses forfaitaires de bagage en soute (11 / 13 / 15 kg) : règlement (UE) n° 965/2012 "
            "— à confirmer dans le MANEX")
+SRC_EASA_CREW = ("Règlement (UE) n° 965/2012, AMC2 CAT.POL.MAB.100(d) : masses standard, bagage à main compris, "
+                 "de 85 kg (équipage de conduite) et 75 kg (équipage de cabine)")
 
 
 def default_referentiel() -> dict:
@@ -1067,6 +1375,9 @@ def default_referentiel() -> dict:
                        "child": item("Enfants", 35, SRC_EASA_PAX), "infant": item("Bébés", 0, SRC_EASA_INF)},
         "bag_masses": {"domestic": item("Vol intérieur", 11, SRC_BAG), "other": item("Autres vols", 13, SRC_BAG),
                        "intercontinental": item("Vol intercontinental", 15, SRC_BAG)},
+        "crew_masses": {"flight": item("Équipage de conduite", 85, SRC_EASA_CREW),
+                        "cabin": item("Équipage de cabine", 75, SRC_EASA_CREW)},
+        "procedures": {"lmc_max": None},
     }
 
 
@@ -1075,7 +1386,7 @@ def normalize_referentiel(r) -> dict:
     base = default_referentiel()
     if not isinstance(r, dict):
         return base
-    for grp in ("pax_masses", "bag_masses"):
+    for grp in ("pax_masses", "bag_masses", "crew_masses"):
         for k, it in base[grp].items():
             src = (r.get(grp) or {}).get(k)
             if isinstance(src, dict):
@@ -1090,6 +1401,8 @@ def normalize_referentiel(r) -> dict:
     for k in base["identification"]:
         if isinstance(ident.get(k), str):
             base["identification"][k] = ident[k]
+    lm = _num((r.get("procedures") or {}).get("lmc_max"))
+    base["procedures"]["lmc_max"] = int(lm) if lm and lm > 0 else None
     return base
 
 
@@ -1101,7 +1414,7 @@ def referentiel_label(ref: dict) -> str:
 
 def ref_acceptable(ref: dict) -> bool:
     """Vrai si toutes les valeurs du référentiel sont réglementaires ou issues de la compagnie."""
-    items = list(ref["pax_masses"].values()) + list(ref["bag_masses"].values())
+    items = list(ref["pax_masses"].values()) + list(ref["bag_masses"].values()) + list(ref["crew_masses"].values())
     return all(it["status"] in ("compagnie", "reglementaire") for it in items)
 
 
@@ -1250,12 +1563,16 @@ def render_pax_panel(ac: dict, selected_ac: str, ref: dict) -> dict:
                     st.caption(f"Capacité : {cap if cap is not None else '—'} | Bras : {z.get('arm_m', '—')} m")
             if sum(zone_counts) != seated:
                 st.warning(f"La somme des zones ({sum(zone_counts)}) diffère des sièges occupés ({seated}).")
-    return {"status": status, "prev": prev, "final": final, "active_counts": active_counts, "seated": seated,
+    zones_over = [(z["name"], zone_counts[i], int(z["max_pax"])) for i, z in enumerate(zones)
+                  if zone_counts and z.get("max_pax") is not None and zone_counts[i] > z["max_pax"]]
+    for zname, zcount, zcap in zones_over:
+        st.error(f"Zone {zname} : {zcount} passagers pour une capacité de {zcap} places.")
+    return {"zones_over": zones_over, "status": status, "prev": prev, "final": final, "active_counts": active_counts, "seated": seated,
             "seated_prev": seated_prev, "seated_final": seated_final, "has_final": has_final,
             "zone_counts": zone_counts, "max_seats": max_seats, "masses": masses}
 
 
-def render_pax_comparison(ac: dict, pax: dict, comp_loads: dict, tof: float):
+def render_pax_comparison(ac: dict, pax: dict, comp_loads: dict, tof: float, extra_items=None, crew_delta: float = 0.0):
     """Tableau prévu / final : sièges, bébés, ZFW, TOW, centrage."""
     st.markdown("**Comparaison prévu / final**")
     if not pax["has_final"]:
@@ -1263,7 +1580,8 @@ def render_pax_comparison(ac: dict, pax: dict, comp_loads: dict, tof: float):
         return
 
     def scenario(counts):
-        return compute_mc(ac, zone_weights_from_counts(ac, counts, pax["masses"]), comp_loads, tof)
+        return compute_mc(ac, zone_weights_from_counts(ac, counts, pax["masses"]), comp_loads, tof,
+                          extra_items=extra_items, crew_delta_kg=crew_delta)
 
     rp, rf = scenario(pax["prev"]), scenario(pax["final"])
     rows = [
@@ -1283,18 +1601,33 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
     st.subheader("📋 Plan de vol — Masse & Centrage")
 
     # ── 1. Vol ────────────────────────────────────────────────────────────
+    # Date et heure : valeurs initiales fixées une seule fois (en UTC) puis conservées. Une valeur par défaut qui change
+    # à chaque minute ferait réinitialiser le champ à chaque nouvelle interaction.
+    _now_utc = datetime.now(timezone.utc)
+    st.session_state.setdefault("flight_date", _now_utc.date())
+    st.session_state.setdefault("flight_time", _now_utc.replace(second=0, microsecond=0).time())
     col_a, col_b, col_c = st.columns([1, 1, 1])
     with col_a:
         flight_number = st.text_input("N° de vol", value="AF1234", placeholder="AF1234")
         origin = st.selectbox("🛫 Départ", list(airports.keys()), key="origin")
     with col_b:
-        flight_date = st.date_input("Date du vol", value=datetime.now())
+        flight_date = st.date_input("Date du vol", key="flight_date")
         dest = st.selectbox("🛬 Arrivée", list(airports.keys()), index=min(1, len(airports) - 1), key="dest")
     with col_c:
-        flight_time = st.time_input("Heure départ (UTC)", value=datetime.now().time())
-        alternate = st.selectbox("⚡ Alternate", list(airports.keys()), index=min(2, len(airports) - 1), key="alt")
+        flight_time = st.time_input("Heure départ (UTC)", key="flight_time")
     registration = st.text_input("Immatriculation de l'avion", value="", key="registration",
                                  placeholder="ex. F-GKXA", max_chars=10).strip().upper()
+
+    NONE_OPT = "— Aucun —"
+    ap_names = list(airports.keys())
+    ca1, ca2, ca3 = st.columns(3)
+    alt1 = ca1.selectbox("⚡ Dégagement 1", ap_names, index=min(2, len(ap_names) - 1), key="alt")
+    alt2 = ca2.selectbox("⚡ Dégagement 2 (facultatif)", [NONE_OPT] + ap_names, key="alt2")
+    alt3 = ca3.selectbox("⚡ Dégagement 3 (facultatif)", [NONE_OPT] + ap_names, key="alt3")
+    alt_names = []
+    for n_ in (alt1, alt2, alt3):
+        if n_ != NONE_OPT and n_ not in alt_names:
+            alt_names.append(n_)
 
     orig_data, dest_data = airports[origin], airports[dest]
     dist_nm = haversine(orig_data["lat"], orig_data["lon"], dest_data["lat"], dest_data["lon"])
@@ -1311,6 +1644,22 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
         </div>
     </div>
     """, unsafe_allow_html=True)
+    alt_info = [{"name": n_, "icao": airports[n_]["icao"],
+                 "dist_nm": haversine(dest_data["lat"], dest_data["lon"], airports[n_]["lat"], airports[n_]["lon"]),
+                 "rwy_m": airports[n_].get("rwy_length_m")} for n_ in alt_names]
+    far = max((a_["dist_nm"] for a_ in alt_info), default=0)
+    alt_fuel_dist = float(far) if far > 0 else 200.0
+    st.session_state.alternates = alt_names
+    st.session_state.alt_dist_nm = alt_fuel_dist
+    alternate = " / ".join(a_["icao"] for a_ in alt_info)
+    st.dataframe(pd.DataFrame([{"Dégagement": a_["name"], "Distance depuis l'arrivée (NM)": round(a_["dist_nm"]),
+                                "Piste (m)": a_["rwy_m"]} for a_ in alt_info]), hide_index=True, use_container_width=True)
+    if far > 0:
+        st.caption(f"Le carburant de dégagement est calculé sur le dégagement le plus éloigné : {alt_fuel_dist:.0f} NM.")
+    else:
+        st.warning("Dégagement identique à l'arrivée : la distance par défaut de 200 NM est utilisée pour le carburant.")
+    if any(a_["name"] == dest for a_ in alt_info) and far > 0:
+        st.warning("Un des dégagements est identique à l'aéroport d'arrivée.")
     st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
 
     # ── 2. Passagers ──────────────────────────────────────────────────────
@@ -1403,72 +1752,205 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
         st.error(f"Le trip fuel ({trip:,} kg) dépasse le carburant au décollage ({tof:,} kg).")
     st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
 
+    # ── 4b. Équipage, autres masses, limites du jour, chargements spéciaux ────
+    hold_names = [c["name"] for c in comps]
+    arm_by_name = {c["name"]: c["arm_m"] for c in comps}
+    st.markdown("**👩‍✈️ Équipage**")
+    cm = ref["crew_masses"]
+    m_f, m_c = cm["flight"]["value"], cm["cabin"]["value"]
+    std_f, std_c = ac.get("crew_std_flight"), ac.get("crew_std_cabin")
+    e1, e2, e3 = st.columns(3)
+    n_f = int(e1.number_input("Équipage de conduite (nombre)", 0, 10, int(std_f) if std_f is not None else 2,
+                              key=f"crew_f_{selected_ac}"))
+    n_c = int(e2.number_input("Équipage de cabine (nombre)", 0, 30, int(std_c) if std_c is not None else 0,
+                              key=f"crew_c_{selected_ac}"))
+    crew_delta = ((n_f - int(std_f)) * m_f if std_f is not None else 0) + ((n_c - int(std_c)) * m_c if std_c is not None else 0)
+    e3.metric("Écart de masse d'équipage", f"{crew_delta:+,.0f} kg",
+              help=f"Écart par rapport à la composition standard ({std_f if std_f is not None else '—'} / "
+                   f"{std_c if std_c is not None else '—'}), aux masses du référentiel.")
+    if std_f is None or std_c is None:
+        st.caption("Composition standard non renseignée pour ce type : aucun ajustement de masse n'est appliqué "
+                   "(onglet « Données aéronef »).")
+
+    with st.expander("Autres masses (lest, consommables autres que le carburant)"):
+        o1, o2, o3, o4 = st.columns(4)
+        ballast = int(o1.number_input("Lest (kg)", 0, 20000, 0, step=10, key=f"ballast_{selected_ac}"))
+        ballast_pos = o2.selectbox("Position du lest", hold_names, key=f"ballast_pos_{selected_ac}") if hold_names else ""
+        cons = int(o3.number_input("Consommables (kg)", 0, 20000, 0, step=10, key=f"cons_{selected_ac}"))
+        cons_pos = o4.selectbox("Position des consommables", hold_names, key=f"cons_pos_{selected_ac}") if hold_names else ""
+        st.caption("Ces masses sont incluses dans le ZFW. Leur position est approchée par le bras de la soute choisie.")
+    extra_items = [(kg_, arm_by_name.get(pos_, ac["oew_arm_m"])) for kg_, pos_ in ((ballast, ballast_pos), (cons, cons_pos)) if kg_ > 0]
+    extra_kg = ballast + cons
+
+    with st.expander("Limites de masse du jour (performances : piste, météo)"):
+        l1, l2 = st.columns(2)
+        perf_tow = int(l1.number_input("TOW maximal limité par les performances (kg, 0 = aucune)", 0, 700000, 0, step=100,
+                                       key=f"perf_tow_{selected_ac}"))
+        perf_lw = int(l2.number_input("LW maximal limité par les performances (kg, 0 = aucune)", 0, 700000, 0, step=100,
+                                      key=f"perf_lw_{selected_ac}"))
+        st.caption("La limite retenue est la plus faible entre le maximum de structure et la limite de performances.")
+    eff_tow, tow_basis = (perf_tow, "performances") if 0 < perf_tow < ac["max_tow_kg"] else (ac["max_tow_kg"], "structure")
+    eff_lw, lw_basis = (perf_lw, "performances") if 0 < perf_lw < ac["max_lw_kg"] else (ac["max_lw_kg"], "structure")
+
+    with st.expander("⚠ Chargements spéciaux (marchandises dangereuses, animaux vivants, restes humains, valeurs)"):
+        sp_empty = pd.DataFrame({"Type": pd.Series(dtype="object"), "N° ONU": pd.Series(dtype="object"),
+                                 "Classe / division": pd.Series(dtype="object"), "Masse (kg)": pd.Series(dtype="float"),
+                                 "Soute": pd.Series(dtype="object"), "Observations": pd.Series(dtype="object")})
+        sp_df = st.data_editor(sp_empty, num_rows="dynamic", hide_index=True, use_container_width=True,
+                               key=f"special_{selected_ac}",
+                               column_config={"Type": st.column_config.SelectboxColumn("Type", options=SPECIAL_TYPES),
+                                              "Soute": st.column_config.SelectboxColumn("Soute", options=hold_names or [""]),
+                                              "Masse (kg)": st.column_config.NumberColumn("Masse (kg)", min_value=0)})
+        st.caption("Reportez la masse dans les champs fret ou courrier de la soute concernée : ce tableau n'en modifie pas le calcul.")
+    special_rows = parse_special(sp_df)
+    notoc_required = any(r_["type"] == "Marchandise dangereuse" for r_ in special_rows)
+    if notoc_required:
+        st.warning("NOTOC requis : l'information écrite sur les marchandises dangereuses, avec leur position de chargement, "
+                   "doit être remise au commandant de bord, avec la confirmation signée du chargement. Elle est établie par "
+                   "le personnel formé aux marchandises dangereuses.")
+        if any(r_["type"] == "Marchandise dangereuse" and (not r_["un"] or not r_["hold"]) for r_ in special_rows):
+            st.error("Marchandise dangereuse : le numéro ONU et la soute sont à renseigner pour le NOTOC.")
+    st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+
     # ── 5. Calculs ────────────────────────────────────────────────────────
     pax_weights = zone_weights_from_counts(ac, pax["active_counts"], pax["masses"], pax["zone_counts"])
-    result = compute_mc(ac, pax_weights, comp_loads, tof)
+    result = compute_mc(ac, pax_weights, comp_loads, tof, extra_items=extra_items, crew_delta_kg=crew_delta,
+                        trip_kg=min(trip, tof))
     lw = result["tow"] - trip
+    payload = result["pax_total_kg"] + sum(comp_loads.values())
 
+    lim_z, lim_t, lim_l = (cg_limits_at(ac, result["zfw"]), cg_limits_at(ac, result["tow"]), cg_limits_at(ac, lw))
     zfw_ok = result["zfw"] <= ac["max_zfw_kg"]
-    tow_ok = result["tow"] <= ac["max_tow_kg"]
-    lw_ok = lw <= ac["max_lw_kg"]
-    cg_ok = ac["cg_min_m"] <= result["tow_cg"] <= ac["cg_max_m"]
+    tow_ok = result["tow"] <= eff_tow
+    lw_ok = lw <= eff_lw
+    zfw_cg_ok = lim_z[0] <= result["zfw_cg"] <= lim_z[1]
+    tow_cg_ok = lim_t[0] <= result["tow_cg"] <= lim_t[1]
+    lw_cg_ok = lim_l[0] <= result["lw_cg"] <= lim_l[1]
+    cg_ok = zfw_cg_ok and tow_cg_ok and lw_cg_ok
+    zones_ok = not pax.get("zones_over")
     stock_ok = unplaced == 0 and all(comp_loads[c["name"]] <= c["max_kg"] for c in comps)
 
+    def card(label, val, unit, note, ok=None, fmt=",.0f"):
+        color = "#E0E8FF" if ok is None else ("#00FF88" if ok else "#FF4444")
+        st.markdown(f"""
+        <div class="metric-card">
+            <div class="label">{label}</div>
+            <div class="value" style="color:{color}">{val:{fmt}}</div>
+            <div class="unit">{unit}</div>
+            <div style="font-size:0.68rem;color:#556688;margin-top:4px">{note}</div>
+        </div>
+        """, unsafe_allow_html=True)
+
     st.markdown("### ⚖ Résultats Masse & Centrage")
-    metrics = [
-        ("ZFW", result["zfw"], "kg", f"Max {ac['max_zfw_kg']:,} kg · marge {ac['max_zfw_kg'] - result['zfw']:,} kg", zfw_ok),
-        ("TOW", result["tow"], "kg", f"Max {ac['max_tow_kg']:,} kg · marge {ac['max_tow_kg'] - result['tow']:,} kg", tow_ok),
-        ("LW", lw, "kg", f"Max {ac['max_lw_kg']:,} kg · marge {ac['max_lw_kg'] - lw:,} kg", lw_ok),
-        ("CG TOW", result["tow_cg"], "m", f"FWD {ac['cg_min_m']} m / AFT {ac['cg_max_m']} m", cg_ok),
-    ]
-    for col, (label, val, unit, limit, ok) in zip(st.columns(4), metrics):
+    row1 = [("ZFW", result["zfw"], "kg", f"Max {ac['max_zfw_kg']:,} kg (structure) · marge {ac['max_zfw_kg'] - result['zfw']:,} kg", zfw_ok),
+            ("TOW", result["tow"], "kg", f"Max {eff_tow:,} kg ({tow_basis}) · marge {eff_tow - result['tow']:,} kg", tow_ok),
+            ("LW", lw, "kg", f"Max {eff_lw:,} kg ({lw_basis}) · marge {eff_lw - lw:,} kg", lw_ok),
+            ("Charge payante", payload, "kg", "passagers, bagages, fret, courrier", None)]
+    for col, (label, val, unit, note, ok) in zip(st.columns(4), row1):
         with col:
-            color = "#00FF88" if ok else "#FF4444"
-            st.markdown(f"""
-            <div class="metric-card">
-                <div class="label">{label}</div>
-                <div class="value" style="color:{color}">{val:,.1f}</div>
-                <div class="unit">{unit}</div>
-                <div style="font-size:0.68rem;color:#556688;margin-top:4px">{limit}</div>
-            </div>
-            """, unsafe_allow_html=True)
+            card(label, val, unit, note, ok)
+    row2 = [("CG DOW", result["dow_cg"], f"m · DOW {result['dow']:,} kg", "masse à vide + équipage", None),
+            ("CG ZFW", result["zfw_cg"], "m", f"limites {lim_z[0]:.2f} à {lim_z[1]:.2f} m", zfw_cg_ok),
+            ("CG TOW", result["tow_cg"], "m", f"limites {lim_t[0]:.2f} à {lim_t[1]:.2f} m", tow_cg_ok),
+            ("CG LW", result["lw_cg"], "m", f"limites {lim_l[0]:.2f} à {lim_l[1]:.2f} m", lw_cg_ok)]
+    for col, (label, val, unit, note, ok) in zip(st.columns(4), row2):
+        with col:
+            card(label, val, unit, note, ok, fmt=".2f")
+    for lab, okc, cgv, lim in (("ZFW", zfw_cg_ok, result["zfw_cg"], lim_z), ("TOW", tow_cg_ok, result["tow_cg"], lim_t),
+                               ("LW", lw_cg_ok, result["lw_cg"], lim_l)):
+        if not okc:
+            st.error(f"Centrage hors limites au {lab} : {cgv:.2f} m (limites {lim[0]:.2f} à {lim[1]:.2f} m).")
+    if not (ac.get("cg_envelope") or []):
+        st.caption("Limites de centrage constantes : l'enveloppe masse-centrage n'est pas renseignée pour ce type "
+                   "(onglet « Données aéronef »).")
 
     st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
-    render_pax_comparison(ac, pax, comp_loads, tof)
+    render_pax_comparison(ac, pax, comp_loads, tof, extra_items, crew_delta)
     st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
     st.plotly_chart(plot_cg_envelope(ac, result, min(trip, tof)), use_container_width=True)
 
-    # ── 6. Récapitulatif pour le commandant de bord (en fin de page) ─────
+    # ── 6. Édition, dernières modifications (LMC) et verrouillage ─────────
+    st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
+    st.markdown("### 📝 Édition, dernières modifications (LMC) et verrouillage")
+    ed1, ed2 = st.columns([1, 3])
+    edition = int(ed1.number_input("Édition n°", 1, 99, 1, key="ls_edition"))
+    lmc_max = ref["procedures"].get("lmc_max")
+    ed2.caption("Nombre maximal de dernières modifications avant nouvelle édition : "
+                + (str(lmc_max) if lmc_max else "non renseigné (référentiel compagnie)"))
+    lmc_empty = pd.DataFrame({"Heure (UTC)": pd.Series(dtype="object"), "Nature": pd.Series(dtype="object"),
+                              "Description": pd.Series(dtype="object"), "Variation (kg)": pd.Series(dtype="float")})
+    lmc_df = st.data_editor(lmc_empty, num_rows="dynamic", hide_index=True, use_container_width=True, key="lmc_editor",
+                            column_config={"Nature": st.column_config.SelectboxColumn("Nature", options=LMC_NATURES)})
+    lmc_rows = parse_lmc(lmc_df)
+    lmc_over = bool(lmc_max) and len(lmc_rows) > lmc_max
+    if lmc_over:
+        st.error(f"Nombre maximal de dernières modifications dépassé ({len(lmc_rows)} pour un maximum de {lmc_max}) : "
+                 "une nouvelle édition est à établir.")
+    st.caption("Les variations sont indicatives : reportez-les dans les champs de saisie pour recalculer la loadsheet.")
+
+    fp_payload = {"vol": flight_number, "immat": registration, "avion": selected_ac, "date": f"{flight_date} {flight_time}",
+                  "route": [origin, dest, alternate], "statut": pax["status"], "pax": pax["active_counts"],
+                  "bagages": bag_total, "soutes": comp_loads, "carburant": [bloc, taxi, trip], "equipage": [n_f, n_c],
+                  "autres": [ballast, ballast_pos, cons, cons_pos], "limites": [perf_tow, perf_lw], "speciaux": special_rows,
+                  "lmc": lmc_rows, "edition": edition, "zfw": result["zfw"], "tow": result["tow"], "lw": lw}
+    fp = hashlib.sha256(json.dumps(fp_payload, sort_keys=True, default=str).encode("utf-8")).hexdigest()[:8].upper()
+    lock = st.session_state.get("locked")
+    lock_state = "none" if not lock else ("locked" if lock["hash"] == fp else "modified")
+    is_final = pax["status"] == "Final"
+    cl1, cl2 = st.columns([3, 1])
+    with cl1:
+        if lock_state == "locked":
+            st.success(f"Édition n°{lock['edition']} verrouillée le {lock['at']} UTC par {lock['by']} (empreinte {fp}).")
+        elif lock_state == "modified":
+            st.warning(f"Les données ont changé depuis le verrouillage de l'édition n°{lock['edition']} : "
+                       "établissez une nouvelle édition.")
+            st.button(f"Établir l'édition n°{int(lock['edition']) + 1}", on_click=_new_edition, key="btn_new_edition")
+        else:
+            st.caption("Édition non verrouillée." + ("" if is_final else " Le verrouillage nécessite le statut « Final »."))
+    if cl2.button("🔒 Verrouiller l'édition", key="btn_lock", disabled=(not is_final or lock_state == "locked"),
+                  use_container_width=True):
+        st.session_state["locked"] = {"edition": edition, "hash": fp, "flight": flight_number,
+                                      "at": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M"),
+                                      "by": st.session_state.get("preparer_name") or user_info.get("nom", "")}
+        audit("edition_locked", f"{flight_number} · édition {edition} · empreinte {fp}")
+        st.rerun()
+
+    # ── 7. Récapitulatif pour le commandant de bord (en fin de page) ──────
     st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
     st.markdown("### 🧑‍✈️ Récapitulatif avion et commandant de bord")
-    r1, r2, r3 = st.columns(3)
+    r1, r2 = st.columns(2)
     r1.metric("Immatriculation", registration or "—")
     r2.metric("Type", ac.get("type") or "—")
+    r3, r4 = st.columns(2)
     cdb_name = r3.text_input("Commandant de bord (nom)", key="cdb_name")
+    preparer = r4.text_input("Préparé par (nom et prénom)", value=user_info.get("nom", ""), key="preparer_name").strip()
     recap = pd.DataFrame([
-        ("ZFW", f"{result['zfw']:,}", f"{ac['max_zfw_kg']:,}", f"{ac['max_zfw_kg'] - result['zfw']:,}", "OK" if zfw_ok else "DÉPASSÉ"),
-        ("TOW", f"{result['tow']:,}", f"{ac['max_tow_kg']:,}", f"{ac['max_tow_kg'] - result['tow']:,}", "OK" if tow_ok else "DÉPASSÉ"),
-        ("LW", f"{lw:,}", f"{ac['max_lw_kg']:,}", f"{ac['max_lw_kg'] - lw:,}", "OK" if lw_ok else "DÉPASSÉ"),
-    ], columns=["Masse (kg)", "Calculée", "Maximum", "Marge", "État"])
+        ("ZFW", f"{result['zfw']:,}", f"{ac['max_zfw_kg']:,}", f"{ac['max_zfw_kg'] - result['zfw']:,}", "structure", "OK" if zfw_ok else "DÉPASSÉ"),
+        ("TOW", f"{result['tow']:,}", f"{eff_tow:,}", f"{eff_tow - result['tow']:,}", tow_basis, "OK" if tow_ok else "DÉPASSÉ"),
+        ("LW", f"{lw:,}", f"{eff_lw:,}", f"{eff_lw - lw:,}", lw_basis, "OK" if lw_ok else "DÉPASSÉ"),
+    ], columns=["Masse (kg)", "Calculée", "Maximum", "Marge", "Limite", "État"])
     st.dataframe(recap, hide_index=True, use_container_width=True)
-    payload = result["pax_total_kg"] + sum(comp_loads.values())
     st.caption(f"Charge payante : {payload:,.0f} kg (passagers {result['pax_total_kg']:,.0f} kg, "
                f"bagages {bag_total:,} kg, fret {sum(cargo_w.values()):,} kg, courrier {sum(mail_w.values()):,} kg). "
-               f"Carburant : bloc {bloc:,} kg, taxi {taxi:,} kg, trip {trip:,} kg, décollage {tof:,} kg.")
+               f"Carburant : bloc {bloc:,} kg, taxi {taxi:,} kg, trip {trip:,} kg, décollage {tof:,} kg. "
+               f"Équipage : {n_f} / {n_c}.")
 
     # ── Synthèse du vol (alimente le PDF et l'historique) ─────────────────
     origin_txt, aircraft_certified = origin_summary(ac)
+    lmc_ok = not lmc_over
     fs = {
         "flight_number": flight_number, "registration": registration, "aircraft": selected_ac,
-        "type": ac.get("type", ""), "origin": origin, "dest": dest, "alternate": alternate,
+        "type": ac.get("type", ""), "origin": origin, "dest": dest, "alternate": alternate, "alternates": alt_info,
         "dist_nm": dist_nm,
         "datetime": f"{flight_date.strftime('%d/%m/%Y')} {flight_time.strftime('%H:%M')} UTC",
         "ls_status": pax["status"].upper(), "cdb_name": cdb_name.strip(),
-        "prepared_by": user_info.get("nom", ""),
+        "prepared_by": preparer or user_info.get("nom", ""), "account": st.session_state.get("username", ""),
         "pax_counts": dict(pax["active_counts"]), "pax_masses": dict(pax["masses"]),
         "seated": pax["seated"], "pax_max": pax["max_seats"],
         "pax_prevus": pax["seated_prev"], "pax_final": pax["seated_final"],
         "pax_mass_kg": result["pax_total_kg"],
+        "zones": [{"name": z["name"], "count": pax["zone_counts"][i], "max": z.get("max_pax")}
+                  for i, z in enumerate(ac.get("pax_zones") or []) if pax["zone_counts"]],
         "bag_mode": bag_mode, "bag_pieces": bag_pieces, "bag_std": bag_std, "bag_ft": bag_ft_label,
         "bag_total": bag_total, "cargo_total": sum(cargo_w.values()), "mail_total": sum(mail_w.values()),
         "payload": payload,
@@ -1476,13 +1958,24 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
                    "mail": mail_w.get(c["name"], 0), "total": comp_loads[c["name"]], "max": int(c["max_kg"])}
                   for c in comps],
         "fuel": {"bloc": bloc, "taxi": taxi, "trip": trip, "tof": tof},
-        "oew": ac["oew_kg"], "crew_kg": ac.get("crew_kg", 0), "dow": ac["oew_kg"] + ac.get("crew_kg", 0),
+        "crew": {"flight": n_f, "cabin": n_c, "std_flight": std_f, "std_cabin": std_c, "delta_kg": crew_delta},
+        "extra": {"ballast": ballast, "ballast_pos": ballast_pos, "cons": cons, "cons_pos": cons_pos, "total": extra_kg},
+        "oew": ac["oew_kg"], "crew_kg": (ac.get("crew_kg") or 0) + crew_delta, "dow": result["dow"],
         "zfw": result["zfw"], "tow": result["tow"], "lw": lw,
-        "max_zfw": ac["max_zfw_kg"], "max_tow": ac["max_tow_kg"], "max_lw": ac["max_lw_kg"],
+        "max_zfw": ac["max_zfw_kg"], "max_tow": eff_tow, "max_lw": eff_lw,
+        "tow_basis": tow_basis, "lw_basis": lw_basis, "struct_tow": ac["max_tow_kg"], "struct_lw": ac["max_lw_kg"],
         "zfw_ok": zfw_ok, "tow_ok": tow_ok, "lw_ok": lw_ok, "cg_ok": cg_ok, "stock_ok": stock_ok,
+        "zfw_cg_ok": zfw_cg_ok, "tow_cg_ok": tow_cg_ok, "lw_cg_ok": lw_cg_ok, "zones_ok": zones_ok, "lmc_ok": lmc_ok,
+        "zones_over": [list(z) for z in pax.get("zones_over", [])],
         "tow_cg": result["tow_cg"], "zfw_cg": result["zfw_cg"], "tow_mac": result["tow_mac"],
-        "zfw_mac": result["zfw_mac"], "cg_min": ac["cg_min_m"], "cg_max": ac["cg_max_m"],
-        "status_ok": all([zfw_ok, tow_ok, lw_ok, cg_ok, stock_ok]),
+        "zfw_mac": result["zfw_mac"], "dow_cg": result["dow_cg"], "lw_cg": result["lw_cg"],
+        "cg_min": lim_t[0], "cg_max": lim_t[1],
+        "cg_lims": {"zfw": list(lim_z), "tow": list(lim_t), "lw": list(lim_l)},
+        "special": special_rows, "notoc_required": notoc_required,
+        "edition": edition, "lmc": lmc_rows, "lmc_max": lmc_max, "lmc_over": lmc_over,
+        "lock": {"state": lock_state, "hash": fp, "edition": (lock or {}).get("edition"),
+                 "at": (lock or {}).get("at"), "by": (lock or {}).get("by")},
+        "status_ok": all([zfw_ok, tow_ok, lw_ok, cg_ok, stock_ok, zones_ok, lmc_ok]),
         "origin_text": origin_txt, "referentiel_text": referentiel_label(ref),
         "data_certified": bool(aircraft_certified and ref_acceptable(ref)),
     }
@@ -1542,6 +2035,8 @@ def render_pdf_tab(blocked: bool, missing: list):
         data["vspeeds"] = st.session_state.get("vspeeds", {})
         with st.spinner("⚙ Génération du PDF en cours..."):
             pdf_bytes = generate_pdf(data, include_speeds)
+        audit("pdf_generated", f"{fs['flight_number'] or '-'} · édition {fs.get('edition', 1)} · {fs['ls_status']} · "
+                               f"verrou {fs['lock']['state']} · {'données non certifiées' if not fs['data_certified'] else 'données certifiées'}")
         fname = f"AETHERDISPATCH_{(fs['flight_number'] or 'VOL')}_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf"
         st.download_button(label="⬇ Télécharger la Load & Trim Sheet", data=pdf_bytes, file_name=fname,
                            mime="application/pdf", use_container_width=True)
@@ -1704,7 +2199,10 @@ REF_ROW_LABELS = [
     ("pax.child", "Masse standard - Enfants (kg)"), ("pax.infant", "Masse standard - Bébés (kg)"),
     ("bag.domestic", "Masse bagage - Vol intérieur (kg)"), ("bag.other", "Masse bagage - Autres vols (kg)"),
     ("bag.intercontinental", "Masse bagage - Vol intercontinental (kg)"),
+    ("crew.flight", "Masse standard - Équipage de conduite (kg)"), ("crew.cabin", "Masse standard - Équipage de cabine (kg)"),
+    ("proc.lmc_max", "Nombre maximal de dernières modifications (LMC) avant nouvelle édition"),
 ]
+REF_GROUPS = {"pax": "pax_masses", "bag": "bag_masses", "crew": "crew_masses"}
 RANK_SHEET_COL = "Rang bagages (1 = premier)"
 
 
@@ -1720,8 +2218,11 @@ def build_referentiel_template(db: dict, ref: dict):
         if grp == "id":
             rows.append({"Paramètre": label, "Valeur": ref["identification"].get(k, ""), "Statut": "",
                          "Source / commentaire": ""})
+        elif grp == "proc":
+            rows.append({"Paramètre": label, "Valeur": ref["procedures"].get(k) or "", "Statut": "",
+                         "Source / commentaire": ""})
         else:
-            it = ref["pax_masses" if grp == "pax" else "bag_masses"][k]
+            it = ref[REF_GROUPS[grp]][k]
             rows.append({"Paramètre": label, "Valeur": it["value"], "Statut": STATUS_LABELS[it["status"]],
                          "Source / commentaire": it["source"]})
     prios = [{"Type d'aéronef": n, "Soute": c["name"], RANK_SHEET_COL: c.get("bag_rank")}
@@ -1757,7 +2258,13 @@ def apply_referentiel_xlsx(raw: bytes, db: dict, ref: dict):
             if t != new_ref["identification"].get(k, ""):
                 new_ref["identification"][k], changed = t, changed + 1
             continue
-        it, v = new_ref["pax_masses" if grp == "pax" else "bag_masses"][k], _num(r.get("Valeur"))
+        if grp == "proc":
+            v = _num(r.get("Valeur"))
+            v = int(v) if v and v > 0 else None
+            if v != new_ref["procedures"].get(k):
+                new_ref["procedures"][k], changed = v, changed + 1
+            continue
+        it, v = new_ref[REF_GROUPS[grp]][k], _num(r.get("Valeur"))
         if v is None:
             continue
         chosen = LABEL_TO_STATUS.get(_txt(r.get("Statut")))
@@ -1813,10 +2320,16 @@ def render_referentiel_section(can_edit: bool, ver: int, db: dict):
         pdf_df = kv_df(ref["pax_masses"])
         st.markdown("**Masses forfaitaires de bagage en soute**")
         bdf = kv_df(ref["bag_masses"])
+        st.markdown("**Masses standard de l'équipage**")
+        cdf_ref = kv_df(ref["crew_masses"])
+        lmc_val = st.number_input("Nombre maximal de dernières modifications (LMC) avant nouvelle édition (0 = non renseigné)",
+                                  0, 99, int(ref["procedures"].get("lmc_max") or 0), key=f"ref_lmc_{ver}", disabled=not can_edit)
         if can_edit:
             ed_p = st.data_editor(pdf_df, hide_index=True, use_container_width=True, key=f"ref_pax_{ver}",
                                   disabled=["Paramètre"], num_rows="fixed", column_config=cfg)
             ed_b = st.data_editor(bdf, hide_index=True, use_container_width=True, key=f"ref_bag_{ver}",
+                                  disabled=["Paramètre"], num_rows="fixed", column_config=cfg)
+            ed_c = st.data_editor(cdf_ref, hide_index=True, use_container_width=True, key=f"ref_crew_{ver}",
                                   disabled=["Paramètre"], num_rows="fixed", column_config=cfg)
             if st.button("💾 Enregistrer le référentiel", key=f"btn_ref_{ver}", use_container_width=True):
                 changed = 0
@@ -1825,10 +2338,16 @@ def render_referentiel_section(can_edit: bool, ver: int, db: dict):
                 if new_ident != ident:
                     ref["identification"] = new_ident
                     changed += 1
-                changed += apply_kv_edits(ref["pax_masses"], ed_p) + apply_kv_edits(ref["bag_masses"], ed_b)
+                changed += (apply_kv_edits(ref["pax_masses"], ed_p) + apply_kv_edits(ref["bag_masses"], ed_b)
+                            + apply_kv_edits(ref["crew_masses"], ed_c))
+                new_lmc = int(lmc_val) if lmc_val > 0 else None
+                if new_lmc != ref["procedures"].get("lmc_max"):
+                    ref["procedures"]["lmc_max"] = new_lmc
+                    changed += 1
                 if changed:
                     st.session_state.dirty = True
                     st.session_state.ed_version = ver + 1
+                    audit("referentiel_saved", f"{changed} modification(s)")
                     st.session_state["_flash"] = (f"Référentiel enregistré ({changed} modification(s)). "
                                                   "Exportez votre profil pour le conserver.")
                     st.rerun()
@@ -1837,6 +2356,7 @@ def render_referentiel_section(can_edit: bool, ver: int, db: dict):
         else:
             st.dataframe(pdf_df, hide_index=True, use_container_width=True)
             st.dataframe(bdf, hide_index=True, use_container_width=True)
+            st.dataframe(cdf_ref, hide_index=True, use_container_width=True)
 
         st.markdown("**Fichier de référentiel (Excel)**")
         st.caption("Téléchargez le modèle, complétez-le d'après votre GOM (masses, priorités de chargement des bagages "
@@ -1858,6 +2378,7 @@ def render_referentiel_section(can_edit: bool, ver: int, db: dict):
                         st.session_state.db = new_db
                         st.session_state.dirty = st.session_state.get("dirty", False) or n > 0
                         st.session_state.ed_version = ver + 1
+                        audit("referentiel_applied", msg)
                         st.session_state["_flash"] = f"Référentiel appliqué : {msg}"
                         st.rerun()
                     else:
@@ -1895,6 +2416,40 @@ def render_referentiel_section(can_edit: bool, ver: int, db: dict):
                 st.rerun()
 
 
+ENV_MAP = [("Masse (kg)", "weight_kg"), ("Limite avant (m)", "fwd_m"), ("Limite arrière (m)", "aft_m")]
+FUEL_MAP = [("Carburant (kg)", "fuel_kg"), ("Bras (m)", "arm_m")]
+
+
+def table_df(rows: list, mapping: list) -> pd.DataFrame:
+    df = pd.DataFrame([{c: r.get(k) for c, k in mapping} for r in (rows or [])], columns=[c for c, _ in mapping])
+    for c, _ in mapping:
+        df[c] = pd.to_numeric(df[c], errors="coerce")
+    return df
+
+
+def apply_table_edits(ac: dict, key: str, df: pd.DataFrame, mapping: list, src: str) -> int:
+    """Enregistre un tableau facultatif (trié par la première colonne). Une modification passe en « Compagnie »."""
+    new = []
+    for rec in df.to_dict("records"):
+        vals = {k: _num(rec.get(c)) for c, k in mapping}
+        if all(v is None for v in vals.values()):
+            continue
+        new.append(vals)
+    first = mapping[0][1]
+    new.sort(key=lambda r: (r[first] is None, r[first] or 0))
+    old = [{k: r.get(k) for _, k in mapping} for r in (ac.get(key) or [])]
+    m = _meta(ac)
+    changed = int(new != old)
+    if new != old:
+        ac[key] = new
+        m["status"][key] = "compagnie" if new else "a_renseigner"
+    src = (src or "").strip()
+    if src != m["source"].get(key, ""):
+        m["source"][key] = src
+        changed += 1
+    return changed
+
+
 def _register_type(new_name: str, rec: dict):
     name = (new_name or "").strip()
     if not name:
@@ -1904,6 +2459,7 @@ def _register_type(new_name: str, rec: dict):
         st.error("Ce nom de type existe déjà.")
         return
     st.session_state.db[name] = rec
+    audit("type_created", name)
     st.session_state.dirty = True
     st.session_state["_pending_select"] = name
     st.session_state["_flash"] = f"Type « {name} » créé. Renseignez ses données ci-dessous."
@@ -1939,6 +2495,7 @@ def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
             if ok:
                 st.session_state.db = new_db
                 st.session_state.profile_info = new_info
+                audit("profile_imported", new_info["name"])
                 st.session_state.referentiel = normalize_referentiel(new_info.get("referentiel"))
                 st.session_state.dirty = False
                 st.session_state.ed_version = ver + 1
@@ -1969,6 +2526,7 @@ def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
                 _register_type(new_name, copy.deepcopy(ac))
             confirm = st.checkbox(f"Confirmer la suppression de « {selected_ac} »", key=f"del_ok_{selected_ac}")
             if st.button("Supprimer le type actuel", key="btn_del", disabled=(not confirm or len(db) <= 1)):
+                audit("type_deleted", selected_ac)
                 del st.session_state.db[selected_ac]
                 st.session_state.dirty = True
                 st.session_state["_flash"] = f"Type « {selected_ac} » supprimé."
@@ -2028,6 +2586,32 @@ def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
     else:
         st.dataframe(cdf, hide_index=True, use_container_width=True)
 
+    st.markdown("**Enveloppe de centrage** (limites avant et arrière selon la masse ; à défaut, limites constantes)")
+    env_df = table_df(ac.get("cg_envelope"), ENV_MAP)
+    fuel_df = table_df(ac.get("fuel_arm_table"), FUEL_MAP)
+    num_cfg = {c: st.column_config.NumberColumn(c, min_value=0) for c, _ in ENV_MAP + FUEL_MAP}
+    if can_edit:
+        edited_env = st.data_editor(env_df, hide_index=True, use_container_width=True, key=f"ed_env_{k}",
+                                    num_rows="dynamic", column_config=num_cfg)
+        env_src = st.text_input("Source de l'enveloppe (chapitre ou section du manuel)",
+                                value=_meta(ac)["source"].get("cg_envelope", ""), key=f"ed_envsrc_{k}")
+    else:
+        st.dataframe(env_df, hide_index=True, use_container_width=True)
+    if len(_valid_pts(ac.get("cg_envelope"), "weight_kg", "fwd_m", "aft_m")) < 2:
+        st.caption("Enveloppe non renseignée (ou moins de deux points) : les limites constantes de la table "
+                   "« Paramètres généraux » sont utilisées.")
+
+    st.markdown("**Bras du carburant selon la quantité** (à défaut, bras unique)")
+    if can_edit:
+        edited_fuel = st.data_editor(fuel_df, hide_index=True, use_container_width=True, key=f"ed_fuel_{k}",
+                                     num_rows="dynamic", column_config=num_cfg)
+        fuel_src = st.text_input("Source de la table du carburant (chapitre ou section du manuel)",
+                                 value=_meta(ac)["source"].get("fuel_arm_table", ""), key=f"ed_fuelsrc_{k}")
+    else:
+        st.dataframe(fuel_df, hide_index=True, use_container_width=True)
+    if len(_valid_pts(ac.get("fuel_arm_table"), "fuel_kg", "arm_m")) < 2:
+        st.caption("Table non renseignée (ou moins de deux points) : le bras unique du carburant est utilisé.")
+
     if can_edit and st.button("💾 Enregistrer les modifications de ce type", key=f"btn_save_{k}",
                               use_container_width=True):
         changed = 0
@@ -2041,6 +2625,10 @@ def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
         changed += apply_scalar_edits(ac, edited_s)
         changed += apply_rows_edits(ac, "pax_zones", edited_z, "Zone", "Capacité (pax)", "max_pax")
         changed += apply_rows_edits(ac, "cargo_comps", edited_c, "Soute", "Capacité (kg)", "max_kg", with_rank=True)
+        changed += apply_table_edits(ac, "cg_envelope", edited_env, ENV_MAP, env_src)
+        changed += apply_table_edits(ac, "fuel_arm_table", edited_fuel, FUEL_MAP, fuel_src)
+        if changed:
+            audit("data_saved", f"{selected_ac} : {changed} modification(s)")
         if changed:
             st.session_state.dirty = True
             st.session_state.ed_version = ver + 1
@@ -2049,6 +2637,112 @@ def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
             st.rerun()
         else:
             st.info("Aucune modification à enregistrer.")
+
+
+SPECIAL_COLS = ["Type", "N° ONU", "Classe / division", "Masse (kg)", "Soute", "Observations"]
+SPECIAL_TYPES = ["Marchandise dangereuse", "Animaux vivants", "Restes humains", "Valeurs", "Autre"]
+LMC_COLS = ["Heure (UTC)", "Nature", "Description", "Variation (kg)"]
+LMC_NATURES = ["Passagers", "Bagages", "Fret", "Courrier", "Carburant", "Autre"]
+
+
+def parse_special(df: pd.DataFrame) -> list:
+    out = []
+    for rec in df.to_dict("records"):
+        row = {"type": _txt(rec.get("Type")), "un": _txt(rec.get("N° ONU")), "cls": _txt(rec.get("Classe / division")),
+               "kg": _num(rec.get("Masse (kg)")), "hold": _txt(rec.get("Soute")), "obs": _txt(rec.get("Observations"))}
+        if any(v not in ("", None) for v in row.values()):
+            out.append(row)
+    return out
+
+
+def parse_lmc(df: pd.DataFrame) -> list:
+    out = []
+    for rec in df.to_dict("records"):
+        row = {"time": _txt(rec.get("Heure (UTC)")), "nature": _txt(rec.get("Nature")),
+               "desc": _txt(rec.get("Description")), "kg": _num(rec.get("Variation (kg)"))}
+        if any(v not in ("", None) for v in row.values()):
+            out.append(row)
+    return out
+
+
+def _new_edition():
+    """Établit une nouvelle édition de la loadsheet : numéro suivant, verrouillage levé."""
+    st.session_state["ls_edition"] = int(st.session_state.get("ls_edition", 1)) + 1
+    st.session_state.pop("locked", None)
+
+
+def render_admin_tab(user_info: dict, users: dict):
+    st.subheader("📜 Journal et comptes")
+    role = user_info.get("role")
+    if role not in ("admin", "dispatcher"):
+        st.info("Accès réservé aux profils admin et dispatcher.")
+        return
+    st.markdown("### Journal des actions")
+    st.caption("Le journal est conservé sur le serveur de l'application : l'hébergement gratuit peut l'effacer lors d'un "
+               "redémarrage. Exportez-le régulièrement.")
+    entries = read_json_fresh(AUDIT_FILE)
+    entries = entries if isinstance(entries, list) else []
+    f1, f2 = st.columns(2)
+    ev_sel = f1.multiselect("Événement", sorted({e.get("event", "") for e in entries}), key="audit_ev")
+    usr_txt = f2.text_input("Utilisateur ou nom contient", key="audit_user").strip().lower()
+    rows = [e for e in entries if (not ev_sel or e.get("event") in ev_sel)
+            and (not usr_txt or usr_txt in f"{e.get('user', '')} {e.get('name', '')}".lower())]
+    if rows:
+        df = pd.DataFrame(rows)[["t", "user", "name", "event", "detail"]]
+        df.columns = ["Date (UTC)", "Compte", "Nom", "Événement", "Détail"]
+        st.dataframe(df, hide_index=True, use_container_width=True)
+        st.download_button("⬇ Exporter le journal (CSV)", df.to_csv(index=False).encode("utf-8-sig"),
+                           f"journal_aetherdispatch_{datetime.now().strftime('%Y%m%d')}.csv", "text/csv", key="audit_csv")
+    else:
+        st.info("Aucun événement enregistré.")
+
+    if role != "admin":
+        st.caption("L'assistant de création de comptes est réservé au profil admin.")
+        return
+    st.markdown("---")
+    st.markdown("### Assistant de création de comptes")
+    st.caption("Les comptes sont définis dans le fichier users.json du dépôt. Cet assistant prépare le contenu complet du "
+               "fichier avec le nouveau compte (mot de passe haché et salé). L'application ne conserve aucun mot de passe.")
+    c1, c2, c3 = st.columns(3)
+    login = c1.text_input("Identifiant", key="acc_login").strip()
+    full_name = c2.text_input("Nom et prénom", key="acc_name").strip()
+    role_sel = c3.selectbox("Profil", ["agent", "dispatcher", "admin"], key="acc_role")
+    kind = st.radio("Type de compte", ["Individuel", "Partagé"], horizontal=True, key="acc_kind",
+                    help="Un compte partagé n'identifie pas la personne qui prépare la loadsheet : celle-ci devra saisir son nom.")
+    mode = st.radio("Mot de passe", ["Générer un mot de passe robuste", "Saisir un mot de passe"], horizontal=True, key="acc_mode")
+    if mode.startswith("Saisir"):
+        pwd = st.text_input("Mot de passe (12 caractères minimum)", type="password", key="acc_pwd")
+        generated = False
+    else:
+        pwd = st.session_state.setdefault("acc_gen_pwd", generate_password())
+        st.text_input("Mot de passe généré", pwd, disabled=True, key="acc_pwd_show")
+        st.button("Générer un autre mot de passe", on_click=lambda: st.session_state.update(acc_gen_pwd=generate_password()),
+                  key="acc_regen")
+        generated = True
+    valid_login = bool(login) and all(ch.isalnum() or ch in "._-" for ch in login)
+    if login and not valid_login:
+        st.error("Identifiant : lettres, chiffres, point, tiret et tiret bas uniquement.")
+    if not generated and pwd and len(pwd) < 12:
+        st.error("Le mot de passe doit comporter au moins 12 caractères.")
+    ready = valid_login and bool(full_name) and bool(pwd) and (generated or len(pwd) >= 12)
+    if st.button("Préparer le compte", key="acc_make", disabled=not ready):
+        entry = {**hash_password_pbkdf2(pwd), "role": role_sel, "nom": full_name,
+                 "type": "partagé" if kind == "Partagé" else "individuel"}
+        st.session_state["acc_result"] = {"login": login, "password": pwd if generated else None, "exists": login in users,
+                                          "json": json.dumps({**users, login: entry}, ensure_ascii=False, indent=2)}
+        audit("account_prepared", f"{login} ({role_sel}, {entry['type']})")
+        if generated:
+            st.session_state.pop("acc_gen_pwd", None)
+    res = st.session_state.get("acc_result")
+    if res:
+        st.success(f"Compte « {res['login']} » préparé" + (" (il remplace le compte existant du même nom)." if res["exists"] else "."))
+        if res["password"]:
+            st.warning(f"Mot de passe à transmettre à l'utilisateur par un canal sûr : **{res['password']}**  "
+                       "Il n'est affiché qu'ici et n'est conservé nulle part.")
+        st.markdown("Sur GitHub : ouvrez `users.json`, cliquez sur le crayon, sélectionnez tout (Ctrl+A), collez le contenu "
+                    "ci-dessous, puis « Commit changes ». L'application redémarre seule.")
+        st.code(res["json"], language="json")
+        st.button("Effacer ce résultat", on_click=lambda: st.session_state.pop("acc_result", None), key="acc_clear")
 
 
 def blocked_message(missing: list):
@@ -2102,7 +2796,7 @@ def main():
              border-radius:10px;border:1px solid rgba(0,191,255,0.2);margin-bottom:1rem">
             <div style="font-size:2.5rem">✈</div>
             <div style="font-weight:900;font-size:1.1rem;color:#00BFFF;letter-spacing:3px">AETHERDISPATCH</div>
-            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v4.0 | EG CONSEIL</div>
+            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v5.0 | EG CONSEIL</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -2144,7 +2838,8 @@ def main():
 
         st.markdown("---")
         if st.button("🔓 Déconnexion", use_container_width=True):
-            for key in ["authenticated", "username", "user_info", "db", "profile_info", "dirty", "sel_ac", "ed_version", "pax_info", "referentiel", "flight_summary", "fuel_in", "ref_docs", "ref_docs_ver"]:
+            audit("logout", "")
+            for key in ["authenticated", "username", "user_info", "db", "profile_info", "dirty", "sel_ac", "ed_version", "pax_info", "referentiel", "flight_summary", "fuel_in", "ref_docs", "ref_docs_ver", "preparer_name", "cdb_name", "locked", "ls_edition", "wx", "wx_sel", "lmc_editor", "acc_result", "acc_gen_pwd", "flight_date", "flight_time"]:
                 st.session_state.pop(key, None)
             st.rerun()
 
@@ -2158,18 +2853,22 @@ def main():
 
     # ── Bandeau d'état du profil compagnie + contrôle des données du type ────
     render_profile_banner()
+    if user_info.get("type") == "partagé":
+        st.info("Compte partagé : il n'identifie pas la personne qui prépare la loadsheet. Saisissez votre nom et prénom "
+                "dans le champ « Préparé par » (onglet « Nouveau vol »).")
     missing = missing_fields(ac)
     blocked = bool(missing)
 
     # ── Onglets ───────────────────────────────────────────────────────────────
-    tab1, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
+    tab1, tab3, tab4, tab5, tab6, tab7, tab8, tab9 = st.tabs([
         "📋 Nouveau vol",
         "📈 Performances & V-Speeds",
         "⛽ Carburant & Météo",
         "🧠 Optimisation Cargo",
         "📄 Export PDF",
         "🗂 Historique",
-        "🛠 Données aéronef"
+        "🛠 Données aéronef",
+        "📜 Journal et comptes"
     ])
 
     # =========================================================================
@@ -2190,7 +2889,6 @@ def main():
             mc  = st.session_state.get("mc_result", {})
             tow = mc.get("tow", ac["max_tow_kg"])
             lw  = st.session_state.get("lw", ac["max_lw_kg"])
-            dist_nm_perf = st.session_state.get("dist_nm", 1000)
 
             col_p1, col_p2, col_p3 = st.columns(3)
             with col_p1:
@@ -2204,9 +2902,8 @@ def main():
                 flap_conf = st.selectbox("Configuration volets décollage",
                                          ["CONF 1+F", "CONF 2", "CONF 3", "CONF FULL"])
             with col_p3:
-                wind_dir_perf = st.number_input("Vent direction (°)", 0, 360, 270)
-                wind_kt_perf  = st.number_input("Vent vitesse (kts)", 0, 60, 10)
-                wind_note = "Vent arrière ✓" if wind_kt_perf > 0 else "Vent debout ✓"
+                st.caption("Le vent n'intervient pas dans ce calcul. Valeurs indicatives (formule approchée), "
+                           "à ne pas utiliser en exploitation.")
 
             vs = compute_vspeeds(ac, tow, lw, elev_ft, oat_c, rwy_m, flap_conf)
 
@@ -2317,7 +3014,8 @@ def main():
                 st.metric("Distance route", f"{dist_nm_fuel:.0f} NM")
 
             fp = compute_fuel_plan(dist_nm_fuel, ac, pax_tot_est // 84, cargo_tot_est,
-                                   wind_kt_fuel, rwy_alt_ft, oat_fuel)
+                                   wind_kt_fuel, rwy_alt_ft, oat_fuel,
+                                   alt_dist_nm=st.session_state.get("alt_dist_nm", 200.0))
 
             # ── Tableau carburant ─────────────────────────────────────────────────
             st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
@@ -2326,7 +3024,7 @@ def main():
             fuel_items = [
                 ("Trip Fuel", fp["trip_fuel_kg"], "Carburant de route"),
                 ("Contingence (5%)", fp["contingency_kg"], "Marge réglementaire"),
-                ("Alternate Fuel", fp["alt_fuel_kg"], f"≈ 200 NM – {fp['trip_time_str']}"),
+                ("Alternate Fuel", fp["alt_fuel_kg"], f"dégagement le plus éloigné : {fp['alt_dist_nm']:.0f} NM"),
                 ("Final Reserve (30 min)", fp["final_reserve_kg"], "Minimum réglementaire OACI"),
                 ("Taxi Fuel", fp["taxi_kg"], "Roulage estimé"),
             ]
@@ -2379,54 +3077,66 @@ def main():
             st.plotly_chart(fig_fuel, use_container_width=True)
             st.session_state.fuel_plan = fp
 
-        # ── METAR Live ────────────────────────────────────────────────────────
+        # ── Météo : METAR et TAF ──────────────────────────────────────────────
         st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
-        st.markdown("### 🌍 METAR Live — Météo aéroports")
+        st.markdown("### 🌍 Météo aéroports — METAR et TAF")
+        ap_all = list(airports.keys())
+        flight_aps = []
+        for n_ in [st.session_state.get("origin"), st.session_state.get("dest")] + list(st.session_state.get("alternates", [])):
+            if n_ in ap_all and n_ not in flight_aps:
+                flight_aps.append(n_)
+        st.session_state.setdefault("wx_sel", flight_aps or ap_all[:3])
 
-        metar_airports = st.multiselect(
-            "Sélectionnez les aéroports à interroger",
-            list(airports.keys()),
-            default=list(airports.keys())[:3]
-        )
+        def _use_flight_airports():
+            st.session_state["wx_sel"] = flight_aps or ap_all[:3]
 
-        if st.button("🔄 Actualiser METARs", use_container_width=False):
-            for ap_name in metar_airports:
-                icao = airports[ap_name]["icao"]
-                with st.spinner(f"Interrogation {icao}..."):
-                    metar = fetch_metar(icao)
-                cat = metar.get("flight_cat", "UNKN")
-                cat_color = flight_cat_color(cat)
-
-                if metar["ok"]:
-                    temp_str  = f"{metar['temp']}°C" if metar.get("temp") is not None else "N/D"
-                    wind_str  = f"{metar.get('wind_dir','---')}°/{metar.get('wind_kt','--')}kts" \
-                                if metar.get("wind_dir") is not None else "N/D"
-                    vis_str   = f"{metar.get('visibility_m','N/D')} SM"
-                    st.markdown(f"""
-                    <div style="background:#0D1F3C;border:1px solid {cat_color}33;border-radius:8px;
-                         padding:10px 14px;margin:6px 0">
-                        <div style="display:flex;justify-content:space-between;align-items:center">
-                            <div>
-                                <span style="font-weight:700;color:{cat_color};font-size:1rem">{icao}</span>
-                                <span style="color:#556688;font-size:0.8rem;margin-left:8px">{ap_name}</span>
-                            </div>
-                            <span style="background:{cat_color}22;color:{cat_color};border:1px solid {cat_color};
-                                  border-radius:12px;padding:2px 10px;font-size:0.75rem;font-weight:700">{cat}</span>
-                        </div>
-                        <div style="font-family:monospace;font-size:0.78rem;color:#A0B0D0;margin:6px 0;
-                             background:#050510;padding:6px 10px;border-radius:4px">{metar['raw']}</div>
-                        <div style="display:flex;gap:16px;font-size:0.78rem;color:#8899BB">
-                            <span>🌡 {temp_str}</span>
-                            <span>💨 {wind_str}</span>
-                            <span>👁 {vis_str}</span>
-                            <span>🕐 {str(metar.get('obs_time') or '')[:5] or 'N/D'}Z</span>
-                        </div>
-                    </div>
-                    """, unsafe_allow_html=True)
-                else:
-                    st.error(f"❌ {icao} : {metar['raw']}")
+        sel = st.multiselect("Aéroports à interroger", ap_all, key="wx_sel")
+        wc1, wc2 = st.columns([1, 2])
+        wc2.button("Utiliser les aéroports du vol", on_click=_use_flight_airports, key="wx_use_flight")
+        if wc1.button("🔄 Actualiser la météo", key="wx_refresh"):
+            items = []
+            with st.spinner("Interrogation du service météo..."):
+                for ap_name in sel:
+                    icao = airports[ap_name]["icao"]
+                    items.append({"name": ap_name, "icao": icao, "metar": fetch_metar(icao), "taf": fetch_taf(icao)})
+            st.session_state["wx"] = {"fetched_at": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M"), "items": items}
+        wx = st.session_state.get("wx")
+        if not wx:
+            st.info("Cliquez sur « Actualiser la météo » pour récupérer les METAR et les TAF en temps réel.")
         else:
-            st.info("👆 Cliquez sur 'Actualiser METARs' pour récupérer les données météo en temps réel.")
+            st.caption(f"Interrogé le {wx['fetched_at']} UTC · source : NOAA / NWS Aviation Weather Center (aviationweather.gov). "
+                       "Source non contractuelle : à vérifier auprès du service météorologique compétent pour la préparation opérationnelle.")
+            for it in wx["items"]:
+                mt, tf = it["metar"], it["taf"]
+                cat = mt.get("category", "INCONNUE")
+                col = flight_cat_color(cat)
+                metar_html = (f'<div style="font-family:monospace;font-size:0.78rem;color:#A0B0D0;margin:6px 0;'
+                              f'background:#050510;padding:6px 10px;border-radius:4px">{_html.escape(mt["raw"])}</div>'
+                              f'<div style="font-size:0.78rem;color:#8899BB">{_html.escape(wx_decoded_line(mt))}</div>'
+                              if mt.get("ok") else
+                              f'<div style="color:#FF8888;font-size:0.8rem;margin:6px 0">METAR indisponible : {_html.escape(mt.get("error", ""))}</div>')
+                taf_html = (f'<div style="font-family:monospace;font-size:0.76rem;color:#A0B0D0;margin:6px 0;background:#050510;'
+                            f'padding:6px 10px;border-radius:4px">{"<br>".join(_html.escape(l) for l in tf["raw"].splitlines())}</div>'
+                            if tf.get("ok") else
+                            f'<div style="color:#E0B060;font-size:0.8rem;margin:6px 0">TAF indisponible : {_html.escape(tf.get("error", ""))}</div>')
+                st.markdown(f"""
+                <div style="background:#0D1F3C;border:1px solid {col}55;border-radius:8px;padding:10px 14px;margin:8px 0">
+                    <div style="display:flex;justify-content:space-between;align-items:center">
+                        <div><span style="font-weight:700;color:{col};font-size:1rem">{it['icao']}</span>
+                             <span style="color:#556688;font-size:0.8rem;margin-left:8px">{_html.escape(it['name'])}</span></div>
+                        <span style="background:{col}22;color:{col};border:1px solid {col};border-radius:12px;
+                              padding:2px 10px;font-size:0.75rem;font-weight:700">{cat}</span>
+                    </div>
+                    <div style="color:#8899BB;font-size:0.72rem;margin-top:6px">METAR</div>{metar_html}
+                    <div style="color:#8899BB;font-size:0.72rem;margin-top:4px">TAF</div>{taf_html}
+                </div>
+                """, unsafe_allow_html=True)
+            if st.button("📄 Générer le briefing météo (PDF)", key="wx_pdf_btn"):
+                ctx = st.session_state.get("flight_info") or {}
+                wx_bytes = generate_wx_pdf(wx, ctx)
+                st.download_button("⬇ Télécharger le briefing météo", data=wx_bytes,
+                                   file_name=f"AETHERDISPATCH_meteo_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                                   mime="application/pdf", key="wx_pdf_dl", use_container_width=True)
 
 
     # =========================================================================
@@ -2527,7 +3237,7 @@ def main():
     with tab7:
         st.subheader("🗂 Historique des vols AETHERDISPATCH")
 
-        history = load_json("flight_history.json")
+        history = read_json_fresh("flight_history.json")
         if not isinstance(history, list) or len(history) == 0:
             st.info("📭 Aucun vol sauvegardé. Remplissez l'onglet 'Nouveau vol' et cliquez sur 'Sauvegarder le vol'.")
         else:
@@ -2552,6 +3262,7 @@ def main():
                 "Route": f"{h.get('origin','?')} → {h.get('dest','?')}",
                 "Date": h.get("datetime", "—"),
                 "Loadsheet": str(h.get("ls_status", "—")),
+                "Édition": str(h.get("edition", "—")),
                 "PAX prévus": str(h.get("pax_prevus", "—")),
                 "PAX final": str(h.get("pax_final", "—")),
                 "TOW (kg)": h.get("tow", 0),
@@ -2607,10 +3318,16 @@ def main():
     with tab8:
         render_data_tab(selected_ac, can_edit, user_info)
 
+    # =========================================================================
+    # ONGLET 9 : JOURNAL DES ACTIONS ET ASSISTANT DE COMPTES
+    # =========================================================================
+    with tab9:
+        render_admin_tab(user_info, users)
+
     # ── Footer ─────────────────────────────────────────────────────────────────
     st.markdown("""
     <div class="aether-footer">
-        AETHERDISPATCH v4.0 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
+        AETHERDISPATCH v5.0 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
         Données à usage opérationnel restreint — Vérification obligatoire par le commandant de bord
     </div>
     """, unsafe_allow_html=True)
