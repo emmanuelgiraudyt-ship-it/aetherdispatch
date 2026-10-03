@@ -7,3 +7,4 @@ Pillow
 pulp==2.9.0
 plotly
 matplotlib
+openpyxl
