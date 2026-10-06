@@ -1,10 +1,9 @@
-streamlit
+streamlit>=1.32.0,<2
 pandas
 numpy
 requests
-fpdf2
-Pillow
-pulp==2.9.0
+fpdf2>=2.7.9
+PuLP==2.9.0
 plotly
-matplotlib
 openpyxl
+pymupdf
