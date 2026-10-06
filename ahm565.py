@@ -1093,7 +1093,7 @@ def is_ahm565(data: bytes) -> bool:
 # ===========================================================================
 LEN_M = {'m': 1.0, 'cm': 0.01, 'in': 0.0254, 'ft': 0.3048}
 LEN_TEXT = {'meters': 'm', 'metres': 'm', 'inches': 'in', 'centimeters': 'cm', 'feet': 'ft'}
-SRC_TXT = "AHM 565 {org} édition {ed} du {date} : {feuille}"
+SRC_TXT = "AHM {org} édition {ed} du {date} : {feuille}"
 
 
 def _interp_pts(pts, x):
