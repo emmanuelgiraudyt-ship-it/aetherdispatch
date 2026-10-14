@@ -2,8 +2,8 @@
   "admin": {
     "algo": "pbkdf2_sha256",
     "iterations": 200000,
-    "salt": "09c3d3b1ec8ce3404ec6eaf88e43e83c",
-    "password_hash": "2ed8a4a55db471a4f96423da90b132360e8618b2ee49d57f88979ae432993416",
+    "salt": "2078ccf295000d869830558028baa3e2",
+    "password_hash": "3614bf854fc29b82e6f2d5ba2d20731e8ca9513d60c78cdf6a18b3c5abce2476",
     "role": "admin",
     "nom": "Administrateur AETHERDISPATCH",
     "type": "individuel"
@@ -11,8 +11,8 @@
   "handling1": {
     "algo": "pbkdf2_sha256",
     "iterations": 200000,
-    "salt": "75f123993596ef6b699848eb40b96104",
-    "password_hash": "959bb040eb573c2119a2b3b35ed4b8d73669a2270217dc7b47ff6cc470e98dd8",
+    "salt": "958e2489bc95b44a3711789d397a2732",
+    "password_hash": "0b65e0776cc1d83a43bb1a5c860f8bdc96a34f7d6ad0da8076f230d15aae6b9c",
     "role": "agent",
     "nom": "Agent Handling Alpha",
     "type": "partagé"
@@ -20,14 +20,17 @@
   "dispatcher": {
     "algo": "pbkdf2_sha256",
     "iterations": 200000,
-    "salt": "a7ea28650b0a97e498fcbe5cc496f12b",
-    "password_hash": "6cc667e0856c1407799a94dfae4955a9019b6cfee7df16f4da4828cf98f40ec0",
+    "salt": "145693cc22aad00fedfa95d9f347e3ff",
+    "password_hash": "737cef929301d014ada9f1e03e9c5cda62067013b088a3e09fec3e2684c93ef5",
     "role": "dispatcher",
     "nom": "Dispatcher OPS",
     "type": "partagé"
   },
   "testeur": {
-    "password_hash": "09f7863cb25ccc4ece9f2b82364a9a8c7a1dc57cc2baa582168a09046873c292",
+    "algo": "pbkdf2_sha256",
+    "iterations": 200000,
+    "salt": "0d0bd3d361a9a81655b1b3279284798f",
+    "password_hash": "f852d341d0b7b089910fc42dc848a74a7bac9d1435dfd90dc5897c5e2e332391",
     "role": "dispatcher",
     "nom": "Testeur dispatcher",
     "type": "individuel"
