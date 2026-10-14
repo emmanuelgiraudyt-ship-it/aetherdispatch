@@ -6,6 +6,7 @@ La barre latérale (Configuration, Immatriculation), apply_selection() et toute 
 modification. Deux modes : « demo » (catalogue sourcé, statut « démo ») et « client » (fichier de l'exploitant).
 """
 import json
+import re
 
 LEN = {"m": 1.0, "in": 0.0254}
 PHASE = {"ZEROFUEL": "zfw", "TAKEOFF": "tow", "LANDING": "law"}
@@ -186,11 +187,22 @@ def to_app_record(t, mode="demo", info=None):
         _, W0, I0 = rows[0]
         adj = {cd: (W - W0, I - I0) for cd, W, I in rows}
         zones = []
+        cls = re.findall(r"(\d+)\s*([A-Z])", c["name"].replace(" ", ""))
+        left = [[k_, int(n_)] for n_, k_ in cls] if len(cls) > 1 else []        # classes de la configuration, de l'avant vers l'arrière
         for s in c["sections"]:
             cs = cabsec.get(s["id"]) or {}
+            by_class = {}
+            if left:
+                rest_s = s["seats"]
+                for ent in left:                                                  # les classes avant occupent d'abord les sections avant
+                    take = min(ent[1], rest_s)
+                    if take > 0:
+                        by_class[ent[0]] = take
+                    ent[1] -= take
+                    rest_s -= take
             rr = f" (R{cs['row_from']}–R{cs['row_to']})" if cs.get("row_from") and cs.get("row_to") else ""
             zones.append({"name": f"Cabine {s['id']}{rr}", "arm_m": round(ix["ref_m"] + ix["C_m"] * s["index_per_kg"], 4),
-                          "max_pax": s["seats"], "status": status,
+                          "max_pax": s["seats"], "status": status, **({"classes": by_class} if by_class else {}),
                           "source": srcfn(f"feuille {_sheet(t['saleable_configurations'])}, configuration {c['name']}")})
         cfgs.append({"nom": c["name"], "pnt": pnt, "pnc": pnc, "equipage_txt": None, "crew_kg": float(crew_kg), "crew_arm_m": None,
                      "dow_flotte_kg": W0, "dow_flotte_index": I0, "ajustements": adj, "zones": zones, "sieges": seats})
@@ -223,6 +235,20 @@ def to_app_record(t, mode="demo", info=None):
         rap.append(("attention", "Aucune soute en vrac exploitable : à saisir dans « Données aéronef »."))
     rap.append(("info", "Masse à vide injectée = masse de base de la feuille E5 + équipage (2 PNT et un PNC par tranche de 50 sièges, minimum réglementaire) ; offices, eau et pantry ne sont pas inclus : à ajuster."))
     rap.append(("info", "Positions ULD non importées par ce lecteur : chargement en vrac par soute."))
+    it = t.get("ideal_trim")
+    if it and it.get("ideal_trim_line"):
+        ac["ideal_trim"] = {"reference": it.get("ideal_trim_reference_remark") or "TOW",
+                            "line": [{"weight_kg": p["weight_kg"], "pct_mac": p["pct_mac"], "fwd_pct_mac": p.get("fwd_pct_mac"),
+                                      "aft_pct_mac": p.get("aft_pct_mac")} for p in it["ideal_trim_line"]],
+                            "tipping": [{"name": x["name"], "condition": x.get("condition") or "",
+                                         "points": [(p["weight_kg"], p["pct_mac"]) for p in x["points"]]}
+                                        for x in (it.get("tipping_tables") or [])],
+                            "source": srcfn("feuille C7, ligne de centrage idéale et limites de basculement")}
+        if it.get("ideal_trim_reference_remark") == "ZFW":
+            rap.append(("info", "La remarque de la feuille C7 cite le centrage à la masse sans carburant alors que le tableau est en masse au décollage : "
+                                "la ligne est comparée au centrage au décollage."))
+    else:
+        rap.append(("info", "Pas de ligne de centrage idéale dans ce fichier : la répartition des bagages visera le milieu de l'enveloppe."))
     ac["ahm"] = {"source": {"fichier": info.get("fichier") or info.get("document"), "organisme": org, "edition": ed, "date": dt,
                             "type": ac["type"], "fabricant": None},
                  "unites_fichier": {"longueur": unit, "masse": "kg"}, "index": ix, "configs": cfgs,

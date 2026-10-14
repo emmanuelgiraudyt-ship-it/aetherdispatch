@@ -213,6 +213,50 @@ def src(sh, code=None):
     return {'sheet': (code or sh.get('code') or '') + ' ' + sh['sheet'], 'pages': sh['pages'], 'where': sh.get('where')}
 
 
+def x_ideal(sheets, group):
+    """Feuille C7 : ligne et zone de centrage idéales (§ 4.3) et limites de basculement / stabilité au sol (§ 4.4)."""
+    shs = pick(sheets, 'Ideal Trim Line', group)
+    if not shs:
+        return None
+    sh = shs[0]
+    line, sec, tabs, cur = [], None, [], None
+    ref_kind = 'TOW'
+    num = r'[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?'
+    for l in sh['txt'].split('\n'):
+        t = l.strip()
+        if re.match(r'4\.3\b', t):
+            sec = '43'
+        elif re.match(r'4\.4\b', t):
+            sec = '44'
+        if re.search(r'LIZFW', t):
+            ref_kind = 'ZFW'
+        if sec == '44':
+            m = re.match(r'Table Name:\s*(\S.*)$', t)
+            if m:
+                cur = {'name': m.group(1).strip(), 'condition': '', 'points': []}
+                tabs.append(cur)
+                continue
+            m = re.match(r'Condition:\s*(.*)$', t)
+            if m and cur is not None:
+                cur['condition'] = m.group(1).strip()
+                continue
+        toks = t.split()
+        if toks and all(re.fullmatch(num, x) for x in toks):
+            v = [fnum(x) for x in toks]
+            if sec == '43' and len(v) in (3, 7) and v[0] >= 1000:
+                line.append({'weight_kg': v[0], 'pct_mac': v[1], 'index': v[2],
+                             'fwd_pct_mac': v[3] if len(v) == 7 else None, 'aft_pct_mac': v[5] if len(v) == 7 else None})
+            elif sec == '44' and cur is not None and len(v) == 3 and v[0] >= 1000:
+                if cur['points'] and v[0] < cur['points'][-1]['weight_kg']:      # nouvelle table sans nouvel en-tête
+                    cur = {'name': cur['name'], 'condition': '', 'points': []}
+                    tabs.append(cur)
+                cur['points'].append({'weight_kg': v[0], 'pct_mac': v[1], 'index': v[2]})
+    if not line:
+        return None
+    return {'registrations_group': sh['regs'], 'ideal_trim_line': line, 'ideal_trim_reference_remark': ref_kind,
+            'tipping_tables': [t for t in tabs if t['points']], 'source': src(sh, 'C')}
+
+
 def x_units(sheets):
     shs = find_sheets(sheets, 'Units of Measurement')
     if not shs:
@@ -769,7 +813,10 @@ def build_entry(sheets, group_label):
                                     'source': SAL['source']},
         'crew': {'pnt': pnt, 'pnc': pnc, 'kg_pnt': cw.get('flight_deck', 85), 'kg_pnc': cw.get('cabin', 75), 'source': (CREW or {}).get('source')},
         'standards': STD, 'group': group_label,
+        'ideal_trim': x_ideal(sheets, g),
     }
+    if not entry['ideal_trim']:
+        inf("Ligne de centrage idéale (feuille C7) introuvable : la répartition des bagages visera le milieu de l'enveloppe.")
     return entry, rap
 
 

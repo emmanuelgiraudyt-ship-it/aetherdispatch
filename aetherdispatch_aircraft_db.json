@@ -2034,6 +2034,281 @@
      ],
      "where": "page"
     }
+   },
+   "ideal_trim": {
+    "registrations_group": "ALL",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 40000.0,
+      "pct_mac": 26.8,
+      "index": 53.0,
+      "fwd_pct_mac": 25.0,
+      "aft_pct_mac": 28.6
+     },
+     {
+      "weight_kg": 70000.0,
+      "pct_mac": 31.1,
+      "index": 68.0,
+      "fwd_pct_mac": 30.1,
+      "aft_pct_mac": 32.2
+     }
+    ],
+    "ideal_trim_reference_remark": "ZFW",
+    "tipping_tables": [
+     {
+      "name": "Ground Stability Limits",
+      "condition": "25 knot wind speed",
+      "points": [
+       {
+        "weight_kg": 31000.0,
+        "pct_mac": 41.0,
+        "index": 70.8
+       },
+       {
+        "weight_kg": 35000.0,
+        "pct_mac": 42.0,
+        "index": 75.0
+       },
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 45.0,
+        "index": 83.5
+       },
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 46.5,
+        "index": 90.6
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 48.0,
+        "index": 98.2
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 49.0,
+        "index": 105.4
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 50.0,
+        "index": 112.9
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 50.5,
+        "index": 119.5
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 51.0,
+        "index": 126.3
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 51.5,
+        "index": 133.3
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 51.9,
+        "index": 140.3
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "30 knot wind speed",
+      "points": [
+       {
+        "weight_kg": 31000.0,
+        "pct_mac": 38.0,
+        "index": 66.9
+       },
+       {
+        "weight_kg": 35000.0,
+        "pct_mac": 40.0,
+        "index": 72.0
+       },
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 43.0,
+        "index": 80.2
+       },
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 44.5,
+        "index": 86.8
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 46.0,
+        "index": 94.0
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 47.0,
+        "index": 100.7
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 48.0,
+        "index": 107.9
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 49.0,
+        "index": 115.4
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 49.5,
+        "index": 121.9
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 50.0,
+        "index": 128.6
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 50.6,
+        "index": 135.9
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "35 knot wind speed",
+      "points": [
+       {
+        "weight_kg": 31000.0,
+        "pct_mac": 34.0,
+        "index": 61.7
+       },
+       {
+        "weight_kg": 35000.0,
+        "pct_mac": 37.0,
+        "index": 67.6
+       },
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 40.0,
+        "index": 75.2
+       },
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 42.0,
+        "index": 82.1
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 43.5,
+        "index": 88.8
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 45.0,
+        "index": 96.1
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 46.0,
+        "index": 102.8
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 47.0,
+        "index": 110.0
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 48.0,
+        "index": 117.5
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 48.5,
+        "index": 123.9
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 49.0,
+        "index": 130.5
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 34000.0,
+        "pct_mac": 18.0,
+        "index": 40.0
+       },
+       {
+        "weight_kg": 37000.0,
+        "pct_mac": 35.0,
+        "index": 65.5
+       },
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 36.5,
+        "index": 69.3
+       },
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 39.0,
+        "index": 76.4
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 41.0,
+        "index": 83.5
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 42.5,
+        "index": 90.4
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 44.0,
+        "index": 97.8
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 45.0,
+        "index": 104.5
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 46.0,
+        "index": 111.6
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 47.0,
+        "index": 119.2
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 47.5,
+        "index": 125.5
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      17,
+      18,
+      19
+     ],
+     "where": "page"
+    }
    }
   },
   "A320-232": {
@@ -3818,6 +4093,288 @@
      ],
      "where": "page"
     }
+   },
+   "ideal_trim": {
+    "registrations_group": "320A",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 40000.0,
+      "pct_mac": 29.2,
+      "index": 57.0,
+      "fwd_pct_mac": 27.4,
+      "aft_pct_mac": 31.0
+     },
+     {
+      "weight_kg": 61000.0,
+      "pct_mac": 32.0,
+      "index": 67.9,
+      "fwd_pct_mac": 30.9,
+      "aft_pct_mac": 33.2
+     },
+     {
+      "weight_kg": 73500.0,
+      "pct_mac": 31.9,
+      "index": 71.3,
+      "fwd_pct_mac": 30.7,
+      "aft_pct_mac": 33.0
+     }
+    ],
+    "ideal_trim_reference_remark": "TOW",
+    "tipping_tables": [
+     {
+      "name": "Ground Stability Limits",
+      "condition": "25 knot wind speed",
+      "points": [
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 44.0,
+        "index": 81.9
+       },
+       {
+        "weight_kg": 44000.0,
+        "pct_mac": 46.0,
+        "index": 88.7
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 47.0,
+        "index": 96.1
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 48.0,
+        "index": 103.0
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 49.0,
+        "index": 110.4
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 50.0,
+        "index": 118.1
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 50.5,
+        "index": 124.8
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 51.0,
+        "index": 131.8
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 51.5,
+        "index": 138.9
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 52.0,
+        "index": 146.2
+       },
+       {
+        "weight_kg": 90000.0,
+        "pct_mac": 52.5,
+        "index": 153.8
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "30 knot wind speed",
+      "points": [
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 41.0,
+        "index": 76.8
+       },
+       {
+        "weight_kg": 44000.0,
+        "pct_mac": 43.0,
+        "index": 83.2
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 45.0,
+        "index": 91.9
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 46.0,
+        "index": 98.4
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 47.0,
+        "index": 105.3
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 48.0,
+        "index": 112.7
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 49.0,
+        "index": 120.4
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 49.5,
+        "index": 127.0
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 50.0,
+        "index": 133.9
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 50.5,
+        "index": 140.9
+       },
+       {
+        "weight_kg": 90000.0,
+        "pct_mac": 51.0,
+        "index": 148.1
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "35 knot wind speed",
+      "points": [
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 38.0,
+        "index": 71.8
+       },
+       {
+        "weight_kg": 44000.0,
+        "pct_mac": 40.0,
+        "index": 77.7
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 42.0,
+        "index": 85.6
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 44.0,
+        "index": 93.8
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 45.0,
+        "index": 100.3
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 46.0,
+        "index": 107.2
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 47.0,
+        "index": 114.6
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 48.0,
+        "index": 122.3
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 48.5,
+        "index": 128.8
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 49.0,
+        "index": 135.5
+       },
+       {
+        "weight_kg": 90000.0,
+        "pct_mac": 49.5,
+        "index": 142.5
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 22.0,
+        "index": 45.0
+       },
+       {
+        "weight_kg": 44000.0,
+        "pct_mac": 37.0,
+        "index": 72.1
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 40.0,
+        "index": 81.4
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 41.5,
+        "index": 88.0
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 43.0,
+        "index": 95.3
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 44.0,
+        "index": 101.8
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 45.0,
+        "index": 108.7
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 46.0,
+        "index": 116.0
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 47.0,
+        "index": 123.8
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 47.5,
+        "index": 130.2
+       },
+       {
+        "weight_kg": 90000.0,
+        "pct_mac": 48.0,
+        "index": 136.8
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      19,
+      20,
+      21
+     ],
+     "where": "page"
+    }
    }
   },
   "A321-231": {
@@ -5494,6 +6051,322 @@
      "sheet": "E 2",
      "pages": [
       101
+     ],
+     "where": "page"
+    }
+   },
+   "ideal_trim": {
+    "registrations_group": "ALL",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 45000.0,
+      "pct_mac": 19.7,
+      "index": 40.0,
+      "fwd_pct_mac": 18.1,
+      "aft_pct_mac": 21.3
+     },
+     {
+      "weight_kg": 52000.0,
+      "pct_mac": 25.0,
+      "index": 50.0,
+      "fwd_pct_mac": 23.6,
+      "aft_pct_mac": 26.4
+     },
+     {
+      "weight_kg": 71500.0,
+      "pct_mac": 31.7,
+      "index": 70.0,
+      "fwd_pct_mac": 30.7,
+      "aft_pct_mac": 32.7
+     },
+     {
+      "weight_kg": 73800.0,
+      "pct_mac": 32.4,
+      "index": 73.0,
+      "fwd_pct_mac": 31.5,
+      "aft_pct_mac": 33.4
+     },
+     {
+      "weight_kg": 89000.0,
+      "pct_mac": 32.0,
+      "index": 76.1,
+      "fwd_pct_mac": 30.7,
+      "aft_pct_mac": 33.0
+     }
+    ],
+    "ideal_trim_reference_remark": "TOW",
+    "tipping_tables": [
+     {
+      "name": "Ground Stability Limits",
+      "condition": "25 knot wind speed",
+      "points": [
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 45.0,
+        "index": 87.7
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 46.0,
+        "index": 94.0
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 47.0,
+        "index": 100.7
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 48.0,
+        "index": 107.9
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 49.0,
+        "index": 115.4
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 50.0,
+        "index": 123.4
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 50.5,
+        "index": 130.2
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 51.0,
+        "index": 137.2
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 51.3,
+        "index": 143.7
+       },
+       {
+        "weight_kg": 90000.0,
+        "pct_mac": 51.6,
+        "index": 150.4
+       },
+       {
+        "weight_kg": 95000.0,
+        "pct_mac": 52.0,
+        "index": 157.6
+       },
+       {
+        "weight_kg": 100000.0,
+        "pct_mac": 52.3,
+        "index": 164.5
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "30 knot wind speed",
+      "points": [
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 42.5,
+        "index": 83.0
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 44.0,
+        "index": 89.8
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 45.5,
+        "index": 97.3
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 46.5,
+        "index": 104.1
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 47.5,
+        "index": 111.3
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 48.5,
+        "index": 119.0
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 49.0,
+        "index": 125.5
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 49.5,
+        "index": 132.2
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 50.0,
+        "index": 139.1
+       },
+       {
+        "weight_kg": 90000.0,
+        "pct_mac": 50.5,
+        "index": 146.2
+       },
+       {
+        "weight_kg": 95000.0,
+        "pct_mac": 51.0,
+        "index": 153.6
+       },
+       {
+        "weight_kg": 100000.0,
+        "pct_mac": 51.5,
+        "index": 161.1
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "35 knot wind speed",
+      "points": [
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 40.0,
+        "index": 78.3
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 41.5,
+        "index": 84.6
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 43.0,
+        "index": 91.5
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 44.5,
+        "index": 99.1
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 45.5,
+        "index": 105.9
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 46.5,
+        "index": 113.1
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 47.5,
+        "index": 120.8
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 48.0,
+        "index": 127.2
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 48.5,
+        "index": 133.8
+       },
+       {
+        "weight_kg": 90000.0,
+        "pct_mac": 49.0,
+        "index": 140.6
+       },
+       {
+        "weight_kg": 95000.0,
+        "pct_mac": 49.5,
+        "index": 147.6
+       },
+       {
+        "weight_kg": 100000.0,
+        "pct_mac": 50.0,
+        "index": 154.8
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 25.0,
+        "index": 50.0
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 39.0,
+        "index": 79.3
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 41.0,
+        "index": 86.9
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 42.5,
+        "index": 94.0
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 43.5,
+        "index": 100.4
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 44.5,
+        "index": 107.2
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 45.5,
+        "index": 114.5
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 46.5,
+        "index": 122.1
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 47.3,
+        "index": 129.5
+       },
+       {
+        "weight_kg": 90000.0,
+        "pct_mac": 48.0,
+        "index": 136.8
+       },
+       {
+        "weight_kg": 95000.0,
+        "pct_mac": 48.5,
+        "index": 143.6
+       },
+       {
+        "weight_kg": 100000.0,
+        "pct_mac": 49.0,
+        "index": 150.6
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      25,
+      26,
+      27
      ],
      "where": "page"
     }
@@ -8459,6 +9332,289 @@
      ],
      "where": "page"
     }
+   },
+   "ideal_trim": {
+    "registrations_group": "ALL",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 127000.0,
+      "pct_mac": 30.0,
+      "index": 100.0,
+      "fwd_pct_mac": 30.0,
+      "aft_pct_mac": 30.0
+     },
+     {
+      "weight_kg": 195700.0,
+      "pct_mac": 31.4,
+      "index": 104.9,
+      "fwd_pct_mac": 31.4,
+      "aft_pct_mac": 31.4
+     },
+     {
+      "weight_kg": 280000.0,
+      "pct_mac": 31.4,
+      "index": 107.1,
+      "fwd_pct_mac": 31.4,
+      "aft_pct_mac": 31.4
+     }
+    ],
+    "ideal_trim_reference_remark": "TOW",
+    "tipping_tables": [
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 48.26,
+        "index": 192.11
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 100000.0,
+        "pct_mac": 36.59,
+        "index": 111.88
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 47.5,
+        "index": 188.28
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 100000.0,
+        "pct_mac": 34.48,
+        "index": 108.08
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 46.23,
+        "index": 181.87
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 100000.0,
+        "pct_mac": 30.91,
+        "index": 101.65
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 44.42,
+        "index": 172.74
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 100000.0,
+        "pct_mac": 25.86,
+        "index": 92.55
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 43.33,
+        "index": 167.24
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 100000.0,
+        "pct_mac": 22.79,
+        "index": 87.02
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 42.1,
+        "index": 161.04
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 112546.0,
+        "pct_mac": 3.34,
+        "index": 45.96
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 40.74,
+        "index": 154.18
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 134334.0,
+        "pct_mac": 7.67,
+        "index": 45.98
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 39.24,
+        "index": 146.62
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 158229.0,
+        "pct_mac": 11.04,
+        "index": 45.97
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 37.62,
+        "index": 138.45
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 184227.0,
+        "pct_mac": 13.72,
+        "index": 45.99
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 35.87,
+        "index": 129.62
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 205379.0,
+        "pct_mac": 29.0,
+        "index": 96.31
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 203433.0,
+        "pct_mac": 28.08,
+        "index": 92.98
+       },
+       {
+        "weight_kg": 212323.0,
+        "pct_mac": 15.87,
+        "index": 45.97
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 33.98,
+        "index": 120.09
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 239785.0,
+        "pct_mac": 30.5,
+        "index": 102.17
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 233835.0,
+        "pct_mac": 28.08,
+        "index": 91.93
+       },
+       {
+        "weight_kg": 242528.0,
+        "pct_mac": 17.63,
+        "index": 45.98
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 31.96,
+        "index": 109.9
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 276579.0,
+        "pct_mac": 31.68,
+        "index": 108.39
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 266353.0,
+        "pct_mac": 28.08,
+        "index": 90.8
+       },
+       {
+        "weight_kg": 274831.0,
+        "pct_mac": 19.08,
+        "index": 45.96
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      19,
+      20
+     ],
+     "where": "page"
+    }
    }
   },
   "B737-800": {
@@ -9852,6 +11008,165 @@
      "sheet": "E 2",
      "pages": [
       77
+     ],
+     "where": "page"
+    }
+   },
+   "ideal_trim": {
+    "registrations_group": "ALL",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 40000.0,
+      "pct_mac": 19.5,
+      "index": 44.1,
+      "fwd_pct_mac": 17.8,
+      "aft_pct_mac": 21.1
+     },
+     {
+      "weight_kg": 79000.0,
+      "pct_mac": 22.9,
+      "index": 55.1,
+      "fwd_pct_mac": 22.0,
+      "aft_pct_mac": 23.7
+     },
+     {
+      "weight_kg": 79015.0,
+      "pct_mac": 22.9,
+      "index": 55.1,
+      "fwd_pct_mac": 22.0,
+      "aft_pct_mac": 23.7
+     }
+    ],
+    "ideal_trim_reference_remark": "TOW",
+    "tipping_tables": [
+     {
+      "name": "Aft Tipping Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 35000.0,
+        "pct_mac": 50.8,
+        "index": 92.9
+       },
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 50.8,
+        "index": 99.8
+       },
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 50.8,
+        "index": 106.6
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 50.8,
+        "index": 113.5
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 50.8,
+        "index": 120.3
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 50.8,
+        "index": 127.2
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 50.8,
+        "index": 134.0
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 50.8,
+        "index": 140.9
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 50.8,
+        "index": 147.7
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 50.8,
+        "index": 154.6
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 50.8,
+        "index": 161.4
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 35000.0,
+        "pct_mac": 34.7,
+        "index": 67.9
+       },
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 35.5,
+        "index": 72.6
+       },
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 36.2,
+        "index": 77.4
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 36.8,
+        "index": 82.3
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 37.3,
+        "index": 87.3
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 37.8,
+        "index": 92.5
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 38.2,
+        "index": 97.6
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 38.6,
+        "index": 102.9
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 39.0,
+        "index": 108.3
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 39.3,
+        "index": 113.6
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 39.7,
+        "index": 119.4
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      31,
+      32
      ],
      "where": "page"
     }
@@ -11498,6 +12813,186 @@
      "sheet": "E 2",
      "pages": [
       62
+     ],
+     "where": "page"
+    }
+   },
+   "ideal_trim": {
+    "registrations_group": "ALL",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 42638.0,
+      "pct_mac": 20.0,
+      "index": 45.0,
+      "fwd_pct_mac": 18.4,
+      "aft_pct_mac": 21.6
+     },
+     {
+      "weight_kg": 55000.0,
+      "pct_mac": 24.1,
+      "index": 55.0,
+      "fwd_pct_mac": 22.9,
+      "aft_pct_mac": 25.3
+     },
+     {
+      "weight_kg": 74280.0,
+      "pct_mac": 24.1,
+      "index": 58.5,
+      "fwd_pct_mac": 23.3,
+      "aft_pct_mac": 24.9
+     },
+     {
+      "weight_kg": 80920.0,
+      "pct_mac": 24.1,
+      "index": 59.7,
+      "fwd_pct_mac": 23.3,
+      "aft_pct_mac": 24.9
+     },
+     {
+      "weight_kg": 82190.0,
+      "pct_mac": 24.1,
+      "index": 59.9,
+      "fwd_pct_mac": 23.3,
+      "aft_pct_mac": 24.9
+     },
+     {
+      "weight_kg": 82644.0,
+      "pct_mac": 24.1,
+      "index": 60.0,
+      "fwd_pct_mac": 23.3,
+      "aft_pct_mac": 24.9
+     }
+    ],
+    "ideal_trim_reference_remark": "TOW",
+    "tipping_tables": [
+     {
+      "name": "Aft Tipping Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 35000.0,
+        "pct_mac": 50.8,
+        "index": 92.9
+       },
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 50.8,
+        "index": 99.8
+       },
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 50.8,
+        "index": 106.6
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 50.8,
+        "index": 113.5
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 50.8,
+        "index": 120.3
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 50.8,
+        "index": 127.2
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 50.8,
+        "index": 134.0
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 50.8,
+        "index": 140.9
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 50.8,
+        "index": 147.7
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 50.8,
+        "index": 154.6
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 50.8,
+        "index": 161.4
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 35000.0,
+        "pct_mac": 34.7,
+        "index": 67.9
+       },
+       {
+        "weight_kg": 40000.0,
+        "pct_mac": 35.5,
+        "index": 72.6
+       },
+       {
+        "weight_kg": 45000.0,
+        "pct_mac": 36.2,
+        "index": 77.4
+       },
+       {
+        "weight_kg": 50000.0,
+        "pct_mac": 36.8,
+        "index": 82.3
+       },
+       {
+        "weight_kg": 55000.0,
+        "pct_mac": 37.3,
+        "index": 87.3
+       },
+       {
+        "weight_kg": 60000.0,
+        "pct_mac": 37.8,
+        "index": 92.5
+       },
+       {
+        "weight_kg": 65000.0,
+        "pct_mac": 38.2,
+        "index": 97.6
+       },
+       {
+        "weight_kg": 70000.0,
+        "pct_mac": 38.6,
+        "index": 102.9
+       },
+       {
+        "weight_kg": 75000.0,
+        "pct_mac": 39.0,
+        "index": 108.3
+       },
+       {
+        "weight_kg": 80000.0,
+        "pct_mac": 39.3,
+        "index": 113.6
+       },
+       {
+        "weight_kg": 85000.0,
+        "pct_mac": 39.7,
+        "index": 119.4
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      26,
+      27
      ],
      "where": "page"
     }
@@ -15504,6 +16999,185 @@
      ],
      "where": "page"
     }
+   },
+   "ideal_trim": {
+    "registrations_group": "ALL",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 170000.0,
+      "pct_mac": 27.1,
+      "index": 45.5,
+      "fwd_pct_mac": 25.2,
+      "aft_pct_mac": 29.0
+     },
+     {
+      "weight_kg": 237682.0,
+      "pct_mac": 30.9,
+      "index": 52.0,
+      "fwd_pct_mac": 29.5,
+      "aft_pct_mac": 32.3
+     },
+     {
+      "weight_kg": 351534.0,
+      "pct_mac": 34.0,
+      "index": 63.0,
+      "fwd_pct_mac": 33.1,
+      "aft_pct_mac": 34.9
+     }
+    ],
+    "ideal_trim_reference_remark": "TOW",
+    "tipping_tables": [
+     {
+      "name": "Aft Tipping Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 130000.0,
+        "pct_mac": 60.6,
+        "index": 87.0
+       },
+       {
+        "weight_kg": 150000.0,
+        "pct_mac": 60.6,
+        "index": 92.6
+       },
+       {
+        "weight_kg": 170000.0,
+        "pct_mac": 60.6,
+        "index": 98.3
+       },
+       {
+        "weight_kg": 190000.0,
+        "pct_mac": 60.6,
+        "index": 104.0
+       },
+       {
+        "weight_kg": 210000.0,
+        "pct_mac": 60.6,
+        "index": 109.7
+       },
+       {
+        "weight_kg": 230000.0,
+        "pct_mac": 60.6,
+        "index": 115.4
+       },
+       {
+        "weight_kg": 250000.0,
+        "pct_mac": 60.6,
+        "index": 121.1
+       },
+       {
+        "weight_kg": 270000.0,
+        "pct_mac": 60.6,
+        "index": 126.7
+       },
+       {
+        "weight_kg": 290000.0,
+        "pct_mac": 60.6,
+        "index": 132.4
+       },
+       {
+        "weight_kg": 310000.0,
+        "pct_mac": 60.6,
+        "index": 138.1
+       },
+       {
+        "weight_kg": 330000.0,
+        "pct_mac": 60.6,
+        "index": 143.8
+       },
+       {
+        "weight_kg": 350000.0,
+        "pct_mac": 60.6,
+        "index": 149.5
+       },
+       {
+        "weight_kg": 370000.0,
+        "pct_mac": 60.6,
+        "index": 155.2
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 130000.0,
+        "pct_mac": 48.1,
+        "index": 71.9
+       },
+       {
+        "weight_kg": 150000.0,
+        "pct_mac": 49.1,
+        "index": 76.6
+       },
+       {
+        "weight_kg": 170000.0,
+        "pct_mac": 50.0,
+        "index": 81.6
+       },
+       {
+        "weight_kg": 190000.0,
+        "pct_mac": 50.6,
+        "index": 86.4
+       },
+       {
+        "weight_kg": 210000.0,
+        "pct_mac": 51.0,
+        "index": 91.0
+       },
+       {
+        "weight_kg": 230000.0,
+        "pct_mac": 51.5,
+        "index": 95.9
+       },
+       {
+        "weight_kg": 250000.0,
+        "pct_mac": 52.0,
+        "index": 101.1
+       },
+       {
+        "weight_kg": 270000.0,
+        "pct_mac": 52.0,
+        "index": 105.2
+       },
+       {
+        "weight_kg": 290000.0,
+        "pct_mac": 52.2,
+        "index": 109.8
+       },
+       {
+        "weight_kg": 310000.0,
+        "pct_mac": 52.7,
+        "index": 115.4
+       },
+       {
+        "weight_kg": 330000.0,
+        "pct_mac": 52.9,
+        "index": 120.2
+       },
+       {
+        "weight_kg": 350000.0,
+        "pct_mac": 53.0,
+        "index": 124.8
+       },
+       {
+        "weight_kg": 370000.0,
+        "pct_mac": 53.0,
+        "index": 129.1
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      22,
+      23
+     ],
+     "where": "page"
+    }
    }
   },
   "B787-9": {
@@ -18537,6 +20211,94 @@
      ],
      "where": "page"
     }
+   },
+   "ideal_trim": {
+    "registrations_group": "ALL",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 110000.0,
+      "pct_mac": 21.5,
+      "index": 52.0,
+      "fwd_pct_mac": 19.3,
+      "aft_pct_mac": 23.7
+     },
+     {
+      "weight_kg": 181436.0,
+      "pct_mac": 21.8,
+      "index": 54.0,
+      "fwd_pct_mac": 20.3,
+      "aft_pct_mac": 23.1
+     },
+     {
+      "weight_kg": 252650.0,
+      "pct_mac": 21.9,
+      "index": 55.9,
+      "fwd_pct_mac": 20.9,
+      "aft_pct_mac": 22.9
+     }
+    ],
+    "ideal_trim_reference_remark": "TOW",
+    "tipping_tables": [
+     {
+      "name": "Ground Stability Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 90000.0,
+        "pct_mac": 41.5,
+        "index": 73.9
+       },
+       {
+        "weight_kg": 110000.0,
+        "pct_mac": 43.0,
+        "index": 81.2
+       },
+       {
+        "weight_kg": 130000.0,
+        "pct_mac": 44.0,
+        "index": 88.5
+       },
+       {
+        "weight_kg": 150000.0,
+        "pct_mac": 45.0,
+        "index": 96.3
+       },
+       {
+        "weight_kg": 170000.0,
+        "pct_mac": 45.5,
+        "index": 103.5
+       },
+       {
+        "weight_kg": 190000.0,
+        "pct_mac": 46.0,
+        "index": 111.0
+       },
+       {
+        "weight_kg": 210000.0,
+        "pct_mac": 46.5,
+        "index": 118.7
+       },
+       {
+        "weight_kg": 230000.0,
+        "pct_mac": 46.5,
+        "index": 125.2
+       },
+       {
+        "weight_kg": 250000.0,
+        "pct_mac": 46.5,
+        "index": 131.8
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      18,
+      19
+     ],
+     "where": "page"
+    }
    }
   },
   "A330-243F": {
@@ -20782,6 +22544,202 @@
     "kg_pnt": 85,
     "kg_pnc": 75,
     "source": null
+   },
+   "ideal_trim": {
+    "registrations_group": "ALL",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 116000.0,
+      "pct_mac": 28.0,
+      "index": 110.0,
+      "fwd_pct_mac": null,
+      "aft_pct_mac": null
+     },
+     {
+      "weight_kg": 173000.0,
+      "pct_mac": 30.0,
+      "index": 125.0,
+      "fwd_pct_mac": null,
+      "aft_pct_mac": null
+     },
+     {
+      "weight_kg": 227000.0,
+      "pct_mac": 30.0,
+      "index": 133.0,
+      "fwd_pct_mac": null,
+      "aft_pct_mac": null
+     },
+     {
+      "weight_kg": 233000.0,
+      "pct_mac": 30.0,
+      "index": 134.0,
+      "fwd_pct_mac": null,
+      "aft_pct_mac": null
+     }
+    ],
+    "ideal_trim_reference_remark": "ZFW",
+    "tipping_tables": [
+     {
+      "name": "Aft Tipping Limits",
+      "condition": "",
+      "points": [
+       {
+        "weight_kg": 110000.0,
+        "pct_mac": 44.7,
+        "index": 163.0
+       },
+       {
+        "weight_kg": 120000.0,
+        "pct_mac": 45.3,
+        "index": 170.8
+       },
+       {
+        "weight_kg": 130000.0,
+        "pct_mac": 45.7,
+        "index": 178.2
+       },
+       {
+        "weight_kg": 140000.0,
+        "pct_mac": 46.1,
+        "index": 185.9
+       },
+       {
+        "weight_kg": 150000.0,
+        "pct_mac": 46.5,
+        "index": 193.8
+       },
+       {
+        "weight_kg": 160000.0,
+        "pct_mac": 46.9,
+        "index": 201.6
+       },
+       {
+        "weight_kg": 170000.0,
+        "pct_mac": 47.2,
+        "index": 209.7
+       },
+       {
+        "weight_kg": 180000.0,
+        "pct_mac": 47.6,
+        "index": 218.0
+       },
+       {
+        "weight_kg": 190000.0,
+        "pct_mac": 47.9,
+        "index": 226.2
+       },
+       {
+        "weight_kg": 200000.0,
+        "pct_mac": 48.2,
+        "index": 234.6
+       },
+       {
+        "weight_kg": 210000.0,
+        "pct_mac": 48.4,
+        "index": 242.9
+       },
+       {
+        "weight_kg": 220000.0,
+        "pct_mac": 48.7,
+        "index": 251.3
+       },
+       {
+        "weight_kg": 230000.0,
+        "pct_mac": 48.9,
+        "index": 259.5
+       },
+       {
+        "weight_kg": 240000.0,
+        "pct_mac": 49.1,
+        "index": 267.8
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "35 knot Wind Speed",
+      "points": [
+       {
+        "weight_kg": 110000.0,
+        "pct_mac": 28.0,
+        "index": 109.6
+       },
+       {
+        "weight_kg": 120000.0,
+        "pct_mac": 30.5,
+        "index": 119.2
+       },
+       {
+        "weight_kg": 130000.0,
+        "pct_mac": 32.0,
+        "index": 126.4
+       },
+       {
+        "weight_kg": 140000.0,
+        "pct_mac": 33.5,
+        "index": 134.6
+       },
+       {
+        "weight_kg": 150000.0,
+        "pct_mac": 35.0,
+        "index": 143.6
+       },
+       {
+        "weight_kg": 160000.0,
+        "pct_mac": 36.5,
+        "index": 153.5
+       },
+       {
+        "weight_kg": 170000.0,
+        "pct_mac": 37.5,
+        "index": 161.8
+       },
+       {
+        "weight_kg": 180000.0,
+        "pct_mac": 38.0,
+        "index": 168.0
+       },
+       {
+        "weight_kg": 190000.0,
+        "pct_mac": 39.0,
+        "index": 177.3
+       },
+       {
+        "weight_kg": 200000.0,
+        "pct_mac": 39.8,
+        "index": 185.7
+       },
+       {
+        "weight_kg": 210000.0,
+        "pct_mac": 40.5,
+        "index": 194.6
+       },
+       {
+        "weight_kg": 220000.0,
+        "pct_mac": 41.0,
+        "index": 202.3
+       },
+       {
+        "weight_kg": 230000.0,
+        "pct_mac": 41.5,
+        "index": 210.3
+       },
+       {
+        "weight_kg": 240000.0,
+        "pct_mac": 42.0,
+        "index": 218.6
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      22,
+      23
+     ],
+     "where": "page"
+    }
    }
   },
   "B777F": {
@@ -22777,6 +24735,143 @@
      "sheet": "E 2",
      "pages": [
       43
+     ],
+     "where": "page"
+    }
+   },
+   "ideal_trim": {
+    "registrations_group": "ALL",
+    "ideal_trim_line": [
+     {
+      "weight_kg": 132903.0,
+      "pct_mac": 27.0,
+      "index": 45.6,
+      "fwd_pct_mac": null,
+      "aft_pct_mac": null
+     },
+     {
+      "weight_kg": 347814.0,
+      "pct_mac": 27.0,
+      "index": 38.4,
+      "fwd_pct_mac": null,
+      "aft_pct_mac": null
+     }
+    ],
+    "ideal_trim_reference_remark": "ZFW",
+    "tipping_tables": [
+     {
+      "name": "Aft Tipping Limits",
+      "condition": "-",
+      "points": [
+       {
+        "weight_kg": 130000.0,
+        "pct_mac": 60.6,
+        "index": 94.3
+       },
+       {
+        "weight_kg": 160000.0,
+        "pct_mac": 60.6,
+        "index": 104.6
+       },
+       {
+        "weight_kg": 190000.0,
+        "pct_mac": 60.6,
+        "index": 114.8
+       },
+       {
+        "weight_kg": 220000.0,
+        "pct_mac": 60.6,
+        "index": 125.0
+       },
+       {
+        "weight_kg": 250000.0,
+        "pct_mac": 60.6,
+        "index": 135.3
+       },
+       {
+        "weight_kg": 280000.0,
+        "pct_mac": 60.6,
+        "index": 145.5
+       },
+       {
+        "weight_kg": 310000.0,
+        "pct_mac": 60.6,
+        "index": 155.7
+       },
+       {
+        "weight_kg": 340000.0,
+        "pct_mac": 60.6,
+        "index": 166.0
+       },
+       {
+        "weight_kg": 350000.0,
+        "pct_mac": 60.6,
+        "index": 169.4
+       }
+      ]
+     },
+     {
+      "name": "Ground Stability Limits",
+      "condition": "3% uphill ramp slope, Towing Forces, 35 knot headwind",
+      "points": [
+       {
+        "weight_kg": 130000.0,
+        "pct_mac": 48.0,
+        "index": 76.1
+       },
+       {
+        "weight_kg": 135000.0,
+        "pct_mac": 48.5,
+        "index": 77.8
+       },
+       {
+        "weight_kg": 145000.0,
+        "pct_mac": 49.0,
+        "index": 80.7
+       },
+       {
+        "weight_kg": 157500.0,
+        "pct_mac": 49.5,
+        "index": 84.2
+       },
+       {
+        "weight_kg": 170000.0,
+        "pct_mac": 50.0,
+        "index": 87.9
+       },
+       {
+        "weight_kg": 185000.0,
+        "pct_mac": 50.5,
+        "index": 92.3
+       },
+       {
+        "weight_kg": 205000.0,
+        "pct_mac": 51.0,
+        "index": 98.0
+       },
+       {
+        "weight_kg": 230000.0,
+        "pct_mac": 51.5,
+        "index": 105.1
+       },
+       {
+        "weight_kg": 260000.0,
+        "pct_mac": 52.0,
+        "index": 113.8
+       },
+       {
+        "weight_kg": 350000.0,
+        "pct_mac": 53.0,
+        "index": 139.7
+       }
+      ]
+     }
+    ],
+    "source": {
+     "sheet": "C 7",
+     "pages": [
+      18,
+      19
      ],
      "where": "page"
     }

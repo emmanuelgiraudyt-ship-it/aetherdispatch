@@ -863,6 +863,31 @@ def optimize_cargo_pulp(ac: dict, cargo_offers: list, max_payload_kg: float) -> 
 # MODULE 6 : EXPORT PDF
 # =============================================================================
 
+_PDF_MAP = {'→': '->', '—': '-', '–': '-', '─': '-', '−': '-', '€': 'EUR', '×': 'x', '≥': '>=', '≤': '<=',
+            'İ': 'I', 'ı': 'i', 'Ş': 'S', 'ş': 's', 'Ğ': 'G', 'ğ': 'g', 'Ç': 'Ç', 'ç': 'ç', 'Ö': 'Ö', 'ö': 'ö', 'Ü': 'Ü', 'ü': 'ü',
+            'ń': 'n', 'ł': 'l', 'ž': 'z', 'š': 's', 'č': 'c', 'ř': 'r', 'ě': 'e', 'ő': 'o', 'ű': 'u', '’': "'", '‘': "'", '“': '"', '”': '"', '…': '...'}
+
+
+def pdf_text(t) -> str:
+    """Texte compatible avec la police standard des PDF (latin-1) : les lettres hors latin-1 sont translittérées (İ -> I, ş -> s),
+    jamais remplacées par un point d'interrogation."""
+    import unicodedata
+    out = []
+    for ch in str(t):
+        if ch in _PDF_MAP:
+            out.append(_PDF_MAP[ch])
+            continue
+        try:
+            ch.encode('latin-1')
+            out.append(ch)
+        except UnicodeEncodeError:
+            base = unicodedata.normalize('NFKD', ch)
+            base = ''.join(c for c in base if not unicodedata.combining(c))
+            out.append(base if base and all(ord(c) < 256 for c in base) else '')
+    return ''.join(out)
+
+
+
 class _LoadsheetPDF(FPDF):
     """PDF de loadsheet : filigrane diagonal sur chaque page lorsque les données sont celles du catalogue démo."""
     wm = False
@@ -871,7 +896,7 @@ class _LoadsheetPDF(FPDF):
         """Dessiné après le contenu de la page : le filigrane reste visible au-dessus des tableaux."""
         if not self.wm:
             return
-        with self.local_context(fill_opacity=0.22, text_color=(200, 30, 30)):
+        with self.local_context(fill_opacity=0.16, text_color=(200, 30, 30)):
             self.set_font("Helvetica", "B", 40)
             with self.rotation(38, x=105, y=150):
                 self.text(14, 142, "DOCUMENT NON UTILISABLE")
@@ -896,7 +921,7 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     pdf.set_auto_page_break(auto=True, margin=31)
     pdf.add_page()
     # La police standard ne gère que le latin-1 : remplacement des symboles non supportés
-    pdf.normalize_text = lambda t: str(t).replace('→', '->').replace('—', '-').replace('–', '-').replace('─', '-').replace('−', '-').replace('€', 'EUR').replace('×', 'x').encode('latin-1', 'replace').decode('latin-1')
+    pdf.normalize_text = pdf_text
 
     NAVY, CYAN = (13, 31, 60), (0, 191, 255)
     HEAD, ZEBRA = (214, 228, 244), (244, 247, 252)
@@ -906,6 +931,13 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     def n(v):
         try:
             return f"{int(round(float(v))):,}".replace(",", " ")
+        except (TypeError, ValueError):
+            return str(v)
+
+    def nil(v):
+        """« NIL » plutôt que 0 : une soute ou une charge vide est écrite explicitement."""
+        try:
+            return "NIL" if abs(float(v)) < 0.5 else n(v)
         except (TypeError, ValueError):
             return str(v)
 
@@ -986,12 +1018,12 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
         grid(zrows, [34] + [wz] * (len(zones) + 1), header=True, bold_cols=(0,),
              aligns=["L"] + ["C"] * (len(zones) + 1), colors=zcol, gap=1.0)
     bag_lab = (f"Bagages ({fs.get('bag_pieces', 0)} x {fs.get('bag_std')} kg)"
-               if fs.get("bag_mode") == "Masse forfaitaire" else "Bagages (pesée)")
+               if (fs.get("bag_mode") == "Masse forfaitaire" and fs.get("bag_total")) else "Bagages (pesée)" if fs.get("bag_total") else "Bagages")
     if fs.get("uld_plan"):
         bag_lab = "Bagages (ULD et vrac)"
     grid([("Passagers (kg)", bag_lab, "Fret (kg)", "Courrier (kg)", "CHARGE PAYANTE (kg)"),
-          (n(fs.get("pax_mass_kg", 0)), n(fs.get("bag_total", 0)), n(fs.get("cargo_total", 0)),
-           n(fs.get("mail_total", 0)), n(fs.get("payload", 0)))],
+          (n(fs.get("pax_mass_kg", 0)), nil(fs.get("bag_total", 0)), nil(fs.get("cargo_total", 0)),
+           nil(fs.get("mail_total", 0)), n(fs.get("payload", 0)))],
          [38, 38, 38, 38, 38], header=True, aligns=["C"] * 5, bold_rows=(1,))
 
     # ── Soutes ────────────────────────────────────────────────────────────
@@ -1001,11 +1033,11 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
         rows = [("Soute", "Bagages", "Fret", "Courrier", "Total", "Maxi")]
         colors = {}
         for i, c in enumerate(comps, start=1):
-            rows.append((c["name"], n(c["bag"]), n(c["cargo"]), n(c["mail"]), n(c["total"]), n(c["max"])))
+            rows.append((c["name"], nil(c["bag"]), nil(c["cargo"]), nil(c["mail"]), nil(c["total"]), n(c["max"])))
             if c["total"] > c["max"]:
                 colors[(i, 4)] = RED
-        rows.append(("TOTAL", n(sum(c["bag"] for c in comps)), n(sum(c["cargo"] for c in comps)),
-                     n(sum(c["mail"] for c in comps)), n(sum(c["total"] for c in comps)),
+        rows.append(("TOTAL", nil(sum(c["bag"] for c in comps)), nil(sum(c["cargo"] for c in comps)),
+                     nil(sum(c["mail"] for c in comps)), nil(sum(c["total"] for c in comps)),
                      n(sum(c["max"] for c in comps))))
         grid(rows, [46, 28, 28, 28, 30, 30], header=True, bold_rows=(len(rows) - 1,), bold_cols=(0,),
              aligns=["L", "R", "R", "R", "R", "R"], colors=colors, gap=(0.2 if fs.get("uld_plan") else 1.4))
@@ -1212,7 +1244,7 @@ def generate_wx_pdf(wx: dict, ctx: dict) -> bytes:
     pdf = FPDF(orientation='P', unit='mm', format='A4')
     pdf.set_auto_page_break(auto=True, margin=18)
     pdf.add_page()
-    pdf.normalize_text = lambda t: str(t).replace('→', '->').replace('—', '-').replace('–', '-').replace('─', '-').replace('−', '-').replace('€', 'EUR').replace('×', 'x').replace('°', ' deg').encode('latin-1', 'replace').decode('latin-1')
+    pdf.normalize_text = lambda t: pdf_text(str(t).replace('°', ' deg'))
     NAVY, CYAN, TEXT = (13, 31, 60), (0, 191, 255), (30, 30, 30)
     pdf.set_fill_color(*NAVY)
     pdf.rect(0, 0, 210, 24, "F")
@@ -1432,6 +1464,47 @@ def split_pax(total: int, zones: list) -> list:
     for i in order[:max(rest, 0)]:
         base[i] += 1
     return base
+
+
+def zone_class_caps(zones: list):
+    """(places premium, places économique) par zone, d'après la ventilation par classe de la configuration ; None si mono-classe."""
+    if not any(z.get("classes") for z in zones):
+        return None
+    out = []
+    for z in zones:
+        cl = z.get("classes") or {}
+        mx = max(int(z.get("max_pax") or 0), 0)
+        prem = sum(int(v) for k, v in list(cl.items())[:-1]) if len(cl) > 1 else 0
+        if cl and len(cl) == 1 and list(cl.keys())[0] != "Y":
+            prem = mx                                   # section entièrement en classe avant
+        out.append((prem, max(mx - prem, 0)))
+    return out
+
+
+def split_pax_classes(total: int, n_prem: int, zones: list) -> list:
+    """Répartition bi-classe : les passagers premium (affaires) occupent les sièges premium, les autres les sièges économiques."""
+    caps = zone_class_caps(zones)
+    if caps is None:
+        return split_pax(total, zones)
+    prem_cap, eco_cap = sum(c[0] for c in caps), sum(c[1] for c in caps)
+    n_prem = max(min(int(n_prem), prem_cap, int(total)), 0)
+    n_eco = min(int(total) - n_prem, eco_cap)
+    def share(n, ws):
+        s = sum(ws)
+        if s <= 0 or n <= 0:
+            return [0] * len(ws)
+        raw = [n * w / s for w in ws]
+        base = [min(int(x), w) for x, w in zip(raw, ws)]
+        rest = n - sum(base)
+        for i in sorted(range(len(ws)), key=lambda i: raw[i] - int(raw[i]), reverse=True):
+            if rest <= 0:
+                break
+            add = min(ws[i] - base[i], rest)
+            base[i] += add
+            rest -= add
+        return base
+    p, e = share(n_prem, [c[0] for c in caps]), share(n_eco, [c[1] for c in caps])
+    return [p[i] + e[i] for i in range(len(zones))]
 
 
 def origin_counts(ac: dict, scope: str = "all") -> dict:
@@ -1663,6 +1736,142 @@ def allocate_bags(comps: list, bag_total: float, used: dict):
     return base, mode, max(rest, 0)
 
 
+# ── Bagages : répartition pilotée par la ligne de centrage idéale de l'AHM ────────────────────────────
+def _interp_pts(pts: list, x: float):
+    pts = sorted(pts)
+    if x <= pts[0][0]:
+        return pts[0][1]
+    for (x0, y0), (x1, y1) in zip(pts, pts[1:]):
+        if x <= x1:
+            return y0 + (y1 - y0) * (x - x0) / (x1 - x0) if x1 > x0 else y1
+    return pts[-1][1]
+
+
+def ideal_trim_at(ac: dict, tow: float):
+    """(ligne, limite avant de la zone, limite arrière de la zone) en %MAC à la masse donnée, d'après l'AHM ; None si absente."""
+    it = ac.get("ideal_trim") or {}
+    line = it.get("line") or []
+    if not line:
+        return None
+    ln = _interp_pts([(p["weight_kg"], p["pct_mac"]) for p in line], tow)
+    fw = [(p["weight_kg"], p["fwd_pct_mac"]) for p in line if p.get("fwd_pct_mac") is not None]
+    af = [(p["weight_kg"], p["aft_pct_mac"]) for p in line if p.get("aft_pct_mac") is not None]
+    return ln, (_interp_pts(fw, tow) if len(fw) >= 2 else ln - 1.0), (_interp_pts(af, tow) if len(af) >= 2 else ln + 1.0)
+
+
+def ground_stability_limit(ac: dict, mass: float):
+    """Limite arrière de stabilité au sol (%MAC) à la masse donnée : la plus contraignante des tables de l'AHM, avec son nom."""
+    best = None
+    for t in (ac.get("ideal_trim") or {}).get("tipping") or []:
+        pts = [tuple(p) for p in t.get("points") or []]
+        if len(pts) < 2:
+            continue
+        v = _interp_pts(pts, mass)
+        if best is None or v < best[0]:
+            best = (v, f"{t['name']}" + (f" ({t['condition']})" if t.get("condition") else ""))
+    return best
+
+
+def _is_bulk_comp(c: dict) -> bool:
+    return bool(re.match(r"^(CPT|BAY)\s*5\d?\b", c["name"])) or str(c.get("groupe") or "").strip() == "CPT 5"
+
+
+def allocate_bags_ideal(ac: dict, comps: list, bag_total: float, used: dict, tow_pct_fn):
+    """Répartit les bagages selon la ligne de centrage idéale de l'AHM. `tow_pct_fn(charges_par_soute)` renvoie
+    (masse au décollage, %MAC au décollage). Retourne (répartition, mode, non placé, ordre de chargement, note) ou None."""
+    if not (ac.get("ideal_trim") and comps):
+        return None
+    names = [c["name"] for c in comps]
+    alloc = {n: 0 for n in names}
+    total = max(int(round(bag_total)), 0)
+    if total == 0:
+        return alloc, "aucune", 0, [], ""
+    free = {c["name"]: max(int(c["max_kg"]) - int(used.get(c["name"], 0)), 0) for c in comps}
+    # plafond de masse par groupe de soutes
+    gmax = {}
+    for c in comps:
+        if c.get("groupe") and c.get("max_groupe_kg"):
+            gmax[c["groupe"]] = float(c["max_groupe_kg"])
+
+    def room(c, cur):
+        r = free[c["name"]] - cur[c["name"]]
+        g = c.get("groupe")
+        if g in gmax:
+            gu = sum(cur[x["name"]] + used.get(x["name"], 0) for x in comps if x.get("groupe") == g)
+            r = min(r, int(gmax[g] - gu))
+        return max(int(r), 0)
+
+    def pct(cur):
+        loads = {n: cur[n] + used.get(n, 0) for n in names}
+        return tow_pct_fn(loads)
+
+    m0, p0 = pct(alloc)
+    tgt = ideal_trim_at(ac, m0 + total)
+    if tgt is None:
+        return None
+    line, zfw_, zaft = tgt
+    normal = [c for c in comps if not _is_bulk_comp(c)]
+    bulk = [c for c in comps if _is_bulk_comp(c)]
+    aft_first = sorted(normal, key=lambda c: -c["arm_m"]) + sorted(bulk, key=lambda c: c["arm_m"])
+    fwd_first = sorted(normal, key=lambda c: c["arm_m"]) + sorted(bulk, key=lambda c: c["arm_m"])
+    def run(forward_needed, first=None):
+        primary, secondary = (aft_first, fwd_first) if forward_needed else (fwd_first, aft_first)
+        if first is not None:
+            primary = [first] + [c for c in primary if c is not first]
+        alloc_, rest_, order_ = {n: 0 for n in names}, total, []
+        # Passe 1 : sens principal, limité par la zone idéale ; passe 2 : sens inverse, limité de même ; passe 3 : remplissage libre.
+        for seq, moving_aft in [(primary, forward_needed), (secondary, not forward_needed), (primary + secondary, None)]:
+            for c in seq:
+                if rest_ <= 0:
+                    break
+                take = min(room(c, alloc_), rest_)
+                if take <= 0:
+                    continue
+                hit = False
+                if moving_aft is not None:
+                    def within(n_, c=c, moving_aft=moving_aft):
+                        a_ = dict(alloc_)
+                        a_[c["name"]] += n_
+                        mm, pp = pct(a_)
+                        tg_ = ideal_trim_at(ac, mm + (rest_ - n_))
+                        if not tg_:
+                            return True
+                        return (pp <= tg_[2]) if moving_aft else (pp >= tg_[1])
+                    if not within(take):
+                        lo, hi = 0, take
+                        while hi - lo > 1:
+                            mid = (lo + hi) // 2
+                            lo, hi = (mid, hi) if within(mid) else (lo, mid)
+                        take = lo if within(lo) else 0
+                        hit = True
+                if take > 0:
+                    alloc_[c["name"]] += take
+                    rest_ -= take
+                    if c["name"] not in order_:
+                        order_.append(c["name"])
+                if hit:
+                    break
+        mf, pf = pct(alloc_)
+        zz = ideal_trim_at(ac, mf)
+        dist = 0.0 if not zz else max(zz[1] - pf, pf - zz[2], 0.0)
+        return alloc_, rest_, order_, dist, forward_needed
+
+    cands = [run(p0 < line), run(not (p0 < line))]
+    if min(r[3] for r in cands) > 0.05:          # zone non atteinte : on essaie chaque soute comme première soute remplie
+        for c_ in normal:
+            for fa_ in (True, False):
+                cands.append(run(fa_, c_))
+    cands.sort(key=lambda r: (round(r[3], 3), r[1], sum(1 for v in r[0].values() if v > 0)))
+    alloc, rest, order, _dist, forward_needed = cands[0]
+    unplaced = max(rest, 0)
+    seq_exec = sorted([c for c in comps if alloc[c["name"]] > 0], key=lambda c: c["arm_m"])     # exécution : avant vers arrière
+    note = ("ligne de centrage idéale de l'AHM (feuille C7) : " + ("soutes arrière d'abord, le centrage étant en avant de la ligne"
+            if forward_needed else "soutes avant d'abord, le centrage étant déjà en arrière de la ligne")
+            + " ; soutes remplies une à une ; soute vrac en dernier recours")
+    return alloc, "ligne idéale", unplaced, [c["name"] for c in seq_exec], note
+
+
+
 def bag_priority_text(comps: list) -> str:
     ranked = sorted([c for c in comps if c.get("bag_rank") is not None], key=lambda c: c["bag_rank"])
     return " > ".join(c["name"] for c in ranked)
@@ -1733,16 +1942,25 @@ def render_pax_panel(ac: dict, selected_ac: str, ref: dict) -> dict:
 
     zone_counts = []
     if zones:
-        auto = split_pax(seated, zones)
+        ccaps = zone_class_caps(zones)
+        n_prem = 0
+        if ccaps:
+            _pc, _ec = sum(c_[0] for c_ in ccaps), sum(c_[1] for c_ in ccaps)
+            n_prem = int(st.number_input(f"Passagers en classe affaires (sièges affaires : {_pc}, économique : {_ec})", 0, max(_pc, 1),
+                                         min(int(round(seated * _pc / max(_pc + _ec, 1))), _pc), key=f"paxprem_{wk}_{status}_{seated}",
+                                         help="Les passagers affaires occupent les rangées de l'avant ; les autres les sièges économiques."))
+        auto = split_pax_classes(seated, n_prem, zones) if ccaps else split_pax(seated, zones)
         with st.expander("Répartition par zone (automatique, ajustable)"):
             cols = st.columns(len(zones))
             for i, z in enumerate(zones):
                 with cols[i]:
                     n = st.number_input(f"{z['name']}", 0, 1000, int(auto[i]),
-                                        key=f"paxz_{wk}_{i}_{status}_{seated}")
+                                        key=f"paxz_{wk}_{i}_{status}_{seated}_{n_prem}")
                     zone_counts.append(int(n))
                     cap = z.get("max_pax")
-                    st.caption(f"Capacité : {cap if cap is not None else '—'} | Bras : {z.get('arm_m', '—')} m")
+                    _cl = z.get("classes")
+                    st.caption(f"Capacité : {cap if cap is not None else '—'}" + (" (" + " + ".join(f"{v} {k}" for k, v in _cl.items()) + ")" if _cl else "")
+                               + f" | Bras : {z.get('arm_m', '—')} m")
             if sum(zone_counts) != seated:
                 st.warning(f"La somme des zones ({sum(zone_counts)}) diffère des sièges occupés ({seated}).")
     zones_over = [(z["name"], zone_counts[i], int(z["max_pax"])) for i, z in enumerate(zones)
@@ -1932,7 +2150,7 @@ def generate_loading_plan_pdf(d: dict) -> bytes:
     pdf = _PlanPDF(orientation="P", unit="mm", format="A4")
     pdf.set_auto_page_break(auto=True, margin=16)
     pdf.add_page()
-    pdf.normalize_text = lambda t: str(t).replace('→', '->').replace('—', '-').replace('–', '-').replace('─', '-').replace('−', '-').replace('€', 'EUR').replace('×', 'x').replace('≥', '>=').replace('≤', '<=').encode('latin-1', 'replace').decode('latin-1')
+    pdf.normalize_text = pdf_text
     NAVY, CYAN = (13, 31, 60), (0, 191, 255)
     HEAD, ZEBRA = (214, 228, 244), (244, 247, 252)
     GREEN, RED, TEXT, GREY = (0, 130, 70), (190, 30, 30), (30, 30, 30), (110, 110, 110)
@@ -2002,29 +2220,25 @@ def generate_loading_plan_pdf(d: dict) -> bytes:
     grid([("Vol", fs.get("flight_number") or "-", "Date / heure (UTC)", fs.get("datetime", "-")),
           ("Départ", fs.get("origin", "-"), "Arrivée", fs.get("dest", "-")),
           ("Immatriculation", fs.get("registration") or "-", "Type",
-           (fs.get("type") or "-") + (f" (config. {fs['ahm_config']})" if fs.get("ahm_config") else "")),
-          ("Préparé par", fs.get("prepared_by") or "-", "Données", _plan_src(fs))],
+           (fs.get("type") or "-") + (f" (config. {fs['ahm_config']})" if fs.get("ahm_config") else ""))],
          [30, 70, 34, 56], bold_cols=(0, 2))
 
     # ── Charge à placer ──────────────────────────────────────────────────
     loads = d.get("loads") or {}
-    section("CHARGE À PLACER (kg)")
+    section("À CHARGER")
     tot_l = sum(float(loads.get(k, 0) or 0) for k in ("Bagages", "Fret", "Courrier"))
-    rows_ = [("", "Bagages", "Fret", "Courrier", "Total"),
-             ("Masse (kg)", n(loads.get("Bagages", 0)), n(loads.get("Fret", 0)), n(loads.get("Courrier", 0)), n(tot_l))]
-    colors = {}
     if mode == "uld":
         nu = d.get("n_uld") or {}
-        th = d.get("theory") or {}
-        rows_.append(("Nombre de ULD", nu.get("Bagages", 0), nu.get("Fret", 0), nu.get("Courrier", 0), sum(nu.values())))
-        rows_.append(("Minimum par la masse seule", *[(th.get(k) if th.get(k) is not None else "-") for k in ("Bagages", "Fret", "Courrier")],
-                      sum(v for v in th.values() if v)))
+        rows_ = [("", "Bagages", "Fret", "Courrier", "Total"),
+                 ("Masse (kg)", n(loads.get("Bagages", 0)), n(loads.get("Fret", 0)), n(loads.get("Courrier", 0)), n(tot_l)),
+                 ("Nombre de ULD", nu.get("Bagages", 0), nu.get("Fret", 0), nu.get("Courrier", 0), sum(nu.values()))]
     else:
-        rows_.append(("Bagages (pièces)", d.get("pieces") if d.get("pieces") is not None else "-", "", "", ""))
-    grid(rows_, [58, 33, 33, 33, 33], header=True, bold_cols=(0,), bold_rows=(1,), aligns=["L", "C", "C", "C", "C"], gap=0.4,
-         colors=colors)
-    note(d.get("bag_text") or "")
-    pdf.ln(1.2)
+        pc = d.get("pieces")
+        rows_ = [("", "Bagages", "Fret", "Courrier", "Total"),
+                 ("Pièces", pc if pc is not None else "-", "", "", ""),
+                 ("Masse (kg)", n(loads.get("Bagages", 0)) if loads.get("Bagages") else "NIL", n(loads.get("Fret", 0)) if loads.get("Fret") else "NIL",
+                  n(loads.get("Courrier", 0)) if loads.get("Courrier") else "NIL", n(tot_l) if tot_l else "NIL")]
+    grid(rows_, [58, 33, 33, 33, 33], header=True, bold_cols=(0,), bold_rows=(len(rows_) - 1,), aligns=["L", "C", "C", "C", "C"], gap=1.0)
 
     plan = d.get("plan") or []
     if not plan:
@@ -2097,44 +2311,57 @@ def generate_loading_plan_pdf(d: dict) -> bytes:
         pdf.cell(110, 4.2, "Valeur affichée : masse brute (contenu + tare), en kg. Position vide : contour gris.")
         pdf.ln(7)
     elif plan and mode == "bulk":
-        section("SCHÉMA DES SOUTES (de l'avant vers l'arrière ; barre = taux de remplissage)")
+        section("SCHÉMA DES SOUTES (avant à gauche, arrière à droite ; n° = ordre de chargement, de l'avant vers l'arrière)")
         order = sorted(plan, key=lambda r: r["arm"])
-        gap = 3.0
+        seq = {r["comp"]: i_ for i_, r in enumerate([r for r in order if r["total"] > 0], start=1)}
+        gap = 2.0
         wsum = sum(max(r["max"], 1.0) for r in order)
         avail = 190 - gap * (len(order) - 1)
-        widths = [max(avail * max(r["max"], 1.0) / wsum, 28.0) for r in order]
+        widths = [max(avail * max(r["max"], 1.0) / wsum, 17.0) for r in order]
         k = avail / sum(widths)
         widths = [w * k for w in widths]
-        room(34)
+        room(32)
         y0, x_ = pdf.get_y(), 10.0
         for r, w in zip(order, widths):
+            empty = r["total"] <= 0
             pdf.set_draw_color(40, 40, 40)
-            pdf.rect(x_, y0, w, 29)
+            pdf.set_fill_color(*((245, 245, 245) if empty else (255, 244, 214)))
+            pdf.rect(x_, y0, w, 25, "DF")
             pdf.set_xy(x_, y0 + 0.8)
-            pdf.set_font("Helvetica", "B", 6.8)
+            pdf.set_font("Helvetica", "B", 7.2)
             pdf.set_text_color(*NAVY)
-            pdf.cell(w, 3.6, str(r["comp"])[:int(w / 1.9)], align="C")
-            pdf.set_font("Helvetica", "", 6.2)
-            pdf.set_text_color(*TEXT)
-            for i_, nat in enumerate(("Bagages", "Fret", "Courrier")):
-                pdf.set_xy(x_ + 1, y0 + 5 + 3.5 * i_)
-                extra = f" ({r['pieces']})" if (nat == "Bagages" and r.get("pieces") is not None) else ""
-                pdf.cell(w - 2, 3.4, f"{nat[:4]}. {n(r[nat])} kg{extra}")
-            pdf.set_xy(x_ + 1, y0 + 16)
-            pdf.set_font("Helvetica", "B", 6.6)
-            pdf.cell(w - 2, 3.4, f"{n(r['total'])} / {n(r['max'])} kg")
-            ratio = r["total"] / r["max"] if r["max"] else 0
-            pdf.set_fill_color(235, 235, 235)
-            pdf.rect(x_ + 1, y0 + 21, w - 2, 3.4, "F")
-            pdf.set_fill_color(*(GREEN if ratio <= 0.85 else ((230, 150, 0) if ratio <= 1.0 else RED)))
-            pdf.rect(x_ + 1, y0 + 21, (w - 2) * min(ratio, 1.0), 3.4, "F")
-            pdf.set_xy(x_, y0 + 24.6)
+            pdf.cell(w, 3.8, str(r["comp"])[:int(w / 1.8)], align="C")
+            pdf.set_xy(x_, y0 + 6)
+            if empty:
+                pdf.set_font("Helvetica", "B", 11)
+                pdf.set_text_color(*GREY)
+                pdf.cell(w, 8, "NIL", align="C")
+            else:
+                pdf.set_font("Helvetica", "B", 9)
+                pdf.set_text_color(*TEXT)
+                pdf.cell(w, 5, f"{seq[r['comp']]}", align="C")
+                pdf.set_xy(x_, y0 + 11.5)
+                pdf.set_font("Helvetica", "B", 7.6)
+                if r.get("pieces") is not None and r["Bagages"] > 0:
+                    pdf.cell(w, 4, f"{r['pieces']} bag.", align="C")
+                    pdf.set_xy(x_, y0 + 15.2)
+                pdf.set_font("Helvetica", "", 6.8)
+                extra = []
+                if r["Fret"] > 0:
+                    extra.append(f"Fret {n(r['Fret'])}")
+                if r["Courrier"] > 0:
+                    extra.append(f"Cour. {n(r['Courrier'])}")
+                pdf.cell(w, 3.4, " ".join(extra) if extra else f"{n(r['total'])} kg", align="C")
+                if extra:
+                    pdf.set_xy(x_, y0 + 18.6)
+                    pdf.cell(w, 3.4, f"{n(r['total'])} kg", align="C")
+            pdf.set_xy(x_, y0 + 21.6)
             pdf.set_font("Helvetica", "", 5.8)
             pdf.set_text_color(*GREY)
-            pdf.cell(w, 3.2, f"bras {r['arm']:.2f} m - {ratio * 100:.0f} %", align="C")
+            pdf.cell(w, 3, f"maxi {n(r['max'])} kg", align="C")
             x_ += w + gap
         pdf.set_draw_color(0, 0, 0)
-        pdf.set_y(y0 + 32)
+        pdf.set_y(y0 + 28)
 
     # ── Détail ───────────────────────────────────────────────────────────
     if plan and mode == "uld":
@@ -2151,46 +2378,28 @@ def generate_loading_plan_pdf(d: dict) -> bytes:
         grid(rows_, [42, 30, 14, 20, 18, 14, 18, 18, 16], header=True, bold_rows=(len(rows_) - 1,),
              aligns=["L", "L", "C", "L", "R", "R", "R", "R", "R"], colors=colors, gap=1.2, fsz=7.6)
     elif plan and mode == "bulk":
-        section("DÉTAIL PAR SOUTE (kg)")
-        rows_ = [("Soute", "Bras (m)", "Bagages", "Pièces", "Fret", "Courrier", "Total", "Maxi", "Taux")]
+        section("DÉTAIL PAR SOUTE")
+        rows_ = [("Ordre", "Soute", "Bagages (pièces)", "Bagages (kg)", "Fret (kg)", "Courrier (kg)", "Total (kg)", "Maxi (kg)")]
         colors = {}
+        seq_n = 0
         for i, r in enumerate(sorted(plan, key=lambda r: r["arm"]), start=1):
-            rows_.append((r["comp"], f"{r['arm']:.2f}", n(r["Bagages"]), r["pieces"] if r.get("pieces") is not None else "-",
-                          n(r["Fret"]), n(r["Courrier"]), n(r["total"]), n(r["max"]),
-                          f"{(r['total'] / r['max'] * 100 if r['max'] else 0):.0f} %"))
-            if r["total"] > r["max"] + 1e-9:
-                colors[(i, 6)] = RED
-        rows_.append(("TOTAL", "", n(sum(r["Bagages"] for r in plan)), sum(r["pieces"] or 0 for r in plan) if plan and plan[0].get("pieces") is not None else "-",
-                      n(sum(r["Fret"] for r in plan)), n(sum(r["Courrier"] for r in plan)), n(sum(r["total"] for r in plan)),
-                      n(sum(r["max"] for r in plan)), ""))
-        grid(rows_, [44, 18, 20, 16, 20, 20, 20, 20, 12], header=True, bold_rows=(len(rows_) - 1,),
-             aligns=["L", "R", "R", "R", "R", "R", "R", "R", "R"], colors=colors, gap=1.2, fsz=7.8)
-
-    # ── Soutes (totaux par soute et par groupe) ──────────────────────────
-    comps = d.get("comps") or []
-    if plan and mode == "uld" and comps:
-        section("TOTAUX PAR SOUTE (kg, tare comprise)")
-        rows_ = [("Soute", "Bagages", "Fret", "Courrier", "Tare", "Total brut", "Maxi", "Taux")]
-        colors = {}
-        gsum = {}
-        for i, c in enumerate(comps, start=1):
-            xs = [x for x in plan if x["comp"] == c["name"]]
-            tot = sum(x["gross"] for x in xs)
-            rows_.append((c["name"], n(sum(x["content"] for x in xs if x["nature"] == "Bagages")),
-                          n(sum(x["content"] for x in xs if x["nature"] == "Fret")),
-                          n(sum(x["content"] for x in xs if x["nature"] == "Courrier")),
-                          n(sum(x["tare"] for x in xs)), n(tot), n(c["max"]), f"{(tot / c['max'] * 100 if c['max'] else 0):.0f} %"))
-            if tot > c["max"] + 1e-9:
-                colors[(i, 5)] = RED
-            if c.get("groupe") and c.get("max_groupe") is not None:
-                g_ = gsum.setdefault(c["groupe"], [0.0, float(c["max_groupe"])])
-                g_[0] += tot
-        grid(rows_, [48, 22, 22, 22, 18, 24, 20, 14], header=True, bold_cols=(0,), aligns=["L"] + ["R"] * 7, colors=colors,
-             gap=0.8, fsz=7.8)
-        for g_, (tot, mx) in gsum.items():
-            note(f"Groupe {g_} : {n(tot)} kg pour une limite de groupe de {n(mx)} kg"
-                 + ("" if tot <= mx + 1e-9 else "  -  LIMITE DÉPASSÉE"), 7.2, RED if tot > mx + 1e-9 else TEXT, "")
+            if r["total"] > 0:
+                seq_n += 1
+                rows_.append((seq_n, r["comp"], (r["pieces"] if r.get("pieces") is not None else "-") if r["Bagages"] > 0 else "NIL",
+                              n(r["Bagages"]) if r["Bagages"] > 0 else "NIL", n(r["Fret"]) if r["Fret"] > 0 else "NIL",
+                              n(r["Courrier"]) if r["Courrier"] > 0 else "NIL", n(r["total"]), n(r["max"])))
+                if r["total"] > r["max"] + 1e-9:
+                    colors[(len(rows_) - 1, 6)] = RED
+            else:
+                rows_.append(("-", r["comp"], "NIL", "NIL", "NIL", "NIL", "NIL", n(r["max"])))
+        rows_.append(("", "TOTAL", sum(r["pieces"] or 0 for r in plan) if plan and plan[0].get("pieces") is not None else "-",
+                      n(sum(r["Bagages"] for r in plan)), n(sum(r["Fret"] for r in plan)) if sum(r["Fret"] for r in plan) else "NIL",
+                      n(sum(r["Courrier"] for r in plan)) if sum(r["Courrier"] for r in plan) else "NIL", n(sum(r["total"] for r in plan)), ""))
+        grid(rows_, [14, 38, 28, 24, 20, 24, 22, 20], header=True, bold_rows=(len(rows_) - 1,), bold_cols=(1,),
+             aligns=["C", "L", "C", "R", "R", "R", "R", "R"], colors=colors, gap=1.2, fsz=8)
+        note("Exécution : charger de l'avant vers l'arrière ; décharger l'arrière en premier (stabilité de l'avion au sol).", 7.2, TEXT, "")
         pdf.ln(1)
+
     oth = d.get("other") or []
     if oth:
         section("AUTRES SOUTES (vrac, hors plan ULD)")
@@ -2198,38 +2407,6 @@ def generate_loading_plan_pdf(d: dict) -> bytes:
         for o in oth:
             rows_.append((o["name"], n(o["bag"]), n(o["cargo"]), n(o["mail"]), n(o["total"]), n(o["max"])))
         grid(rows_, [58, 26, 26, 26, 27, 27], header=True, bold_cols=(0,), aligns=["L"] + ["R"] * 5, gap=1.2, fsz=7.8)
-
-    # ── Centrage ─────────────────────────────────────────────────────────
-    cg = d.get("cg") or {}
-    if cg:
-        section("MASSES ET CENTRAGE AVEC CE PLAN")
-        rows_ = [("État", "Masse (kg)", "Maxi (kg)", "CG (m)", "%MAC", "Limites de centrage (m)", "Contrôle")]
-        colors = {}
-        for i, (k_, lab) in enumerate((("zfw", "ZFW"), ("tow", "TOW"), ("lw", "LW")), start=1):
-            v = cg.get(k_)
-            if not v:
-                continue
-            lim = v.get("lim")
-            ok = v.get("ok")
-            rows_.append((lab, n(v["mass"]), n(v.get("max")) if v.get("max") else "-", f"{v['cg']:.2f}", f"{v['mac']:.1f}",
-                          (f"{lim[0]:.2f} à {lim[1]:.2f}" if lim else "non définie par la compagnie"),
-                          ("OK" if ok else "HORS LIMITES") if lim else "non contrôlé"))
-            colors[(len(rows_) - 1, 6)] = GREEN if (ok or not lim) else RED
-            if v.get("max") and v["mass"] > v["max"]:
-                colors[(len(rows_) - 1, 1)] = RED
-        grid(rows_, [18, 26, 26, 20, 18, 52, 30], header=True, bold_cols=(0,), aligns=["L", "R", "R", "R", "R", "C", "C"],
-             colors=colors, gap=0.6)
-        if d.get("target_mac") is not None:
-            note(f"Cible de centrage au décollage : {d['target_mac']:.1f} %MAC ({d.get('target_txt', '')}).", 7.2, TEXT, "")
-        pdf.ln(1)
-
-    # ── Hypothèses et limites ────────────────────────────────────────────
-    notes = d.get("notes") or []
-    if notes:
-        section("HYPOTHÈSES RETENUES ET LIMITES DU DOCUMENT")
-        for t_ in notes:
-            note("- " + t_, 7.2, TEXT, "")
-        pdf.ln(1)
 
     # ── Signatures ───────────────────────────────────────────────────────
     room(26)
@@ -2291,6 +2468,9 @@ def render_loading_proposal(ac: dict, wk: str, ctx: dict):
     mode = ctx["mode"]
     fs = ctx["fs"]
     st.markdown("### 🧮 Proposition préliminaire de répartition et plan de chargement")
+    if fs.get("bags_missing"):
+        st.error("Plan de chargement indisponible : les bagages ne sont pas renseignés (voir « Bagages en soute »).")
+        return
     if ULDP is None or not ULDP.available():
         st.info("La répartition automatique n'est pas disponible : le module uldplan.py est absent du dépôt, ou la "
                 "bibliothèque PuLP n'est pas installée.")
@@ -2327,9 +2507,14 @@ def render_loading_proposal(ac: dict, wk: str, ctx: dict):
     lim_est = cg_limits_at(ac, base["raw_mass"]["tow"] + tot_load, "tow")
     mid_arm = (lim_est[0] + lim_est[1]) / 2
     mid_mac = cg_to_mac(mid_arm, ac["lemac"], ac["mac_length"])
-    t_mode = st.radio("Cible de centrage au décollage", ["Milieu de l'enveloppe", "Valeur imposée (%MAC)"], horizontal=True,
-                      key=f"plantgt_{wk}")
-    if t_mode.startswith("Valeur"):
+    _ideal = ideal_trim_at(ac, base["raw_mass"]["tow"] + tot_load) if ac.get("ideal_trim") else None
+    _opts = (["Ligne de centrage idéale (AHM)"] if _ideal else []) + ["Milieu de l'enveloppe", "Valeur imposée (%MAC)"]
+    t_mode = st.radio("Cible de centrage au décollage", _opts, horizontal=True, key=f"plantgt_{wk}")
+    if t_mode.startswith("Ligne"):
+        pct = float(_ideal[0])
+        t_arm = ac["lemac"] + pct / 100 * ac["mac_length"]
+        t_txt = f"ligne de centrage idéale de l'AHM, zone de {_ideal[1]:.1f} à {_ideal[2]:.1f} %MAC"
+    elif t_mode.startswith("Valeur"):
         pct = float(st.number_input("Cible (%MAC)", -50.0, 150.0, float(round(mid_mac, 1)), step=0.5, key=f"plantgtv_{wk}"))
         t_arm = ac["lemac"] + pct / 100 * ac["mac_length"]
         t_txt = "valeur imposée"
@@ -2385,6 +2570,30 @@ def render_loading_proposal(ac: dict, wk: str, ctx: dict):
                             "max_groupe_kg": c.get("max_groupe_kg"), "bag_rank": c.get("bag_rank"), "fixed_kg": 0}
                            for c in (ac.get("cargo_comps") or [])]
                 res = ULDP.solve_bulk(comps_b, loads, states, target, bag_unit=bag_unit)
+                if (t_mode.startswith("Ligne") and ac.get("ideal_trim") and res.get("plan")
+                        and loads["Fret"] + loads["Courrier"] <= 0):
+                    # mêmes règles que la répartition de la loadsheet : soutes remplies une à une selon la ligne idéale
+                    def _tpf(cl_):
+                        r_ = ctx["mc_with"](cl_, None)
+                        return r_["raw_mass"]["tow"], (r_["raw_cg"]["tow"] - ac["lemac"]) / ac["mac_length"] * 100
+                    try:
+                        _ra = allocate_bags_ideal(ac, [{k_: v_ for k_, v_ in c_.items()} for c_ in comps_b],
+                                                  loads["Bagages"], {}, _tpf)
+                    except Exception:
+                        _ra = None
+                    if _ra and not _ra[2]:
+                        for r_ in res["plan"]:
+                            r_["Bagages"] = float(_ra[0].get(r_["comp"], 0))
+                            r_["total"] = r_["Bagages"]
+                            r_["pieces"] = int(round(r_["Bagages"] / bag_unit)) if bag_unit else None
+                        gs_ = sum(r_["total"] for r_ in res["plan"])
+                        for s_ in states:
+                            m_ = s_["m_other"] + gs_
+                            cg_ = (s_["mom_other"] + sum(r_["total"] * r_["arm"] for r_ in res["plan"])) / m_
+                            lim_ = s_["lim"](m_)
+                            res["cg"][s_["name"]] = {"mass": m_, "cg": cg_, "lim": lim_,
+                                                     "ok": lim_ is None or (lim_[0] - 1e-6 <= cg_ <= lim_[1] + 1e-6)}
+                        res["ok"] = all(v_["ok"] for v_ in res["cg"].values()) and not res["cg_relaxed"]
                 pl_loads = {r["comp"]: r["total"] for r in res["plan"]}
                 pl_mom = None
         cgsum = _cg_state_summary(ac, ctx["mc_with"](pl_loads, pl_mom), fs) if res["plan"] else {}
@@ -2664,6 +2873,13 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
     else:
         bag_total = int(st.number_input("Masse réelle des bagages (kg)", 0, 100000, 0, key=f"bag_kg_{wk}"))
 
+    bag_none_ok = False
+    if bag_total <= 0:
+        bag_none_ok = st.checkbox("Aucun bagage en soute sur ce vol (confirmation obligatoire pour éditer la loadsheet)",
+                                  key=f"bag_none_{wk}")
+        if not bag_none_ok:
+            st.error("Bagages non renseignés : saisissez le nombre de bagages (ou la masse), ou confirmez qu'il n'y en a aucun. "
+                     "La loadsheet ne pourra pas être éditée sans cela.")
     used = {c["name"]: cargo_w.get(c["name"], 0) + mail_w.get(c["name"], 0) for c in comps}
     reserve_kg = 0
     if uld_on:
@@ -2680,7 +2896,24 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
             if reserve_kg > 0:
                 alloc, alloc_mode, unplaced = allocate_bags(comps, reserve_kg, used)
     else:
-        alloc, alloc_mode, unplaced = allocate_bags(comps, bag_total, used)
+        alloc, alloc_mode, unplaced, ideal_note, load_seq = None, None, 0, "", []
+        if ac.get("ideal_trim") and bag_total > 0 and comps:
+            _mf = int(ac.get("mfuel") or 0)
+            _taxi_d = int(((ac.get("ahm") or {}).get("taxi_standard_kg")) or 300)
+            _tof_est = max(int(st.session_state.get(f"fuel_bloc_{wk}", int(_mf * 0.40))) - int(st.session_state.get(f"fuel_taxi_{wk}", min(_taxi_d, _mf))), 0)
+            _pzw = zone_weights_from_counts(ac, pax["active_counts"], pax["masses"], pax["zone_counts"] or None)
+
+            def _tow_pct_fn(loads, _pzw=_pzw, _tof_est=_tof_est):
+                r_ = compute_mc(ac, _pzw, {c_["name"]: loads.get(c_["name"], 0) for c_ in comps_all}, _tof_est)
+                return r_["raw_mass"]["tow"], (r_["raw_cg"]["tow"] - ac["lemac"]) / ac["mac_length"] * 100
+            try:
+                _r = allocate_bags_ideal(ac, comps, bag_total, used, _tow_pct_fn)
+            except Exception:
+                _r = None
+            if _r:
+                alloc, alloc_mode, unplaced, load_seq, ideal_note = _r
+        if alloc is None:
+            alloc, alloc_mode, unplaced = allocate_bags(comps, bag_total, used)
     sig = zlib.crc32(repr(sorted(used.items())).encode())
     bag_w = {c["name"]: 0 for c in comps_all}
     bag_w.update(alloc)
@@ -2688,6 +2921,8 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
         with st.expander("Répartition des bagages par soute (priorité de chargement, ajustable)"):
             if alloc_mode == "manuel":
                 st.caption("Masse de bagages en vrac à saisir pour chaque soute en vrac.")
+            elif alloc_mode == "ligne idéale":
+                st.caption("Répartition selon la " + ideal_note + ". Ordre d'exécution : " + " > ".join(load_seq or []) + ". Ajustable ci-dessous.")
             elif alloc_mode == "priorité":
                 note = _meta(ac)["source"].get("bag_rank", "")
                 st.caption(f"Priorité de chargement : {bag_priority_text(comps)}"
@@ -2702,7 +2937,7 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
                     bag_w[comp["name"]] = int(st.number_input(
                         f"{comp['name']} (kg)", 0, int(comp["max_kg"]),
                         min(int(_bd if _bd is not None else alloc[comp["name"]]), int(comp["max_kg"])),
-                        key=f"bagz_{wk}_{i}_{int(bag_total)}_{sig}_r{reserve_kg}{ks}"))
+                        key=f"bagz_{wk}_{i}_{int(bag_total)}_{sig}_r{reserve_kg}{ks}_a{zlib.crc32(repr(sorted(alloc.items())).encode())}"))
             if sum(bag_w.values()) != int(bag_total) and not uld_on:
                 st.warning(f"La somme des soutes ({sum(bag_w.values())} kg) diffère de la masse de bagages "
                            f"({int(bag_total)} kg).")
@@ -2963,6 +3198,21 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
                f"Carburant : bloc {bloc:,} kg, taxi {taxi:,} kg, trip {trip:,} kg, décollage {tof:,} kg. "
                f"PNT / PNC : {n_f} / {n_c}.")
 
+    # ── Centrage idéal et stabilité au sol (feuille C7 de l'AHM) ─────────
+    if ac.get("ideal_trim"):
+        _it = ideal_trim_at(ac, result["tow"])
+        if _it:
+            _pos = ("dans la zone idéale" if _it[1] <= result["tow_mac"] <= _it[2]
+                    else ("en arrière de la zone idéale" if result["tow_mac"] > _it[2] else "en avant de la ligne idéale (consommation accrue)"))
+            st.caption(f"Centrage au décollage {result['tow_mac']:.1f} %MAC ; ligne idéale de l'AHM {_it[0]:.1f} %MAC "
+                       f"(zone {_it[1]:.1f} à {_it[2]:.1f}) : {_pos}.")
+        _gs = ground_stability_limit(ac, result["zfw"])
+        if _gs and result["zfw_mac"] > _gs[0]:
+            st.error(f"Stabilité au sol : centrage à la masse sans carburant {result['zfw_mac']:.1f} %MAC, au-delà de la limite de "
+                     f"{_gs[0]:.1f} %MAC de l'AHM ({_gs[1]}). Risque de basculement arrière : charger l'avant en premier.")
+        elif _gs:
+            st.caption(f"Stabilité au sol : {result['zfw_mac']:.1f} %MAC pour une limite de {_gs[0]:.1f} %MAC ({_gs[1]}).")
+
     # ── Synthèse du vol (alimente le PDF et l'historique) ─────────────────
     origin_txt, aircraft_certified = origin_summary(ac, "mc")
     lmc_ok = not lmc_over
@@ -3015,6 +3265,7 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
         "status_ok": all([zfw_ok, tow_ok, lw_ok, cg_ok, stock_ok, zones_ok, lmc_ok]),
         "origin_text": origin_txt, "referentiel_text": referentiel_label(ref),
         "data_certified": bool(aircraft_certified and ref_acceptable(ref)),
+        "bags_missing": bool(bag_total <= 0 and not bag_none_ok and sum(bag_w.values()) <= 0),
     }
     st.session_state.flight_summary = fs
     st.session_state.mc_result = result
@@ -3102,7 +3353,10 @@ def render_pdf_tab(blocked: bool, missing: list):
         st.caption("Les vitesses résultent d'une formule approchée, et non des tables de l'AFM : elles sont "
                    "indiquées comme telles sur le document.")
     st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
-    if st.button("📄 GÉNÉRER LA LOAD & TRIM SHEET PDF", use_container_width=True):
+    if fs.get("bags_missing"):
+        st.error("Édition impossible : les bagages ne sont pas renseignés. Retournez dans l'onglet « Nouveau vol », rubrique "
+                 "« Bagages en soute », saisissez le nombre de bagages ou confirmez qu'il n'y en a aucun.")
+    if st.button("📄 GÉNÉRER LA LOAD & TRIM SHEET PDF", use_container_width=True, disabled=bool(fs.get("bags_missing"))):
         data = dict(fs)
         data["vspeeds"] = st.session_state.get("vspeeds", {})
         with st.spinner("⚙ Génération du PDF en cours..."):
@@ -4270,6 +4524,7 @@ def main():
     # Base de travail de la session : modifiable, non persistante (voir profil compagnie)
     if "db" not in st.session_state:
         st.session_state.db = {k: normalize_aircraft(v) for k, v in base_db.items()}
+        st.session_state.base_keys = set(st.session_state.db.keys())
         st.session_state.db.update(load_demo_types(st.session_state.db))
         st.session_state.profile_info = None
         st.session_state.dirty = False
@@ -4300,12 +4555,18 @@ def main():
         # Sélection aéronef
         st.markdown("**🛩 Type d'aéronef**")
         pending = st.session_state.pop("_pending_select", None)
-        if pending in db:
+        # Liste réduite aux avions de démonstration (et aux types importés d'un AHM ou d'un profil) : les types de base du dépôt
+        # restent en mémoire (valeurs de repli pour les vitesses et performances) mais ne sont plus proposés.
+        _base_keys = st.session_state.get("base_keys") or set()
+        _visible = [k for k, v in db.items()
+                    if not (k in _base_keys and not v.get("ahm") and not v.get("origine_import") and st.session_state.get("profile_info") is None)]
+        _visible = _visible or list(db.keys())
+        if pending in _visible:
             st.session_state["sel_ac"] = pending
-        if st.session_state.get("sel_ac") not in db:
+        if st.session_state.get("sel_ac") not in _visible:
             # À l'ouverture : premier type dont les données sont complètes (calculs disponibles)
-            st.session_state["sel_ac"] = next((k for k, v in db.items() if not missing_fields(v)), list(db.keys())[0])
-        selected_ac = st.selectbox("Type d'aéronef", list(db.keys()), key="sel_ac", label_visibility="collapsed")
+            st.session_state["sel_ac"] = next((k for k in _visible if not missing_fields(db[k])), _visible[0])
+        selected_ac = st.selectbox("Type d'aéronef", _visible, key="sel_ac", label_visibility="collapsed")
         ac = db[selected_ac]
         if ac.get("ahm"):
             if AHM is None:
@@ -4348,7 +4609,7 @@ def main():
             audit("logout", "")
             for k_ in [k_ for k_ in st.session_state if str(k_).startswith(("cargo_keep_", "use_cargo_"))]:
                 del st.session_state[k_]
-            for key in ["ahm_ovr", "ahm_read", "authenticated", "username", "user_info", "db", "profile_info", "dirty", "sel_ac", "ed_version", "pax_info", "referentiel", "flight_summary", "fuel_in", "ref_docs", "ref_docs_ver", "preparer_name", "cdb_name", "locked", "ls_edition", "wx", "wx_sel", "wx_country", "lmc_editor", "acc_result", "acc_gen_pwd", "flight_date", "flight_time", "ahm_import"]:
+            for key in ["ahm_ovr", "ahm_read", "base_keys", "authenticated", "username", "user_info", "db", "profile_info", "dirty", "sel_ac", "ed_version", "pax_info", "referentiel", "flight_summary", "fuel_in", "ref_docs", "ref_docs_ver", "preparer_name", "cdb_name", "locked", "ls_edition", "wx", "wx_sel", "wx_country", "lmc_editor", "acc_result", "acc_gen_pwd", "flight_date", "flight_time", "ahm_import"]:
                 st.session_state.pop(key, None)
             st.rerun()
 
