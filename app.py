@@ -1,5 +1,5 @@
 # =============================================================================
-# AETHERDISPATCH v6.2 — Agent IA Handling Aérien
+# AETHERDISPATCH v6.3 — Agent IA Handling Aérien
 # Développé par EG Conseil & Lobbying | Mars 2026
 # Modules : Masse & Centrage | Performances | V-Speeds | METAR Live
 #           Carburant | Optimisation PuLP | Référentiel compagnie | Export PDF | PWA
@@ -20,6 +20,11 @@ try:
     import ahm565 as AHM          # import des fichiers AHM (PDF) : facultatif
 except Exception:
     AHM = None
+try:
+    import ahm_text as AT         # lecture des AHM 565 au format PDF ou Excel
+    import ahm_adapter as AD      # catalogue démo et import client -> modèle de l'application
+except Exception:
+    AT = AD = None
 try:
     import uldplan as ULDP        # répartition préliminaire des ULD et des soutes en vrac : facultatif
 except Exception:
@@ -383,7 +388,7 @@ def login_page(users: dict):
         st.markdown("""
         <div style="text-align:center;font-size:0.72rem;color:#556688;letter-spacing:1px">
         ACCÈS RESTREINT — Équipe Handling & Dispatch autorisée uniquement<br>
-        AETHERDISPATCH v6.2 | EG Conseil & Lobbying © 2026
+        AETHERDISPATCH v6.3 | EG Conseil & Lobbying © 2026
         </div>
         """, unsafe_allow_html=True)
 
@@ -858,6 +863,27 @@ def optimize_cargo_pulp(ac: dict, cargo_offers: list, max_payload_kg: float) -> 
 # MODULE 6 : EXPORT PDF
 # =============================================================================
 
+class _LoadsheetPDF(FPDF):
+    """PDF de loadsheet : filigrane diagonal sur chaque page lorsque les données sont celles du catalogue démo."""
+    wm = False
+
+    def footer(self):
+        """Dessiné après le contenu de la page : le filigrane reste visible au-dessus des tableaux."""
+        if not self.wm:
+            return
+        with self.local_context(fill_opacity=0.22, text_color=(200, 30, 30)):
+            self.set_font("Helvetica", "B", 40)
+            with self.rotation(38, x=105, y=150):
+                self.text(14, 142, "DOCUMENT NON UTILISABLE")
+                self.set_font("Helvetica", "B", 30)
+                self.text(20, 160, "NOT USABLE FOR OPERATIONS")
+        self.set_text_color(190, 30, 30)
+        self.set_font("Helvetica", "B", 6.5)
+        self.set_xy(10, 289)
+        self.cell(190, 3, "DONNEES DE DEMONSTRATION - DEMONSTRATION DATA - NE PAS UTILISER POUR L'EXPLOITATION / DO NOT USE FOR OPERATIONS",
+                  align='C')
+
+
 def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     """
     Load & Trim Sheet A4, simple et opérationnelle pour le dispatcher et le commandant de bord.
@@ -865,7 +891,8 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     chargements spéciaux et dernières modifications, (vitesses), avion et commandant de bord
     (maxima, centrages, contrôles). Une page dans le cas courant ; la suite passe à la page suivante.
     """
-    pdf = FPDF(orientation='P', unit='mm', format='A4')
+    pdf = _LoadsheetPDF(orientation='P', unit='mm', format='A4')
+    pdf.wm = bool(fs.get("watermark"))
     pdf.set_auto_page_break(auto=True, margin=31)
     pdf.add_page()
     # La police standard ne gère que le latin-1 : remplacement des symboles non supportés
@@ -1175,7 +1202,7 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     pdf.cell(190, 3.8, f"Référentiel : {fs.get('referentiel_text', '-')}", align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "I", 7)
     pdf.set_text_color(130, 130, 130)
-    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v6.2. Vérification obligatoire par le commandant de bord.",
+    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v6.3. Vérification obligatoire par le commandant de bord.",
              align='C')
     return bytes(pdf.output())
 
@@ -1282,6 +1309,8 @@ STATUS_LABELS = {
     "reglementaire": "Réglementaire",
     "estime": "Estimé",
     "compagnie": "Compagnie",
+    "demo": "Démo (non utilisable)",
+    "modifie": "Modifié par l'exploitant",
     "a_renseigner": "À renseigner",
 }
 LABEL_TO_STATUS = {v: k for k, v in STATUS_LABELS.items()}
@@ -1425,7 +1454,7 @@ def origin_summary(ac: dict, scope: str = "all"):
     c = origin_counts(ac, scope)
     others = sum(v for k, v in c.items() if k != "compagnie")
     certified = c["compagnie"] > 0 and others == 0
-    txt = " / ".join(f"{c[k]} {STATUS_LABELS[k]}" for k in ("compagnie", "constructeur", "reglementaire", "estime", "a_renseigner") if c[k])
+    txt = " / ".join(f"{c[k]} {STATUS_LABELS[k]}" for k in ("compagnie", "demo", "modifie", "constructeur", "reglementaire", "estime", "a_renseigner") if c[k])
     return txt or "aucune donnée", certified
 
 
@@ -1455,7 +1484,7 @@ def normalize_aircraft(rec: dict) -> dict:
 
 
 # ── Profil compagnie : export / import ───────────────────────────────────────
-def export_profile_bytes(db: dict, profile_name: str, user_name: str, referentiel=None) -> bytes:
+def export_profile_bytes(db: dict, profile_name: str, user_name: str, referentiel=None, overrides=None) -> bytes:
     payload = {
         "format": "aetherdispatch-profile", "version": 2,
         "name": (profile_name or "Profil compagnie").strip(),
@@ -1463,6 +1492,7 @@ def export_profile_bytes(db: dict, profile_name: str, user_name: str, referentie
         "exported_by": user_name,
         "aircraft": db,
         "referentiel": referentiel,
+        "overrides": overrides or {},
     }
     return json.dumps(payload, ensure_ascii=False, indent=2).encode("utf-8")
 
@@ -1483,7 +1513,7 @@ def import_profile_bytes(raw: bytes):
         out[str(name)] = normalize_aircraft(rec)
     info = {"name": data.get("name") or "Profil sans nom",
             "exported_at": data.get("exported_at", ""), "exported_by": data.get("exported_by", ""),
-            "referentiel": data.get("referentiel")}
+            "referentiel": data.get("referentiel"), "overrides": data.get("overrides") or {}}
     return True, f"{len(out)} type(s) d'aéronef chargé(s).", out, info
 
 
@@ -2938,7 +2968,8 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
     lmc_ok = not lmc_over
     fs = {
         "flight_number": flight_number, "registration": registration, "aircraft": selected_ac,
-        "type": ac.get("type", ""), "origin": origin, "dest": dest, "alternate": alternate, "alternates": alt_info,
+        "type": ac.get("type", ""), "watermark": is_demo(ac), "client_import": ((ac.get("origine_import") or {}).get("mode") == "client"),
+        "origin": origin, "dest": dest, "alternate": alternate, "alternates": alt_info,
         "dist_nm": dist_nm,
         "datetime": f"{flight_date.strftime('%d/%m/%Y')} {flight_time.strftime('%H:%M')} UTC",
         "ls_status": pax["status"].upper(), "cdb_name": cdb_name.strip(),
@@ -3530,7 +3561,7 @@ def _ahm_default_base(db: dict, type_name: str):
     return None
 
 
-def build_ahm_record(ac_raw: dict, base_rec) -> dict:
+def build_ahm_record(ac_raw: dict, base_rec, statut: str = "compagnie") -> dict:
     """Enregistrement de type prêt à être ajouté à la base de la session, à partir du résultat de la conversion."""
     rec = copy.deepcopy(ac_raw)
     h = rec["ahm"]
@@ -3559,16 +3590,16 @@ def build_ahm_record(ac_raw: dict, base_rec) -> dict:
         "lemac": "formule d'index", "mac_length": "formule d'index"}
     for key, label, unit, req in ALL_FIELDS:
         if key in comp_keys and get_field(rec, key) is not None:
-            meta["status"][key] = "compagnie"
+            meta["status"][key] = statut
             meta["source"][key] = _ahm_src(h, comp_keys[key])
         elif key.startswith(("vspeeds.", "perf.")) and get_field(rec, key) is not None:
             meta["status"][key] = "estime"
             meta["source"][key] = "Valeur estimée du type de base (absente de l'AHM)"
         else:
             meta["status"][key] = "a_renseigner"
-    meta["status"]["cg_envelope"] = "compagnie"
+    meta["status"]["cg_envelope"] = statut
     meta["source"]["cg_envelope"] = _ahm_src(h, "enveloppe de centrage au décollage (feuille C3)")
-    meta["status"]["fuel_arm_table"] = "compagnie"
+    meta["status"]["fuel_arm_table"] = statut
     meta["source"]["fuel_arm_table"] = _ahm_src(h, "effet du carburant sur l'index (feuille D4), converti en bras")
     return normalize_aircraft(rec)
 
@@ -3590,10 +3621,111 @@ def _ahm_ref_changes(h: dict, ref: dict):
     return out
 
 
+
+# ── Catalogue démo sourcé, import client (PDF ou Excel) et ajustements tracés ───────────────────────────
+DEMO_SUFFIX = " · démo"
+OVR_FIELDS = [("oew_kg", "Masse à vide hors équipage (kg)", 0), ("max_zfw_kg", "MZFW (kg)", 0),
+              ("max_tow_kg", "MTOW (kg)", 0), ("max_lw_kg", "MLW (kg)", 0)]
+
+
+def load_demo_types(db: dict) -> dict:
+    """Types du catalogue démo sourcé (AHM THY), injectables comme un type importé. Statut « Démo, non utilisable »."""
+    if AD is None:
+        return {}
+    cat = load_json("aetherdispatch_aircraft_db.json")
+    if not isinstance(cat, dict) or not cat.get("aircraft"):
+        return {}
+    out = {}
+    for key, t in cat["aircraft"].items():
+        if not (t.get("basic_weight") or {}).get("aircraft"):
+            continue                                   # types partiels (ATR) : pas de formule d'index ni d'enveloppe
+        src = (t.get("units") or {}).get("source") or {}
+        info = {"label": t.get("label") or key, "edition": src.get("revision"), "document": src.get("document"),
+                "watermark": t.get("watermark") or cat.get("_meta", {}).get("watermark")}
+        try:
+            ac, rap = AD.to_app_record(t, "demo", info)
+            if ac is None:
+                continue
+            base = db.get(_ahm_default_base(db, info["label"]) or "")
+            out[f"{info['label']}{DEMO_SUFFIX}"] = build_ahm_record(ac, base, "demo")
+        except Exception:
+            continue
+    return out
+
+
+def is_demo(ac: dict) -> bool:
+    return ((ac or {}).get("origine_import") or {}).get("mode") == "demo"
+
+
+def without_demo(db: dict) -> dict:
+    return {k: v for k, v in db.items() if not is_demo(v)}
+
+
+def get_overrides(type_name: str, reg) -> dict:
+    return (st.session_state.get("ahm_ovr") or {}).get(f"{type_name}|{reg or ''}", {})
+
+
+def apply_overrides(ac: dict, type_name: str, reg) -> dict:
+    """Valeurs de l'appareil choisi ajustées par l'exploitant : elles passent en statut « Modifié par l'exploitant »."""
+    ov = get_overrides(type_name, reg)
+    if not ov:
+        return ac
+    e = copy.deepcopy(ac)
+    m = _meta(e)
+    for k, d in ov.items():
+        e[k] = d["value"]
+        m["status"][k] = "modifie"
+        m["source"][k] = f"Modifié par {d.get('by', '?')} le {d.get('at', '?')} (valeur du fichier : {d.get('orig')})"
+    return e
+
+
+def render_origin_banner(ac: dict):
+    o = (ac or {}).get("origine_import") or {}
+    if o.get("mode") == "demo":
+        wm = o.get("watermark") or {}
+        st.error("**" + (wm.get("fr") or "DONNÉES DE DÉMONSTRATION — DOCUMENT NON UTILISABLE POUR L'EXPLOITATION.") + "**\n\n"
+                 + (wm.get("en") or "DEMONSTRATION DATA — DOCUMENT NOT USABLE FOR OPERATIONS."))
+    elif o.get("mode") == "client":
+        st.info("Données importées par l'exploitant depuis son fichier AHM. Elles n'ont pas été certifiées par AETHERDISPATCH : "
+                "l'exploitant en reste responsable (vérification obligatoire par le commandant de bord).")
+
+
+def _ahm_read_file(raw: bytes, name: str) -> dict:
+    """Lit un AHM 565 au format PDF ou Excel. Renvoie les feuilles et les groupes d'immatriculations."""
+    h = hashlib.sha256(raw).hexdigest()[:10]
+    err = "Module de lecture absent (fichier ahm_text.py)."
+    if AT is not None:
+        try:
+            sheets, kind = AT.read_sheets(raw, name)
+            groups = AT.groups_of(sheets)
+            if groups:
+                return {"name": name, "hash": h, "kind": kind, "sheets": sheets, "groups": groups,
+                        "info": AT.cover_info(sheets, name)}
+            err = "Aucune masse de base par appareil (feuille E5) trouvée dans ce fichier."
+        except ValueError as exc:
+            err = str(exc)
+    if raw[:4] == b"%PDF" and AHM is not None and AHM.is_ahm565(raw):      # ancien lecteur : AHM d'un autre gabarit
+        P = AHM.parse_all(data=raw, filename=name)
+        ac_raw, rap = AHM.convert(P)
+        st.session_state["ahm_import"] = {"name": name, "ac": ac_raw, "rap": rap, "warn": P.get("avertissements") or [], "hash": h}
+        return {"legacy": True}
+    raise ValueError(err)
+
+
+def _ahm_analyse(rd: dict, group: str) -> dict:
+    entry, rap = AT.build_entry(rd["sheets"], group)
+    if entry is None:
+        return {"name": rd["name"], "ac": None, "rap": rap, "warn": [], "hash": rd["hash"]}
+    info = dict(rd["info"])
+    info.update({"label": info.get("type") or "Type importé", "fichier": rd["name"]})
+    ac_raw, rap2 = AD.to_app_record(entry, "client", info)
+    return {"name": rd["name"], "ac": ac_raw, "rap": rap + rap2, "warn": [], "hash": rd["hash"], "group": group}
+
+
 def render_ahm_import(can_edit: bool, ver: int, db: dict):
-    with st.expander("📥 Importer un fichier AHM (PDF de la compagnie)", expanded=bool(st.session_state.get("ahm_import"))):
-        if AHM is None:
-            st.error("Le module d'import (fichier ahm565.py) est absent du dépôt, ou la bibliothèque pymupdf n'est pas installée.")
+    with st.expander("📥 Importer un fichier AHM (PDF ou Excel de la compagnie)", expanded=bool(st.session_state.get("ahm_import"))):
+        if AT is None and AHM is None:
+            st.error("Le module d'import (fichiers ahm_text.py et ahm_adapter.py) est absent du dépôt, ou la bibliothèque pymupdf n'est pas installée.")
             return
         if not can_edit:
             st.info("L'import est réservé aux profils admin et dispatcher.")
@@ -3604,21 +3736,31 @@ def render_ahm_import(can_edit: bool, ver: int, db: dict):
         st.caption("Les données importées restent dans votre session : exportez ensuite votre profil pour les conserver. "
                    "Elles ne sont jamais écrites dans le dépôt de l'application. Les vitesses et performances ne figurent pas "
                    "dans un AHM : elles restent estimées (type de base) ou à renseigner.")
-        up = st.file_uploader("Fichier AHM (PDF)", type=["pdf"], key=f"ahm_up_{ver}")
-        if st.button("🔎 Analyser le fichier", key=f"ahm_go_{ver}", disabled=up is None):
+        up = st.file_uploader("Fichier AHM (PDF ou Excel)", type=["pdf", "xlsx"], key=f"ahm_up_{ver}")
+        if st.button("🔎 Lire le fichier", key=f"ahm_go_{ver}", disabled=up is None):
             raw = up.getvalue()
-            with st.spinner("Lecture du PDF en cours..."):
+            st.session_state.pop("ahm_import", None)
+            st.session_state.pop("ahm_read", None)
+            with st.spinner("Lecture du fichier en cours..."):
                 try:
-                    if not AHM.is_ahm565(raw):
-                        st.session_state["ahm_import"] = {"err": "Ce PDF ne ressemble pas à un AHM (formulaires EDP)."}
-                    else:
-                        P = AHM.parse_all(data=raw, filename=up.name)
-                        ac_raw, rap = AHM.convert(P)
-                        st.session_state["ahm_import"] = {"name": up.name, "ac": ac_raw, "rap": rap,
-                                                          "warn": P.get("avertissements") or [],
-                                                          "hash": hashlib.sha256(raw).hexdigest()[:10]}
-                except Exception as exc:                                    # fichier illisible : message clair, rien n'est modifié
-                    st.session_state["ahm_import"] = {"err": f"Lecture impossible ({type(exc).__name__}). Le fichier n'est pas modifié."}
+                    rd_ = _ahm_read_file(raw, up.name)
+                    if not rd_.get("legacy"):
+                        st.session_state["ahm_read"] = rd_
+                except Exception as exc:                                    # fichier illisible : rien n'est modifié
+                    st.session_state["ahm_import"] = {"err": f"Lecture impossible : {exc} Le fichier n'est pas modifié."}
+        rd = st.session_state.get("ahm_read")
+        if rd:
+            labels = [f"{g_} : {n_} appareil(s)" for g_, n_ in rd["groups"]]
+            ig = st.selectbox("Groupe d'immatriculations à importer", list(range(len(labels))), format_func=lambda i_: labels[i_],
+                              key=f"ahm_grp_{ver}")
+            st.caption(f"Fichier lu : {rd['name']} ({'PDF' if rd['kind'] == 'pdf' else 'Excel'}). "
+                       "Un groupe correspond à une série d'avions de la compagnie qui partagent les mêmes données.")
+            if st.button("🔬 Analyser ce groupe", key=f"ahm_an_{ver}"):
+                with st.spinner("Analyse en cours..."):
+                    try:
+                        st.session_state["ahm_import"] = _ahm_analyse(rd, rd["groups"][ig][0])
+                    except Exception as exc:
+                        st.session_state["ahm_import"] = {"err": f"Analyse impossible ({type(exc).__name__}). Le fichier n'est pas modifié."}
         imp = st.session_state.get("ahm_import")
         if not imp:
             return
@@ -3707,7 +3849,8 @@ def render_ahm_import(can_edit: bool, ver: int, db: dict):
         else:
             st.caption("Valeurs estimées copiées du type de base : elles sont signalées comme telles et ne remplacent pas "
                        "les données du manuel de vol.")
-        default_name = f"{so.get('type') or 'Type importé'} — {so.get('organisme') or 'compagnie'}"
+        default_name = (f"{so.get('type') or 'Type importé'}" + (f" {imp['group'].split(',')[0].strip()}" if imp.get("group") else "")
+                        + f" — {so.get('organisme') or 'compagnie'}")
         new_name = st.text_input("Nom du type dans l'application", value=default_name, key=f"ahm_name_{ver}").strip()
         exists = new_name in db
         replace = False
@@ -3741,7 +3884,7 @@ def render_ahm_import(can_edit: bool, ver: int, db: dict):
             st.rerun()
 
 
-def render_ahm_type_info(ac: dict):
+def render_ahm_type_info(ac: dict, selected_ac: str = "", can_edit: bool = False):
     """Données propres à un type importé d'un AHM (lecture seule)."""
     h = ac.get("ahm")
     if not h:
@@ -3761,6 +3904,49 @@ def render_ahm_type_info(ac: dict):
             elif st_ == "law":
                 st.caption("Enveloppe d'atterrissage : non définie par la compagnie (limite non contrôlée).")
         st.caption("L'enveloppe au décollage est modifiable dans le tableau « Enveloppe de centrage » ci-dessous.")
+    if can_edit and selected_ac:
+        reg = st.session_state.get(f"ahm_reg_{selected_ac}")
+        reg = None if reg in (None, "Autre (hors liste)") else reg
+        cfg_n = st.session_state.get(f"ahm_cfg_{selected_ac}")
+        base_sel = AHM.apply_selection(ac, cfg_n, reg) if (AHM and h.get("configs")) else ac
+        with st.expander("✏ Ajuster les valeurs de l'appareil choisi (modification tracée)", expanded=False):
+            st.markdown(f"Appareil : **{reg or 'hors liste'}**, configuration **{cfg_n}**. Une valeur ajustée passe en statut "
+                        "« Modifié par l'exploitant » ; la valeur du fichier est conservée, l'auteur et l'heure sont enregistrés "
+                        "dans le journal. Les ajustements sont inclus dans l'export du profil.")
+            cur = get_overrides(selected_ac, reg)
+            newv = {}
+            cols = st.columns(len(OVR_FIELDS))
+            for (k_, lab_, _), c_ in zip(OVR_FIELDS, cols):
+                orig = (cur.get(k_) or {}).get("orig", base_sel.get(k_))
+                v_ = c_.number_input(lab_, value=float((cur.get(k_) or {}).get("value", base_sel.get(k_) or 0)), step=1.0,
+                                     key=f"ovr_{selected_ac}_{reg}_{k_}")
+                newv[k_] = (v_, orig)
+            who = st.session_state.get("username", "-")
+            b1, b2 = st.columns(2)
+            if b1.button("Enregistrer les ajustements", key=f"ovr_save_{selected_ac}_{reg}"):
+                store = st.session_state.setdefault("ahm_ovr", {})
+                slot = store.setdefault(f"{selected_ac}|{reg or ''}", {})
+                n_chg = 0
+                for k_, (v_, orig) in newv.items():
+                    if orig is not None and abs(float(v_) - float(orig)) > 1e-9:
+                        slot[k_] = {"value": float(v_), "orig": float(orig), "by": who,
+                                    "at": datetime.now(timezone.utc).strftime("%d/%m/%Y %H:%M UTC")}
+                        audit("ahm_override", f"{selected_ac} | {reg} | {k_} : {orig} -> {v_}")
+                        n_chg += 1
+                    else:
+                        slot.pop(k_, None)
+                if not slot:
+                    store.pop(f"{selected_ac}|{reg or ''}", None)
+                st.session_state.dirty = True
+                st.session_state["_flash"] = f"{n_chg} valeur(s) ajustée(s) pour {reg or 'cet appareil'}."
+                st.rerun()
+            if cur and b2.button("Rétablir les valeurs du fichier", key=f"ovr_reset_{selected_ac}_{reg}"):
+                st.session_state["ahm_ovr"].pop(f"{selected_ac}|{reg or ''}", None)
+                audit("ahm_override_reset", f"{selected_ac} | {reg}")
+                st.session_state.dirty = True
+                st.rerun()
+            if cur:
+                st.caption("Ajustements en vigueur : " + ", ".join(f"{k_} {d_['orig']:g} -> {d_['value']:g}" for k_, d_ in cur.items()))
 
 
 def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
@@ -3789,8 +3975,10 @@ def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
         if st.button("Charger ce profil", key="btn_load_profile", disabled=up is None):
             ok, msg, new_db, new_info = import_profile_bytes(up.getvalue())
             if ok:
+                new_db.update({k_: v_ for k_, v_ in load_demo_types(new_db).items() if k_ not in new_db})
                 st.session_state.db = new_db
                 st.session_state.profile_info = new_info
+                st.session_state["ahm_ovr"] = new_info.get("overrides") or {}
                 audit("profile_imported", new_info["name"])
                 st.session_state.referentiel = normalize_referentiel(new_info.get("referentiel"))
                 st.session_state.dirty = False
@@ -3803,7 +3991,8 @@ def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
             pname = st.text_input("Nom du profil à exporter", value=(info or {}).get("name", "Profil compagnie"),
                                   key="profile_name")
             st.download_button("⬇ Exporter mon profil",
-                               data=export_profile_bytes(db, pname, user_info.get("nom", ""), st.session_state.referentiel),
+                               data=export_profile_bytes(without_demo(db), pname, user_info.get("nom", ""), st.session_state.referentiel,
+                                         st.session_state.get("ahm_ovr")),
                                file_name=f"profil_compagnie_{datetime.now().strftime('%Y%m%d')}.json",
                                mime="application/json", on_click=_mark_exported, key="btn_export_profile")
         else:
@@ -3834,7 +4023,7 @@ def render_data_tab(selected_ac: str, can_edit: bool, user_info: dict):
     st.markdown("---")
     txt, certified = origin_summary(ac)
     st.markdown(f"**Type sélectionné : {selected_ac}** — origine des données critiques : {txt}")
-    render_ahm_type_info(ac)
+    render_ahm_type_info(ac, selected_ac, can_edit)
     miss = missing_fields(ac)
     if miss:
         st.warning(f"{len(miss)} donnée(s) à renseigner pour activer les calculs : "
@@ -4081,6 +4270,7 @@ def main():
     # Base de travail de la session : modifiable, non persistante (voir profil compagnie)
     if "db" not in st.session_state:
         st.session_state.db = {k: normalize_aircraft(v) for k, v in base_db.items()}
+        st.session_state.db.update(load_demo_types(st.session_state.db))
         st.session_state.profile_info = None
         st.session_state.dirty = False
     if "referentiel" not in st.session_state:
@@ -4094,7 +4284,7 @@ def main():
              border-radius:10px;border:1px solid rgba(0,191,255,0.2);margin-bottom:1rem">
             <div style="font-size:2.5rem">✈</div>
             <div style="font-weight:900;font-size:1.1rem;color:#00BFFF;letter-spacing:3px">AETHERDISPATCH</div>
-            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v6.2 | EG CONSEIL</div>
+            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v6.3 | EG CONSEIL</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -4133,6 +4323,9 @@ def main():
                     st.caption("Immatriculation hors liste : aucun ajustement de masse à vide ni limites propres à l'avion ; "
                                "les limites standard du fichier sont utilisées.")
                 ac = AHM.apply_selection(ac, _cfg_sel, None if _reg_sel == _OTHER else _reg_sel)
+                ac = apply_overrides(ac, selected_ac, None if _reg_sel == _OTHER else _reg_sel)
+                if get_overrides(selected_ac, None if _reg_sel == _OTHER else _reg_sel):
+                    st.warning("Valeurs ajustées par l'exploitant pour cet appareil (statut « Modifié par l'exploitant »).")
 
         st.markdown("---")
         dow_display = (ac["oew_kg"] + ac["crew_kg"]) if ac.get("oew_kg") is not None and ac.get("crew_kg") is not None else None
@@ -4155,7 +4348,7 @@ def main():
             audit("logout", "")
             for k_ in [k_ for k_ in st.session_state if str(k_).startswith(("cargo_keep_", "use_cargo_"))]:
                 del st.session_state[k_]
-            for key in ["authenticated", "username", "user_info", "db", "profile_info", "dirty", "sel_ac", "ed_version", "pax_info", "referentiel", "flight_summary", "fuel_in", "ref_docs", "ref_docs_ver", "preparer_name", "cdb_name", "locked", "ls_edition", "wx", "wx_sel", "wx_country", "lmc_editor", "acc_result", "acc_gen_pwd", "flight_date", "flight_time", "ahm_import"]:
+            for key in ["ahm_ovr", "ahm_read", "authenticated", "username", "user_info", "db", "profile_info", "dirty", "sel_ac", "ed_version", "pax_info", "referentiel", "flight_summary", "fuel_in", "ref_docs", "ref_docs_ver", "preparer_name", "cdb_name", "locked", "ls_edition", "wx", "wx_sel", "wx_country", "lmc_editor", "acc_result", "acc_gen_pwd", "flight_date", "flight_time", "ahm_import"]:
                 st.session_state.pop(key, None)
             st.rerun()
 
@@ -4169,6 +4362,7 @@ def main():
 
     # ── Bandeau d'état du profil compagnie + contrôle des données du type ────
     render_profile_banner()
+    render_origin_banner(ac)
     if user_info.get("type") == "partagé":
         st.info("Compte partagé : il n'identifie pas la personne qui prépare la loadsheet. Saisissez votre nom et prénom "
                 "dans le champ « Préparé par » (onglet « Nouveau vol »).")
@@ -4662,7 +4856,7 @@ def main():
     # ── Footer ─────────────────────────────────────────────────────────────────
     st.markdown("""
     <div class="aether-footer">
-        AETHERDISPATCH v6.2 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
+        AETHERDISPATCH v6.3 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
         Données à usage opérationnel restreint — Vérification obligatoire par le commandant de bord
     </div>
     """, unsafe_allow_html=True)
