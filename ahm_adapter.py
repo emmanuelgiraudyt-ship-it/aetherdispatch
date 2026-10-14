@@ -278,7 +278,7 @@ def to_app_record(t, mode="demo", info=None):
           "max_seats": max(c["sieges"] for c in cfgs), "cg_limits_by_state": True}
     if "law" in env:
         ac["cg_envelope_law"] = env["law"]
-    if ac["max_seats"] == 0:                       # avion tout cargo : plan de chargement par position de ULD
+    if True:                                       # plan de chargement par position de ULD (cargos et gros porteurs)
         U_ = _uld_rows(t.get("uld_positions"), ac["cargo_comps"], f)
         if U_:
             ac["uld"], ac["loading_mode"] = U_, "uld"

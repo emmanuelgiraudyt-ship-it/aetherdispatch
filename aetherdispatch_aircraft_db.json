@@ -4377,7 +4377,158 @@
      "where": "page"
     }
    },
-   "uld_positions": null
+   "uld_positions": {
+    "registrations_group": "320A",
+    "positions": [
+     {
+      "hold": "FORWARD",
+      "config": "AKH",
+      "pos": "11",
+      "max_kg": 1134.0,
+      "arm": 10.7,
+      "from": 9.93,
+      "to": 11.47,
+      "index_per_kg": -0.00815
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "11",
+      "max_kg": 1134.0,
+      "arm": 10.7,
+      "from": 9.93,
+      "to": 11.47,
+      "index_per_kg": -0.00815
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKH",
+      "pos": "12",
+      "max_kg": 1134.0,
+      "arm": 12.272,
+      "from": 11.502,
+      "to": 13.042,
+      "index_per_kg": -0.006578
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "12",
+      "max_kg": 1134.0,
+      "arm": 12.272,
+      "from": 11.502,
+      "to": 13.042,
+      "index_per_kg": -0.006578
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKH",
+      "pos": "13",
+      "max_kg": 1134.0,
+      "arm": 13.844,
+      "from": 13.074,
+      "to": 14.614,
+      "index_per_kg": -0.005006
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "13",
+      "max_kg": 1134.0,
+      "arm": 13.844,
+      "from": 13.074,
+      "to": 14.614,
+      "index_per_kg": -0.005006
+     },
+     {
+      "hold": "AFT",
+      "config": "AKH",
+      "pos": "31",
+      "max_kg": 1134.0,
+      "arm": 22.084,
+      "from": 21.314,
+      "to": 22.854,
+      "index_per_kg": 0.003234
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "31",
+      "max_kg": 1134.0,
+      "arm": 22.084,
+      "from": 21.314,
+      "to": 22.854,
+      "index_per_kg": 0.003234
+     },
+     {
+      "hold": "AFT",
+      "config": "AKH",
+      "pos": "32",
+      "max_kg": 1134.0,
+      "arm": 23.656,
+      "from": 22.886,
+      "to": 24.426,
+      "index_per_kg": 0.004806
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "32",
+      "max_kg": 1134.0,
+      "arm": 23.656,
+      "from": 22.886,
+      "to": 24.426,
+      "index_per_kg": 0.004806
+     },
+     {
+      "hold": "AFT",
+      "config": "AKH",
+      "pos": "41",
+      "max_kg": 1134.0,
+      "arm": 25.229,
+      "from": 24.459,
+      "to": 25.999,
+      "index_per_kg": 0.006379
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "41",
+      "max_kg": 1134.0,
+      "arm": 25.229,
+      "from": 24.459,
+      "to": 25.999,
+      "index_per_kg": 0.006379
+     },
+     {
+      "hold": "AFT",
+      "config": "AKH",
+      "pos": "42",
+      "max_kg": 1134.0,
+      "arm": 26.801,
+      "from": 26.031,
+      "to": 27.571,
+      "index_per_kg": 0.007951
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "42",
+      "max_kg": 1134.0,
+      "arm": 26.801,
+      "from": 26.031,
+      "to": 27.571,
+      "index_per_kg": 0.007951
+     }
+    ],
+    "source": {
+     "sheet": "D 3",
+     "pages": [
+      38
+     ],
+     "where": "page"
+    }
+   }
   },
   "A321-231": {
    "id": "A321-231",
@@ -6373,7 +6524,218 @@
      "where": "page"
     }
    },
-   "uld_positions": null
+   "uld_positions": {
+    "registrations_group": "321A, 321B, 321I, 321K",
+    "positions": [
+     {
+      "hold": "FORWARD",
+      "config": "AKH",
+      "pos": "11",
+      "max_kg": 1134.0,
+      "arm": 10.7,
+      "from": 9.93,
+      "to": 11.47,
+      "index_per_kg": -0.012417
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "11",
+      "max_kg": 1134.0,
+      "arm": 10.7,
+      "from": 9.93,
+      "to": 11.47,
+      "index_per_kg": -0.012417
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKH",
+      "pos": "12",
+      "max_kg": 1134.0,
+      "arm": 12.272,
+      "from": 11.502,
+      "to": 13.042,
+      "index_per_kg": -0.010845
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "12",
+      "max_kg": 1134.0,
+      "arm": 12.272,
+      "from": 11.502,
+      "to": 13.042,
+      "index_per_kg": -0.010845
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKH",
+      "pos": "21",
+      "max_kg": 1134.0,
+      "arm": 13.844,
+      "from": 13.074,
+      "to": 14.614,
+      "index_per_kg": -0.009273
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "21",
+      "max_kg": 1134.0,
+      "arm": 13.844,
+      "from": 13.074,
+      "to": 14.614,
+      "index_per_kg": -0.009273
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKH",
+      "pos": "22",
+      "max_kg": 1134.0,
+      "arm": 15.416,
+      "from": 14.646,
+      "to": 16.186,
+      "index_per_kg": -0.007701
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "22",
+      "max_kg": 1134.0,
+      "arm": 15.416,
+      "from": 14.646,
+      "to": 16.186,
+      "index_per_kg": -0.007701
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKH",
+      "pos": "23",
+      "max_kg": 1134.0,
+      "arm": 16.988,
+      "from": 16.218,
+      "to": 17.758,
+      "index_per_kg": -0.006129
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "23",
+      "max_kg": 1134.0,
+      "arm": 16.988,
+      "from": 16.218,
+      "to": 17.758,
+      "index_per_kg": -0.006129
+     },
+     {
+      "hold": "AFT",
+      "config": "AKH",
+      "pos": "31",
+      "max_kg": 1134.0,
+      "arm": 27.445,
+      "from": 26.675,
+      "to": 28.215,
+      "index_per_kg": 0.004328
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "31",
+      "max_kg": 1134.0,
+      "arm": 27.445,
+      "from": 26.675,
+      "to": 28.215,
+      "index_per_kg": 0.004328
+     },
+     {
+      "hold": "AFT",
+      "config": "AKH",
+      "pos": "32",
+      "max_kg": 1134.0,
+      "arm": 29.017,
+      "from": 28.247,
+      "to": 29.787,
+      "index_per_kg": 0.0059
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "32",
+      "max_kg": 1134.0,
+      "arm": 29.017,
+      "from": 28.247,
+      "to": 29.787,
+      "index_per_kg": 0.0059
+     },
+     {
+      "hold": "AFT",
+      "config": "AKH",
+      "pos": "33",
+      "max_kg": 1134.0,
+      "arm": 30.589,
+      "from": 29.819,
+      "to": 31.359,
+      "index_per_kg": 0.007472
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "33",
+      "max_kg": 1134.0,
+      "arm": 30.589,
+      "from": 29.819,
+      "to": 31.359,
+      "index_per_kg": 0.007472
+     },
+     {
+      "hold": "AFT",
+      "config": "AKH",
+      "pos": "41",
+      "max_kg": 1134.0,
+      "arm": 32.161,
+      "from": 31.391,
+      "to": 32.931,
+      "index_per_kg": 0.009044
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "41",
+      "max_kg": 1134.0,
+      "arm": 32.161,
+      "from": 31.391,
+      "to": 32.931,
+      "index_per_kg": 0.009044
+     },
+     {
+      "hold": "AFT",
+      "config": "AKH",
+      "pos": "42",
+      "max_kg": 1134.0,
+      "arm": 33.733,
+      "from": 32.963,
+      "to": 34.503,
+      "index_per_kg": 0.010616
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "42",
+      "max_kg": 1134.0,
+      "arm": 33.733,
+      "from": 32.963,
+      "to": 34.503,
+      "index_per_kg": 0.010616
+     }
+    ],
+    "source": {
+     "sheet": "D 3",
+     "pages": [
+      41
+     ],
+     "where": "page"
+    }
+   }
   },
   "A350-941": {
    "id": "A350-941",
@@ -9619,7 +9981,799 @@
      "where": "page"
     }
    },
-   "uld_positions": null
+   "uld_positions": {
+    "registrations_group": "ALL",
+    "positions": [
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "11L/11R",
+      "max_kg": 1587.0,
+      "arm": 14.026,
+      "from": 13.259,
+      "to": 14.793,
+      "index_per_kg": -0.004476
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "11L/11R",
+      "max_kg": 1587.0,
+      "arm": 14.026,
+      "from": 13.259,
+      "to": 14.793,
+      "index_per_kg": -0.004476
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "11",
+      "max_kg": 3174.0,
+      "arm": 14.026,
+      "from": 13.259,
+      "to": 14.793,
+      "index_per_kg": -0.004476
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "11P",
+      "max_kg": 4626.0,
+      "arm": 14.377,
+      "from": 13.259,
+      "to": 15.494,
+      "index_per_kg": -0.004406
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "11P",
+      "max_kg": 5102.0,
+      "arm": 14.479,
+      "from": 13.259,
+      "to": 15.698,
+      "index_per_kg": -0.004385
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "12L/12R",
+      "max_kg": 1587.0,
+      "arm": 15.609,
+      "from": 14.842,
+      "to": 16.376,
+      "index_per_kg": -0.004159
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "12L/12R",
+      "max_kg": 1587.0,
+      "arm": 15.609,
+      "from": 14.842,
+      "to": 16.376,
+      "index_per_kg": -0.004159
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "12",
+      "max_kg": 3174.0,
+      "arm": 15.609,
+      "from": 14.842,
+      "to": 16.376,
+      "index_per_kg": -0.004159
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "12P",
+      "max_kg": 4626.0,
+      "arm": 16.841,
+      "from": 15.723,
+      "to": 17.958,
+      "index_per_kg": -0.003913
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "13L/13R",
+      "max_kg": 1587.0,
+      "arm": 16.49,
+      "from": 15.723,
+      "to": 17.257,
+      "index_per_kg": -0.003983
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "13L/13R",
+      "max_kg": 1587.0,
+      "arm": 16.49,
+      "from": 15.723,
+      "to": 17.257,
+      "index_per_kg": -0.003983
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "13",
+      "max_kg": 3174.0,
+      "arm": 16.49,
+      "from": 15.723,
+      "to": 17.257,
+      "index_per_kg": -0.003983
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "13P",
+      "max_kg": 4626.0,
+      "arm": 18.401,
+      "from": 17.283,
+      "to": 19.518,
+      "index_per_kg": -0.003601
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "13P",
+      "max_kg": 5102.0,
+      "arm": 18.299,
+      "from": 17.079,
+      "to": 19.518,
+      "index_per_kg": -0.003621
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "14L/14R",
+      "max_kg": 1587.0,
+      "arm": 17.191,
+      "from": 16.424,
+      "to": 17.958,
+      "index_per_kg": -0.003843
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "14L/14R",
+      "max_kg": 1587.0,
+      "arm": 17.191,
+      "from": 16.424,
+      "to": 17.958,
+      "index_per_kg": -0.003843
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "14",
+      "max_kg": 3174.0,
+      "arm": 17.191,
+      "from": 16.424,
+      "to": 17.958,
+      "index_per_kg": -0.003843
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "15L/15R",
+      "max_kg": 1587.0,
+      "arm": 18.751,
+      "from": 17.984,
+      "to": 19.518,
+      "index_per_kg": -0.003531
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "15L/15R",
+      "max_kg": 1587.0,
+      "arm": 18.751,
+      "from": 17.984,
+      "to": 19.518,
+      "index_per_kg": -0.003531
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "15",
+      "max_kg": 3174.0,
+      "arm": 18.751,
+      "from": 17.984,
+      "to": 19.518,
+      "index_per_kg": -0.003531
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "21L/21R",
+      "max_kg": 1587.0,
+      "arm": 20.513,
+      "from": 19.746,
+      "to": 21.28,
+      "index_per_kg": -0.003178
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "21L/21R",
+      "max_kg": 1587.0,
+      "arm": 20.513,
+      "from": 19.746,
+      "to": 21.28,
+      "index_per_kg": -0.003178
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "21",
+      "max_kg": 3174.0,
+      "arm": 20.513,
+      "from": 19.746,
+      "to": 21.28,
+      "index_per_kg": -0.003178
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "21P",
+      "max_kg": 4626.0,
+      "arm": 20.864,
+      "from": 19.746,
+      "to": 21.982,
+      "index_per_kg": -0.003108
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "21P",
+      "max_kg": 5102.0,
+      "arm": 20.763,
+      "from": 19.543,
+      "to": 21.982,
+      "index_per_kg": -0.003129
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "22L/22R",
+      "max_kg": 1587.0,
+      "arm": 22.096,
+      "from": 21.329,
+      "to": 22.863,
+      "index_per_kg": -0.002862
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "22L/22R",
+      "max_kg": 1587.0,
+      "arm": 22.096,
+      "from": 21.329,
+      "to": 22.863,
+      "index_per_kg": -0.002862
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "22",
+      "max_kg": 3174.0,
+      "arm": 22.096,
+      "from": 21.329,
+      "to": 22.863,
+      "index_per_kg": -0.002862
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "22P",
+      "max_kg": 4626.0,
+      "arm": 23.328,
+      "from": 22.21,
+      "to": 24.445,
+      "index_per_kg": -0.002616
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "22P",
+      "max_kg": 5102.0,
+      "arm": 23.226,
+      "from": 22.007,
+      "to": 24.445,
+      "index_per_kg": -0.002636
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "23L/23R",
+      "max_kg": 1587.0,
+      "arm": 23.678,
+      "from": 22.911,
+      "to": 24.445,
+      "index_per_kg": -0.002545
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "23L/23R",
+      "max_kg": 1587.0,
+      "arm": 23.678,
+      "from": 22.911,
+      "to": 24.445,
+      "index_per_kg": -0.002545
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "23",
+      "max_kg": 3174.0,
+      "arm": 23.678,
+      "from": 22.911,
+      "to": 24.445,
+      "index_per_kg": -0.002545
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "24L/24R",
+      "max_kg": 1587.0,
+      "arm": 25.441,
+      "from": 24.674,
+      "to": 26.208,
+      "index_per_kg": -0.002193
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "24L/24R",
+      "max_kg": 1587.0,
+      "arm": 25.441,
+      "from": 24.674,
+      "to": 26.208,
+      "index_per_kg": -0.002193
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "24",
+      "max_kg": 3174.0,
+      "arm": 25.441,
+      "from": 24.674,
+      "to": 26.208,
+      "index_per_kg": -0.002193
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "24P",
+      "max_kg": 5102.0,
+      "arm": 28.256,
+      "from": 27.138,
+      "to": 29.373,
+      "index_per_kg": -0.00163
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "24P",
+      "max_kg": 5102.0,
+      "arm": 28.154,
+      "from": 26.935,
+      "to": 29.373,
+      "index_per_kg": -0.00165
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "25L/25R",
+      "max_kg": 1587.0,
+      "arm": 27.024,
+      "from": 26.256,
+      "to": 27.791,
+      "index_per_kg": -0.001876
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "25L/25R",
+      "max_kg": 1587.0,
+      "arm": 27.024,
+      "from": 26.256,
+      "to": 27.791,
+      "index_per_kg": -0.001876
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "25",
+      "max_kg": 3174.0,
+      "arm": 27.024,
+      "from": 26.256,
+      "to": 27.791,
+      "index_per_kg": -0.001876
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "26L/26R",
+      "max_kg": 1587.0,
+      "arm": 28.606,
+      "from": 27.839,
+      "to": 29.373,
+      "index_per_kg": -0.00156
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "26L/26R",
+      "max_kg": 1587.0,
+      "arm": 28.606,
+      "from": 27.839,
+      "to": 29.373,
+      "index_per_kg": -0.00156
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "26",
+      "max_kg": 3174.0,
+      "arm": 28.606,
+      "from": 27.839,
+      "to": 29.373,
+      "index_per_kg": -0.00156
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "31L/31R",
+      "max_kg": 1587.0,
+      "arm": 41.253,
+      "from": 40.486,
+      "to": 42.02,
+      "index_per_kg": 0.00097
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "31L/31R",
+      "max_kg": 1587.0,
+      "arm": 41.253,
+      "from": 40.486,
+      "to": 42.02,
+      "index_per_kg": 0.00097
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "31",
+      "max_kg": 3174.0,
+      "arm": 41.253,
+      "from": 40.486,
+      "to": 42.02,
+      "index_per_kg": 0.00097
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "31P",
+      "max_kg": 5102.0,
+      "arm": 41.604,
+      "from": 40.486,
+      "to": 42.722,
+      "index_per_kg": 0.00104
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "31P",
+      "max_kg": 5669.0,
+      "arm": 41.705,
+      "from": 40.486,
+      "to": 42.924,
+      "index_per_kg": 0.00106
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "32L/32R",
+      "max_kg": 1587.0,
+      "arm": 42.836,
+      "from": 42.069,
+      "to": 43.603,
+      "index_per_kg": 0.001286
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "32L/32R",
+      "max_kg": 1587.0,
+      "arm": 42.836,
+      "from": 42.069,
+      "to": 43.603,
+      "index_per_kg": 0.001286
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "32",
+      "max_kg": 3174.0,
+      "arm": 42.836,
+      "from": 42.069,
+      "to": 43.603,
+      "index_per_kg": 0.001286
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "32P",
+      "max_kg": 4626.0,
+      "arm": 44.068,
+      "from": 42.95,
+      "to": 45.186,
+      "index_per_kg": 0.001533
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "32P",
+      "max_kg": 5102.0,
+      "arm": 44.169,
+      "from": 42.95,
+      "to": 45.388,
+      "index_per_kg": 0.001553
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "33L/33R",
+      "max_kg": 1587.0,
+      "arm": 44.418,
+      "from": 43.651,
+      "to": 45.185,
+      "index_per_kg": 0.001603
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "33L/33R",
+      "max_kg": 1587.0,
+      "arm": 44.418,
+      "from": 43.651,
+      "to": 45.185,
+      "index_per_kg": 0.001603
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "33",
+      "max_kg": 3174.0,
+      "arm": 44.418,
+      "from": 43.651,
+      "to": 45.185,
+      "index_per_kg": 0.001603
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "41L/41R",
+      "max_kg": 1587.0,
+      "arm": 46.181,
+      "from": 45.414,
+      "to": 46.948,
+      "index_per_kg": 0.001955
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "41L/41R",
+      "max_kg": 1587.0,
+      "arm": 46.181,
+      "from": 45.414,
+      "to": 46.948,
+      "index_per_kg": 0.001955
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "41",
+      "max_kg": 3174.0,
+      "arm": 46.181,
+      "from": 45.414,
+      "to": 46.948,
+      "index_per_kg": 0.001955
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "41P",
+      "max_kg": 4626.0,
+      "arm": 46.532,
+      "from": 45.414,
+      "to": 47.65,
+      "index_per_kg": 0.002025
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "41P",
+      "max_kg": 5103.0,
+      "arm": 46.498,
+      "from": 45.414,
+      "to": 47.582,
+      "index_per_kg": 0.002019
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "42L/42R",
+      "max_kg": 1587.0,
+      "arm": 47.763,
+      "from": 46.996,
+      "to": 48.53,
+      "index_per_kg": 0.002272
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "42L/42R",
+      "max_kg": 1587.0,
+      "arm": 47.763,
+      "from": 46.996,
+      "to": 48.53,
+      "index_per_kg": 0.002272
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "42",
+      "max_kg": 3174.0,
+      "arm": 47.763,
+      "from": 46.996,
+      "to": 48.53,
+      "index_per_kg": 0.002272
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "42P",
+      "max_kg": 4626.0,
+      "arm": 48.995,
+      "from": 47.877,
+      "to": 50.113,
+      "index_per_kg": 0.002518
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "42P",
+      "max_kg": 5103.0,
+      "arm": 49.097,
+      "from": 47.878,
+      "to": 50.316,
+      "index_per_kg": 0.002538
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "43L/43R",
+      "max_kg": 1587.0,
+      "arm": 49.346,
+      "from": 48.579,
+      "to": 50.113,
+      "index_per_kg": 0.002588
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "43L/43R",
+      "max_kg": 1587.0,
+      "arm": 49.346,
+      "from": 48.579,
+      "to": 50.113,
+      "index_per_kg": 0.002588
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "43",
+      "max_kg": 3174.0,
+      "arm": 49.346,
+      "from": 48.579,
+      "to": 50.113,
+      "index_per_kg": 0.002588
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "43P",
+      "max_kg": 4626.0,
+      "arm": 51.459,
+      "from": 50.341,
+      "to": 52.577,
+      "index_per_kg": 0.003011
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "43P",
+      "max_kg": 5102.0,
+      "arm": 51.561,
+      "from": 50.342,
+      "to": 52.78,
+      "index_per_kg": 0.003031
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "44L/44R",
+      "max_kg": 1587.0,
+      "arm": 51.109,
+      "from": 50.342,
+      "to": 51.876,
+      "index_per_kg": 0.002941
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "44L/44R",
+      "max_kg": 1587.0,
+      "arm": 51.109,
+      "from": 50.342,
+      "to": 51.876,
+      "index_per_kg": 0.002941
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "44",
+      "max_kg": 3174.0,
+      "arm": 51.109,
+      "from": 50.342,
+      "to": 51.876,
+      "index_per_kg": 0.002941
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "45L/45R",
+      "max_kg": 1587.0,
+      "arm": 52.691,
+      "from": 51.924,
+      "to": 53.458,
+      "index_per_kg": 0.003257
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "45L/45R",
+      "max_kg": 1587.0,
+      "arm": 52.691,
+      "from": 51.924,
+      "to": 53.458,
+      "index_per_kg": 0.003257
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "45",
+      "max_kg": 3174.0,
+      "arm": 52.691,
+      "from": 51.924,
+      "to": 53.458,
+      "index_per_kg": 0.003257
+     }
+    ],
+    "source": {
+     "sheet": "D 3",
+     "pages": [
+      34,
+      35
+     ],
+     "where": "page"
+    }
+   }
   },
   "B737-800": {
    "id": "B737-800",
@@ -17185,7 +18339,920 @@
      "where": "page"
     }
    },
-   "uld_positions": null
+   "uld_positions": {
+    "registrations_group": "ALL",
+    "positions": [
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "11L/11R",
+      "max_kg": 1587.0,
+      "arm": 231.4,
+      "from": 201.1,
+      "to": 261.7,
+      "index_per_kg": -0.003422
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "11L/11R",
+      "max_kg": 1587.0,
+      "arm": 231.4,
+      "from": 201.1,
+      "to": 261.7,
+      "index_per_kg": -0.003422
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "11",
+      "max_kg": 3174.0,
+      "arm": 231.4,
+      "from": 201.1,
+      "to": 261.7,
+      "index_per_kg": -0.003422
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "11P",
+      "max_kg": 4626.0,
+      "arm": 245.2,
+      "from": 201.1,
+      "to": 289.3,
+      "index_per_kg": -0.003376
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "11P",
+      "max_kg": 5102.0,
+      "arm": 249.2,
+      "from": 201.1,
+      "to": 297.3,
+      "index_per_kg": -0.003363
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "12L/12R",
+      "max_kg": 1587.0,
+      "arm": 329.6,
+      "from": 299.1,
+      "to": 360.1,
+      "index_per_kg": -0.003095
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "12L/12R",
+      "max_kg": 1587.0,
+      "arm": 329.6,
+      "from": 299.1,
+      "to": 360.1,
+      "index_per_kg": -0.003095
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "12",
+      "max_kg": 3174.0,
+      "arm": 329.6,
+      "from": 299.1,
+      "to": 360.1,
+      "index_per_kg": -0.003095
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "12P",
+      "max_kg": 4626.0,
+      "arm": 343.2,
+      "from": 299.1,
+      "to": 387.3,
+      "index_per_kg": -0.003049
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "12P",
+      "max_kg": 5103.0,
+      "arm": 347.2,
+      "from": 299.1,
+      "to": 395.3,
+      "index_per_kg": -0.003036
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "13L/13R",
+      "max_kg": 1587.0,
+      "arm": 406.5,
+      "from": 376.3,
+      "to": 436.7,
+      "index_per_kg": -0.002838
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "13L/13R",
+      "max_kg": 1587.0,
+      "arm": 406.5,
+      "from": 376.3,
+      "to": 436.7,
+      "index_per_kg": -0.002838
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "13",
+      "max_kg": 3174.0,
+      "arm": 406.5,
+      "from": 376.3,
+      "to": 436.7,
+      "index_per_kg": -0.002838
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "13P",
+      "max_kg": 4626.0,
+      "arm": 448.9,
+      "from": 404.7,
+      "to": 493.0,
+      "index_per_kg": -0.002697
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "13P",
+      "max_kg": 5102.0,
+      "arm": 444.9,
+      "from": 396.7,
+      "to": 493.0,
+      "index_per_kg": -0.002711
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "14L/14R",
+      "max_kg": 1587.0,
+      "arm": 466.9,
+      "from": 436.7,
+      "to": 497.1,
+      "index_per_kg": -0.002637
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "14L/14R",
+      "max_kg": 1587.0,
+      "arm": 466.9,
+      "from": 436.7,
+      "to": 497.1,
+      "index_per_kg": -0.002637
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "14",
+      "max_kg": 3174.0,
+      "arm": 466.9,
+      "from": 436.7,
+      "to": 497.1,
+      "index_per_kg": -0.002637
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "21L/21R",
+      "max_kg": 1587.0,
+      "arm": 527.3,
+      "from": 497.1,
+      "to": 557.5,
+      "index_per_kg": -0.002436
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "21L/21R",
+      "max_kg": 1587.0,
+      "arm": 527.3,
+      "from": 497.1,
+      "to": 557.5,
+      "index_per_kg": -0.002436
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "21",
+      "max_kg": 3174.0,
+      "arm": 527.3,
+      "from": 497.1,
+      "to": 557.5,
+      "index_per_kg": -0.002436
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "21P",
+      "max_kg": 4626.0,
+      "arm": 546.6,
+      "from": 502.4,
+      "to": 590.7,
+      "index_per_kg": -0.002372
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "21P",
+      "max_kg": 5102.0,
+      "arm": 542.6,
+      "from": 494.4,
+      "to": 590.7,
+      "index_per_kg": -0.002385
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "22L/22R",
+      "max_kg": 1587.0,
+      "arm": 587.7,
+      "from": 557.5,
+      "to": 617.9,
+      "index_per_kg": -0.002234
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "22L/22R",
+      "max_kg": 1587.0,
+      "arm": 587.7,
+      "from": 557.5,
+      "to": 617.9,
+      "index_per_kg": -0.002234
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "22",
+      "max_kg": 3174.0,
+      "arm": 587.7,
+      "from": 557.5,
+      "to": 617.9,
+      "index_per_kg": -0.002234
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "22P",
+      "max_kg": 4626.0,
+      "arm": 644.2,
+      "from": 600.1,
+      "to": 688.3,
+      "index_per_kg": -0.002046
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "22P",
+      "max_kg": 5102.0,
+      "arm": 640.2,
+      "from": 592.1,
+      "to": 688.3,
+      "index_per_kg": -0.002059
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "23L/23R",
+      "max_kg": 1587.0,
+      "arm": 648.1,
+      "from": 617.9,
+      "to": 678.3,
+      "index_per_kg": -0.002033
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "23L/23R",
+      "max_kg": 1587.0,
+      "arm": 648.1,
+      "from": 617.9,
+      "to": 678.3,
+      "index_per_kg": -0.002033
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "23",
+      "max_kg": 3174.0,
+      "arm": 648.1,
+      "from": 617.9,
+      "to": 678.3,
+      "index_per_kg": -0.002033
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "23P",
+      "max_kg": 4626.0,
+      "arm": 741.9,
+      "from": 697.8,
+      "to": 786.0,
+      "index_per_kg": -0.00172
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "23P",
+      "max_kg": 5102.0,
+      "arm": 737.9,
+      "from": 689.8,
+      "to": 786.0,
+      "index_per_kg": -0.001734
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "24L/24R",
+      "max_kg": 1587.0,
+      "arm": 708.6,
+      "from": 678.3,
+      "to": 738.9,
+      "index_per_kg": -0.001831
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "24L/24R",
+      "max_kg": 1587.0,
+      "arm": 708.6,
+      "from": 678.3,
+      "to": 738.9,
+      "index_per_kg": -0.001831
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "24",
+      "max_kg": 3174.0,
+      "arm": 708.6,
+      "from": 678.3,
+      "to": 738.9,
+      "index_per_kg": -0.001831
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "24P",
+      "max_kg": 4626.0,
+      "arm": 839.6,
+      "from": 795.4,
+      "to": 883.7,
+      "index_per_kg": -0.001395
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "24P",
+      "max_kg": 5102.0,
+      "arm": 835.6,
+      "from": 787.4,
+      "to": 883.7,
+      "index_per_kg": -0.001408
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "25L/25R",
+      "max_kg": 1587.0,
+      "arm": 769.2,
+      "from": 738.9,
+      "to": 799.5,
+      "index_per_kg": -0.001629
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "25L/25R",
+      "max_kg": 1587.0,
+      "arm": 769.2,
+      "from": 738.9,
+      "to": 799.5,
+      "index_per_kg": -0.001629
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "25",
+      "max_kg": 3174.0,
+      "arm": 769.2,
+      "from": 738.9,
+      "to": 799.5,
+      "index_per_kg": -0.001629
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "26L/26R",
+      "max_kg": 1587.0,
+      "arm": 829.8,
+      "from": 799.5,
+      "to": 860.1,
+      "index_per_kg": -0.001427
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "26L/26R",
+      "max_kg": 1587.0,
+      "arm": 829.8,
+      "from": 799.5,
+      "to": 860.1,
+      "index_per_kg": -0.001427
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "26",
+      "max_kg": 3174.0,
+      "arm": 829.8,
+      "from": 799.5,
+      "to": 860.1,
+      "index_per_kg": -0.001427
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "27L/27R",
+      "max_kg": 1587.0,
+      "arm": 890.4,
+      "from": 860.1,
+      "to": 920.7,
+      "index_per_kg": -0.001225
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "27L/27R",
+      "max_kg": 1587.0,
+      "arm": 890.4,
+      "from": 860.1,
+      "to": 920.7,
+      "index_per_kg": -0.001225
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "27",
+      "max_kg": 3174.0,
+      "arm": 890.4,
+      "from": 860.1,
+      "to": 920.7,
+      "index_per_kg": -0.001225
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "28L/28R",
+      "max_kg": 1587.0,
+      "arm": 951.1,
+      "from": 920.7,
+      "to": 981.4,
+      "index_per_kg": -0.001023
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "28L/28R",
+      "max_kg": 1587.0,
+      "arm": 951.1,
+      "from": 920.7,
+      "to": 981.4,
+      "index_per_kg": -0.001023
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "28",
+      "max_kg": 3174.0,
+      "arm": 951.1,
+      "from": 920.7,
+      "to": 981.4,
+      "index_per_kg": -0.001023
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "31L/31R",
+      "max_kg": 1587.0,
+      "arm": 1480.3,
+      "from": 1449.9,
+      "to": 1510.6,
+      "index_per_kg": 0.000741
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "31L/31R",
+      "max_kg": 1587.0,
+      "arm": 1480.3,
+      "from": 1449.9,
+      "to": 1510.6,
+      "index_per_kg": 0.000741
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "31",
+      "max_kg": 3174.0,
+      "arm": 1480.3,
+      "from": 1449.9,
+      "to": 1510.6,
+      "index_per_kg": 0.000741
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "32L/32R",
+      "max_kg": 1587.0,
+      "arm": 1540.9,
+      "from": 1510.6,
+      "to": 1571.2,
+      "index_per_kg": 0.000943
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "32L/32R",
+      "max_kg": 1587.0,
+      "arm": 1540.9,
+      "from": 1510.6,
+      "to": 1571.2,
+      "index_per_kg": 0.000943
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "32",
+      "max_kg": 3174.0,
+      "arm": 1540.9,
+      "from": 1510.6,
+      "to": 1571.2,
+      "index_per_kg": 0.000943
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "32P",
+      "max_kg": 4626.0,
+      "arm": 1583.7,
+      "from": 1539.5,
+      "to": 1627.8,
+      "index_per_kg": 0.001086
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "32P",
+      "max_kg": 5102.0,
+      "arm": 1595.7,
+      "from": 1547.5,
+      "to": 1643.8,
+      "index_per_kg": 0.001126
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "33L/33R",
+      "max_kg": 1587.0,
+      "arm": 1601.5,
+      "from": 1571.2,
+      "to": 1631.8,
+      "index_per_kg": 0.001145
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "33L/33R",
+      "max_kg": 1587.0,
+      "arm": 1601.5,
+      "from": 1571.2,
+      "to": 1631.8,
+      "index_per_kg": 0.001145
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "33",
+      "max_kg": 3174.0,
+      "arm": 1601.5,
+      "from": 1571.2,
+      "to": 1631.8,
+      "index_per_kg": 0.001145
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "33P",
+      "max_kg": 4626.0,
+      "arm": 1673.4,
+      "from": 1629.2,
+      "to": 1717.5,
+      "index_per_kg": 0.001385
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "33P",
+      "max_kg": 5102.0,
+      "arm": 1693.4,
+      "from": 1645.2,
+      "to": 1741.5,
+      "index_per_kg": 0.001451
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "34L/34R",
+      "max_kg": 1587.0,
+      "arm": 1662.1,
+      "from": 1631.8,
+      "to": 1692.4,
+      "index_per_kg": 0.001347
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "34L/34R",
+      "max_kg": 1587.0,
+      "arm": 1662.1,
+      "from": 1631.8,
+      "to": 1692.4,
+      "index_per_kg": 0.001347
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "34",
+      "max_kg": 3174.0,
+      "arm": 1662.1,
+      "from": 1631.8,
+      "to": 1692.4,
+      "index_per_kg": 0.001347
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "34P",
+      "max_kg": 4626.0,
+      "arm": 1763.0,
+      "from": 1718.9,
+      "to": 1807.1,
+      "index_per_kg": 0.001683
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "34P",
+      "max_kg": 5102.0,
+      "arm": 1791.0,
+      "from": 1742.9,
+      "to": 1839.0,
+      "index_per_kg": 0.001777
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "35L/35R",
+      "max_kg": 1587.0,
+      "arm": 1722.7,
+      "from": 1692.4,
+      "to": 1753.0,
+      "index_per_kg": 0.001549
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "35L/35R",
+      "max_kg": 1587.0,
+      "arm": 1722.7,
+      "from": 1692.4,
+      "to": 1753.0,
+      "index_per_kg": 0.001549
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "35",
+      "max_kg": 3174.0,
+      "arm": 1722.7,
+      "from": 1692.4,
+      "to": 1753.0,
+      "index_per_kg": 0.001549
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "36L/36R",
+      "max_kg": 1587.0,
+      "arm": 1783.2,
+      "from": 1753.0,
+      "to": 1813.4,
+      "index_per_kg": 0.001751
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "36L/36R",
+      "max_kg": 1587.0,
+      "arm": 1783.2,
+      "from": 1753.0,
+      "to": 1813.4,
+      "index_per_kg": 0.001751
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "36",
+      "max_kg": 3174.0,
+      "arm": 1783.2,
+      "from": 1753.0,
+      "to": 1813.4,
+      "index_per_kg": 0.001751
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "41L/41R",
+      "max_kg": 1587.0,
+      "arm": 1843.4,
+      "from": 1813.4,
+      "to": 1873.3,
+      "index_per_kg": 0.001951
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "41L/41R",
+      "max_kg": 1587.0,
+      "arm": 1843.4,
+      "from": 1813.4,
+      "to": 1873.3,
+      "index_per_kg": 0.001951
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "41",
+      "max_kg": 3174.0,
+      "arm": 1843.4,
+      "from": 1813.4,
+      "to": 1873.3,
+      "index_per_kg": 0.001951
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "41P",
+      "max_kg": 4626.0,
+      "arm": 1918.3,
+      "from": 1873.3,
+      "to": 1963.3,
+      "index_per_kg": 0.002201
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "41P",
+      "max_kg": 5103.0,
+      "arm": 1922.3,
+      "from": 1873.3,
+      "to": 1971.3,
+      "index_per_kg": 0.002214
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "42L/42R",
+      "max_kg": 1587.0,
+      "arm": 1905.6,
+      "from": 1875.1,
+      "to": 1936.1,
+      "index_per_kg": 0.002159
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "42L/42R",
+      "max_kg": 1587.0,
+      "arm": 1905.6,
+      "from": 1875.1,
+      "to": 1936.1,
+      "index_per_kg": 0.002159
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "42",
+      "max_kg": 3174.0,
+      "arm": 1905.6,
+      "from": 1875.1,
+      "to": 1936.1,
+      "index_per_kg": 0.002159
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "42P",
+      "max_kg": 4626.0,
+      "arm": 2024.6,
+      "from": 1980.1,
+      "to": 2069.0,
+      "index_per_kg": 0.002555
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "42P",
+      "max_kg": 5103.0,
+      "arm": 2020.9,
+      "from": 1972.7,
+      "to": 2069.0,
+      "index_per_kg": 0.002543
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "43L/43R",
+      "max_kg": 1587.0,
+      "arm": 1978.0,
+      "from": 1947.7,
+      "to": 2008.3,
+      "index_per_kg": 0.0024
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "43L/43R",
+      "max_kg": 1587.0,
+      "arm": 1978.0,
+      "from": 1947.7,
+      "to": 2008.3,
+      "index_per_kg": 0.0024
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "43",
+      "max_kg": 3174.0,
+      "arm": 1978.0,
+      "from": 1947.7,
+      "to": 2008.3,
+      "index_per_kg": 0.0024
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "44L/44R",
+      "max_kg": 1587.0,
+      "arm": 2038.7,
+      "from": 2008.3,
+      "to": 2069.0,
+      "index_per_kg": 0.002602
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "44L/44R",
+      "max_kg": 1587.0,
+      "arm": 2038.7,
+      "from": 2008.3,
+      "to": 2069.0,
+      "index_per_kg": 0.002602
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "44",
+      "max_kg": 3174.0,
+      "arm": 2038.7,
+      "from": 2008.3,
+      "to": 2069.0,
+      "index_per_kg": 0.002602
+     }
+    ],
+    "source": {
+     "sheet": "D 3",
+     "pages": [
+      39,
+      40,
+      41
+     ],
+     "where": "page"
+    }
+   }
   },
   "B787-9": {
    "id": "B787-9",
@@ -20307,7 +22374,739 @@
      "where": "page"
     }
    },
-   "uld_positions": null
+   "uld_positions": {
+    "registrations_group": "ALL",
+    "positions": [
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "11L/11R",
+      "max_kg": 1587.0,
+      "arm": 371.2,
+      "from": 340.9,
+      "to": 401.5,
+      "index_per_kg": -0.00414
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "11L/11R",
+      "max_kg": 1587.0,
+      "arm": 371.2,
+      "from": 340.9,
+      "to": 401.5,
+      "index_per_kg": -0.00414
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "11",
+      "max_kg": 3174.0,
+      "arm": 371.2,
+      "from": 340.9,
+      "to": 401.5,
+      "index_per_kg": -0.00414
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "11P",
+      "max_kg": 4626.0,
+      "arm": 385.0,
+      "from": 340.9,
+      "to": 429.1,
+      "index_per_kg": -0.004071
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "11P",
+      "max_kg": 5102.0,
+      "arm": 389.0,
+      "from": 340.9,
+      "to": 437.1,
+      "index_per_kg": -0.004051
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "12L/12R",
+      "max_kg": 1587.0,
+      "arm": 432.6,
+      "from": 402.3,
+      "to": 462.9,
+      "index_per_kg": -0.003833
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "12L/12R",
+      "max_kg": 1587.0,
+      "arm": 432.6,
+      "from": 402.3,
+      "to": 462.9,
+      "index_per_kg": -0.003833
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "12",
+      "max_kg": 3174.0,
+      "arm": 432.6,
+      "from": 402.3,
+      "to": 462.9,
+      "index_per_kg": -0.003833
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "12P",
+      "max_kg": 4626.0,
+      "arm": 485.1,
+      "from": 441.0,
+      "to": 529.2,
+      "index_per_kg": -0.003571
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "12P",
+      "max_kg": 5102.0,
+      "arm": 489.1,
+      "from": 441.0,
+      "to": 537.2,
+      "index_per_kg": -0.003551
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "13L/13R",
+      "max_kg": 1587.0,
+      "arm": 493.9,
+      "from": 463.6,
+      "to": 524.2,
+      "index_per_kg": -0.003527
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "13L/13R",
+      "max_kg": 1587.0,
+      "arm": 493.9,
+      "from": 463.6,
+      "to": 524.2,
+      "index_per_kg": -0.003527
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "13",
+      "max_kg": 3174.0,
+      "arm": 493.9,
+      "from": 463.6,
+      "to": 524.2,
+      "index_per_kg": -0.003527
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "13P",
+      "max_kg": 4626.0,
+      "arm": 620.6,
+      "from": 576.5,
+      "to": 664.7,
+      "index_per_kg": -0.002893
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "13P",
+      "max_kg": 5102.0,
+      "arm": 616.6,
+      "from": 568.5,
+      "to": 664.7,
+      "index_per_kg": -0.002913
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "14L/14R",
+      "max_kg": 1587.0,
+      "arm": 555.3,
+      "from": 525.0,
+      "to": 585.6,
+      "index_per_kg": -0.00322
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "14L/14R",
+      "max_kg": 1587.0,
+      "arm": 555.3,
+      "from": 525.0,
+      "to": 585.6,
+      "index_per_kg": -0.00322
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "14",
+      "max_kg": 3174.0,
+      "arm": 555.3,
+      "from": 525.0,
+      "to": 585.6,
+      "index_per_kg": -0.00322
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "15L/15R",
+      "max_kg": 1587.0,
+      "arm": 616.6,
+      "from": 586.3,
+      "to": 646.9,
+      "index_per_kg": -0.002913
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "15L/15R",
+      "max_kg": 1587.0,
+      "arm": 616.6,
+      "from": 586.3,
+      "to": 646.9,
+      "index_per_kg": -0.002913
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "15",
+      "max_kg": 3174.0,
+      "arm": 616.6,
+      "from": 586.3,
+      "to": 646.9,
+      "index_per_kg": -0.002913
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "21L/21R",
+      "max_kg": 1587.0,
+      "arm": 678.0,
+      "from": 647.7,
+      "to": 708.3,
+      "index_per_kg": -0.002606
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "21L/21R",
+      "max_kg": 1587.0,
+      "arm": 678.0,
+      "from": 647.7,
+      "to": 708.3,
+      "index_per_kg": -0.002606
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "21",
+      "max_kg": 3174.0,
+      "arm": 678.0,
+      "from": 647.7,
+      "to": 708.3,
+      "index_per_kg": -0.002606
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "21P",
+      "max_kg": 4626.0,
+      "arm": 717.5,
+      "from": 673.4,
+      "to": 761.6,
+      "index_per_kg": -0.002409
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "21P",
+      "max_kg": 5102.0,
+      "arm": 713.5,
+      "from": 665.4,
+      "to": 761.6,
+      "index_per_kg": -0.002429
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "22L/22R",
+      "max_kg": 1587.0,
+      "arm": 739.3,
+      "from": 709.0,
+      "to": 769.6,
+      "index_per_kg": -0.0023
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "22L/22R",
+      "max_kg": 1587.0,
+      "arm": 739.3,
+      "from": 709.0,
+      "to": 769.6,
+      "index_per_kg": -0.0023
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "22",
+      "max_kg": 3174.0,
+      "arm": 739.3,
+      "from": 709.0,
+      "to": 769.6,
+      "index_per_kg": -0.0023
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PAG",
+      "pos": "22P",
+      "max_kg": 4626.0,
+      "arm": 814.5,
+      "from": 770.4,
+      "to": 858.6,
+      "index_per_kg": -0.001924
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PMC",
+      "pos": "22P",
+      "max_kg": 5102.0,
+      "arm": 810.5,
+      "from": 762.4,
+      "to": 858.6,
+      "index_per_kg": -0.001944
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "23L/23R",
+      "max_kg": 1587.0,
+      "arm": 800.7,
+      "from": 770.4,
+      "to": 831.0,
+      "index_per_kg": -0.001993
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "23L/23R",
+      "max_kg": 1587.0,
+      "arm": 800.7,
+      "from": 770.4,
+      "to": 831.0,
+      "index_per_kg": -0.001993
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "23",
+      "max_kg": 3174.0,
+      "arm": 800.7,
+      "from": 770.4,
+      "to": 831.0,
+      "index_per_kg": -0.001993
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "24L/24R",
+      "max_kg": 1587.0,
+      "arm": 863.0,
+      "from": 832.6,
+      "to": 893.3,
+      "index_per_kg": -0.001681
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "24L/24R",
+      "max_kg": 1587.0,
+      "arm": 863.0,
+      "from": 832.6,
+      "to": 893.3,
+      "index_per_kg": -0.001681
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "24",
+      "max_kg": 3174.0,
+      "arm": 863.0,
+      "from": 832.6,
+      "to": 893.3,
+      "index_per_kg": -0.001681
+     },
+     {
+      "hold": "FORWARD",
+      "config": "AKE",
+      "pos": "25L/25R",
+      "max_kg": 1587.0,
+      "arm": 925.2,
+      "from": 894.9,
+      "to": 955.5,
+      "index_per_kg": -0.00137
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PKC",
+      "pos": "25L/25R",
+      "max_kg": 1587.0,
+      "arm": 925.2,
+      "from": 894.9,
+      "to": 955.5,
+      "index_per_kg": -0.00137
+     },
+     {
+      "hold": "FORWARD",
+      "config": "PLA",
+      "pos": "25",
+      "max_kg": 3174.0,
+      "arm": 925.2,
+      "from": 894.9,
+      "to": 955.5,
+      "index_per_kg": -0.00137
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "31L/31R",
+      "max_kg": 1587.0,
+      "arm": 1447.5,
+      "from": 1417.2,
+      "to": 1477.8,
+      "index_per_kg": 0.001242
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "31L/31R",
+      "max_kg": 1587.0,
+      "arm": 1447.5,
+      "from": 1417.2,
+      "to": 1477.8,
+      "index_per_kg": 0.001242
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "31",
+      "max_kg": 3174.0,
+      "arm": 1447.5,
+      "from": 1417.2,
+      "to": 1477.8,
+      "index_per_kg": 0.001242
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "32L/32R",
+      "max_kg": 1587.0,
+      "arm": 1509.8,
+      "from": 1479.4,
+      "to": 1540.1,
+      "index_per_kg": 0.001553
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "32L/32R",
+      "max_kg": 1587.0,
+      "arm": 1509.8,
+      "from": 1479.4,
+      "to": 1540.1,
+      "index_per_kg": 0.001553
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "32",
+      "max_kg": 3174.0,
+      "arm": 1509.8,
+      "from": 1479.4,
+      "to": 1540.1,
+      "index_per_kg": 0.001553
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "32P",
+      "max_kg": 4626.0,
+      "arm": 1558.2,
+      "from": 1514.1,
+      "to": 1602.3,
+      "index_per_kg": 0.001795
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "32P",
+      "max_kg": 5102.0,
+      "arm": 1562.2,
+      "from": 1514.1,
+      "to": 1610.3,
+      "index_per_kg": 0.001815
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "33L/33R",
+      "max_kg": 1587.0,
+      "arm": 1572.0,
+      "from": 1541.7,
+      "to": 1602.3,
+      "index_per_kg": 0.001864
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "33L/33R",
+      "max_kg": 1587.0,
+      "arm": 1572.0,
+      "from": 1541.7,
+      "to": 1602.3,
+      "index_per_kg": 0.001864
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "33",
+      "max_kg": 3174.0,
+      "arm": 1572.0,
+      "from": 1541.7,
+      "to": 1602.3,
+      "index_per_kg": 0.001864
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "33P",
+      "max_kg": 4626.0,
+      "arm": 1655.2,
+      "from": 1611.1,
+      "to": 1699.3,
+      "index_per_kg": 0.00228
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "33P",
+      "max_kg": 5102.0,
+      "arm": 1659.2,
+      "from": 1611.1,
+      "to": 1707.3,
+      "index_per_kg": 0.0023
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "34L/34R",
+      "max_kg": 1587.0,
+      "arm": 1633.4,
+      "from": 1603.1,
+      "to": 1663.7,
+      "index_per_kg": 0.002171
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "34L/34R",
+      "max_kg": 1587.0,
+      "arm": 1633.4,
+      "from": 1603.1,
+      "to": 1663.7,
+      "index_per_kg": 0.002171
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "34",
+      "max_kg": 3174.0,
+      "arm": 1633.4,
+      "from": 1603.1,
+      "to": 1663.7,
+      "index_per_kg": 0.002171
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "41L/41R",
+      "max_kg": 1587.0,
+      "arm": 1694.7,
+      "from": 1664.4,
+      "to": 1725.0,
+      "index_per_kg": 0.002478
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "41L/41R",
+      "max_kg": 1587.0,
+      "arm": 1694.7,
+      "from": 1664.4,
+      "to": 1725.0,
+      "index_per_kg": 0.002478
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "41",
+      "max_kg": 3174.0,
+      "arm": 1694.7,
+      "from": 1664.4,
+      "to": 1725.0,
+      "index_per_kg": 0.002478
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "41P",
+      "max_kg": 4626.0,
+      "arm": 1764.9,
+      "from": 1720.8,
+      "to": 1809.0,
+      "index_per_kg": 0.002829
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "41P",
+      "max_kg": 5103.0,
+      "arm": 1760.9,
+      "from": 1712.8,
+      "to": 1809.0,
+      "index_per_kg": 0.002809
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "42L/42R",
+      "max_kg": 1587.0,
+      "arm": 1756.1,
+      "from": 1725.8,
+      "to": 1786.4,
+      "index_per_kg": 0.002785
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "42L/42R",
+      "max_kg": 1587.0,
+      "arm": 1756.1,
+      "from": 1725.8,
+      "to": 1786.4,
+      "index_per_kg": 0.002785
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "42",
+      "max_kg": 3174.0,
+      "arm": 1756.1,
+      "from": 1725.8,
+      "to": 1786.4,
+      "index_per_kg": 0.002785
+     },
+     {
+      "hold": "AFT",
+      "config": "PAG",
+      "pos": "42P",
+      "max_kg": 4626.0,
+      "arm": 1865.0,
+      "from": 1820.9,
+      "to": 1909.1,
+      "index_per_kg": 0.003329
+     },
+     {
+      "hold": "AFT",
+      "config": "PMC",
+      "pos": "42P",
+      "max_kg": 5103.0,
+      "arm": 1861.0,
+      "from": 1812.9,
+      "to": 1909.1,
+      "index_per_kg": 0.003309
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "43L/43R",
+      "max_kg": 1587.0,
+      "arm": 1817.4,
+      "from": 1787.1,
+      "to": 1847.7,
+      "index_per_kg": 0.003091
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "43L/43R",
+      "max_kg": 1587.0,
+      "arm": 1817.4,
+      "from": 1787.1,
+      "to": 1847.7,
+      "index_per_kg": 0.003091
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "43",
+      "max_kg": 3174.0,
+      "arm": 1817.4,
+      "from": 1787.1,
+      "to": 1847.7,
+      "index_per_kg": 0.003091
+     },
+     {
+      "hold": "AFT",
+      "config": "AKE",
+      "pos": "44L/44R",
+      "max_kg": 1587.0,
+      "arm": 1878.8,
+      "from": 1848.5,
+      "to": 1909.1,
+      "index_per_kg": 0.003398
+     },
+     {
+      "hold": "AFT",
+      "config": "PKC",
+      "pos": "44L/44R",
+      "max_kg": 1587.0,
+      "arm": 1878.8,
+      "from": 1848.5,
+      "to": 1909.1,
+      "index_per_kg": 0.003398
+     },
+     {
+      "hold": "AFT",
+      "config": "PLA",
+      "pos": "44",
+      "max_kg": 3174.0,
+      "arm": 1878.8,
+      "from": 1848.5,
+      "to": 1909.1,
+      "index_per_kg": 0.003398
+     }
+    ],
+    "source": {
+     "sheet": "D 3",
+     "pages": [
+      33,
+      34
+     ],
+     "where": "page"
+    }
+   }
   },
   "A330-243F": {
    "id": "A330-243F",

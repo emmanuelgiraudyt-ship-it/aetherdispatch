@@ -1,5 +1,5 @@
 # =============================================================================
-# AETHERDISPATCH v6.5 — Agent IA Handling Aérien
+# AETHERDISPATCH v6.6 — Agent IA Handling Aérien
 # Développé par EG Conseil & Lobbying | Mars 2026
 # Modules : Masse & Centrage | Performances | V-Speeds | METAR Live
 #           Carburant | Optimisation PuLP | Référentiel compagnie | Export PDF | PWA
@@ -211,8 +211,53 @@ def inject_pwa_and_styles():
         border-top: 1px solid rgba(0,191,255,0.1);
         margin-top: 2rem;
     }
+    /* ── Adaptation tablette / smartphone ── */
+    [data-testid="stDataFrame"], [data-testid="stTable"], [data-testid="stMarkdownContainer"] table {
+        overflow-x: auto !important; max-width: 100% !important;
+    }
+    .stButton > button, .stDownloadButton > button, [data-baseweb="select"] > div, .stNumberInput input, .stTextInput input {
+        min-height: 2.75rem !important;
+    }
+    @media (max-width: 1024px) {
+        .block-container { padding: 1.2rem 1rem 3rem !important; }
+        .aether-header { padding: 1rem 1rem; }
+        .aether-header h1 { font-size: 1.8rem; letter-spacing: 2px; }
+        .stTabs [data-baseweb="tab-list"] { overflow-x: auto; flex-wrap: nowrap; }
+        .stTabs [data-baseweb="tab"] { white-space: nowrap; padding: 0.5rem 0.8rem; }
+    }
+    @media (max-width: 640px) {
+        .block-container { padding: 0.8rem 0.6rem 3rem !important; }
+        .aether-header h1 { font-size: 1.3rem; letter-spacing: 1px; }
+        .aether-header p { font-size: 0.7rem; letter-spacing: 1px; }
+        .stButton > button, .stDownloadButton > button { width: 100% !important; }
+        [data-testid="stMetricValue"] { font-size: 1.2rem !important; }
+        [data-testid="stHorizontalBlock"] { gap: 0.4rem !important; }
+        html, body, .stApp { -webkit-text-size-adjust: 100%; }
+        input, select, textarea { font-size: 16px !important; }
+    }
     </style>
     """, unsafe_allow_html=True)
+    # Application installable (écran d'accueil) : manifeste et balises mobiles injectés côté navigateur
+    import streamlit.components.v1 as _cmp
+    _cmp.html("""<script>
+    (function(){try{
+      var d=window.parent.document, h=d.head;
+      function meta(n,c){if(!d.querySelector('meta[name="'+n+'"]')){var m=d.createElement('meta');m.name=n;m.content=c;h.appendChild(m);}}
+      var vp=d.querySelector('meta[name="viewport"]');
+      if(vp){vp.content='width=device-width, initial-scale=1, viewport-fit=cover';}
+      meta('theme-color','#0A0A1A'); meta('mobile-web-app-capable','yes');
+      meta('apple-mobile-web-app-capable','yes'); meta('apple-mobile-web-app-title','AETHERDISPATCH');
+      meta('apple-mobile-web-app-status-bar-style','black-translucent');
+      if(!d.querySelector('link[rel="manifest"]')){
+        var svg="<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='32' fill='#0A0A1A'/><text x='96' y='128' font-size='110' text-anchor='middle' fill='#00BFFF'>&#9992;</text></svg>";
+        var icon='data:image/svg+xml;utf8,'+encodeURIComponent(svg);
+        var man={name:'AETHERDISPATCH',short_name:'AETHER',display:'standalone',background_color:'#0A0A1A',theme_color:'#0A0A1A',start_url:'.',icons:[{src:icon,sizes:'192x192',type:'image/svg+xml'}]};
+        var l=d.createElement('link');l.rel='manifest';
+        l.href='data:application/manifest+json,'+encodeURIComponent(JSON.stringify(man));h.appendChild(l);
+        var a=d.createElement('link');a.rel='apple-touch-icon';a.href=icon;h.appendChild(a);
+      }
+    }catch(e){}})();
+    </script>""", height=0)
 
 inject_pwa_and_styles()
 
@@ -388,7 +433,7 @@ def login_page(users: dict):
         st.markdown("""
         <div style="text-align:center;font-size:0.72rem;color:#556688;letter-spacing:1px">
         ACCÈS RESTREINT — Équipe Handling & Dispatch autorisée uniquement<br>
-        AETHERDISPATCH v6.5 | EG Conseil & Lobbying © 2026
+        AETHERDISPATCH v6.6 | EG Conseil & Lobbying © 2026
         </div>
         """, unsafe_allow_html=True)
 
@@ -1234,7 +1279,7 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     pdf.cell(190, 3.8, f"Référentiel : {fs.get('referentiel_text', '-')}", align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "I", 7)
     pdf.set_text_color(130, 130, 130)
-    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v6.5. Vérification obligatoire par le commandant de bord.",
+    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v6.6. Vérification obligatoire par le commandant de bord.",
              align='C')
     return bytes(pdf.output())
 
@@ -2552,9 +2597,11 @@ def render_loading_proposal(ac: dict, wk: str, ctx: dict):
         at_limit = True
         for col, t_ in zip(st.columns(len(types)), types):
             mx = max(int(dflt.get(t_, 0)), 1)
-            cb = int(col.number_input(f"{t_} · bagages", 1, mx, mx, step=10, key=f"uldcapb_{wk}_{t_}_{mx}"))
+            _bd = int(st.session_state.get(f"bagcapdef_{wk}") or 0)
+            _bv = min(mx, _bd) if _bd > 0 else mx
+            cb = int(col.number_input(f"{t_} · bagages", 1, mx, max(_bv, 1), step=10, key=f"uldcapb_{wk}_{t_}_{mx}_{_bv}"))
             cf = int(col.number_input(f"{t_} · fret et courrier", 1, mx, mx, step=10, key=f"uldcapf_{wk}_{t_}_{mx}"))
-            at_limit = at_limit and cb == mx and cf == mx
+            at_limit = at_limit and cb >= _bv and cf == mx
             caps[t_] = {"Bagages": float(cb), "Fret": float(cf), "Courrier": float(cf)}
         extra = int(st.number_input("ULD supplémentaires tolérés pour améliorer le centrage", 0, 5, 0, key=f"uldextra_{wk}"))
         if at_limit:
@@ -2925,6 +2972,32 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
                 reserve_kg = int(bag_total)
             if reserve_kg > 0:
                 alloc, alloc_mode, unplaced = allocate_bags(comps, reserve_kg, used)
+        # ── Estimation immédiate du nombre de ULD pour les bagages ───────
+        _bag_u = max(float(bag_total) - reserve_kg, 0.0)
+        if _bag_u > 0:
+            _rows_u = (ac.get("uld") or {}).get("rows") or []
+            _ake = [r_["max_kg"] for r_ in _rows_u if "AKE" in (r_.get("types") or [])]
+            _cap = max(_ake) if _ake else (max(r_["max_kg"] for r_ in _rows_u if r_.get("kind") == "C") if any(r_.get("kind") == "C" for r_ in _rows_u) else 0)
+            _typ = "AKE" if _ake else "ULD"
+            if _cap:
+                import math as _m
+                _nmin = int(_m.ceil(_bag_u / _cap))
+                _per = int(st.number_input("Bagages par ULD observés (pièces, facultatif)", 0, 200, 0, key=f"bagperuld_{wk}",
+                                           help="Contenu moyen constaté d'un conteneur. Sans cette valeur, seul le minimum "
+                                                "par la masse est donné : le volume des ULD n'est pas contrôlé."))
+                try:
+                    _cdef = float(_per) * float(bag_std) if (_per > 0 and bag_std) else (float(_cap) if _ake else 0.0)
+                    st.session_state[f"bagcapdef_{wk}"] = min(_cdef, float(_cap)) if _cdef > 0 else 0.0
+                except Exception:
+                    st.session_state[f"bagcapdef_{wk}"] = 0.0
+                if _per > 0 and bag_pieces:
+                    _n_est = int(_m.ceil((bag_pieces - (reserve_kg / bag_std if bag_std else 0)) / _per))
+                    st.success(f"Proposition : **{max(_n_est, _nmin)} ULD** de type {_typ} pour {int(_bag_u):,} kg de bagages "
+                               f"({_per} bagages par ULD). Minimum par la masse : {_nmin}.".replace(",", " "))
+                else:
+                    st.info(f"Minimum par la masse : **{_nmin} ULD** de type {_typ} pour {int(_bag_u):,} kg de bagages "
+                            f"(limite de {int(_cap):,} kg bruts par position). Saisissez les bagages par ULD observés pour "
+                            "obtenir le nombre réel ; la répartition par position se calcule plus bas.".replace(",", " "))
     else:
         alloc, alloc_mode, unplaced, ideal_note, load_seq = None, None, 0, "", []
         if ac.get("ideal_trim") and bag_total > 0 and comps:
@@ -4585,7 +4658,7 @@ def main():
              border-radius:10px;border:1px solid rgba(0,191,255,0.2);margin-bottom:1rem">
             <div style="font-size:2.5rem">✈</div>
             <div style="font-weight:900;font-size:1.1rem;color:#00BFFF;letter-spacing:3px">AETHERDISPATCH</div>
-            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v6.5 | EG CONSEIL</div>
+            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v6.6 | EG CONSEIL</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -5165,7 +5238,7 @@ def main():
     # ── Footer ─────────────────────────────────────────────────────────────────
     st.markdown("""
     <div class="aether-footer">
-        AETHERDISPATCH v6.5 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
+        AETHERDISPATCH v6.6 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
         Données à usage opérationnel restreint — Vérification obligatoire par le commandant de bord
     </div>
     """, unsafe_allow_html=True)

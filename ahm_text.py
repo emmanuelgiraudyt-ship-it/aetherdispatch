@@ -686,9 +686,8 @@ def x_uld_positions(sheets, group):
     if not shs:
         return None
     sh = shs[0]
-    rx = re.compile(r'^\s*(?P<cfg>[A-Z][A-Z ]*?[A-Z])\s+(?P<pos>[A-Z0-9]{1,4}(?:/[A-Z0-9]{1,3})?)\s+(?P<max>\d+(?:\.\d+)?)\s+'
-                    r'(?P<lat>\S+)\s+(?P<frm>\S+)\s+(?P<to>\S+)\s+(?P<arm>\d+(?:\.\d+)?)\s+(?P<fwd>\d+(?:\.\d+)?)\s+'
-                    r'(?P<aft>\d+(?:\.\d+)?)\s+(?P<idx>[-+]?\d*\.\d+)(?:\s+\S+)?\s*$')
+    rx = re.compile(r'^\s*(?P<cfg>[A-Z][A-Z ]*?[A-Z])\s+(?P<pos>[A-Z0-9]{1,4}(?:\s*[,/]\s*[A-Z0-9]{1,4})?)\s+'
+                    r'(?P<max>\d+(?:\.\d+)?)\s+(?P<rest>[-+0-9.±\s]+?)(?:\s+-)?\s*$')
     out, hold = [], None
     for l in sh['txt'].split('\n'):
         m = re.match(r'\s*Hold Name:\s*(.+?)\s*$', l)
@@ -699,9 +698,19 @@ def x_uld_positions(sheets, group):
         m = rx.match(l)
         if not m:
             continue
-        out.append({'hold': hold, 'config': re.sub(r'\s+', ' ', m.group('cfg')), 'pos': m.group('pos'),
-                    'max_kg': float(m.group('max')), 'arm': float(m.group('arm')),
-                    'from': float(m.group('fwd')), 'to': float(m.group('aft')), 'index_per_kg': float(m.group('idx'))})
+        tk = m.group('rest').split()
+        try:
+            if len(tk) >= 7:
+                arm, fwd, aft, idx = (float(x) for x in tk[-4:])
+            elif len(tk) == 4:
+                arm, fwd, aft, idx = (float(x) for x in tk)
+            else:
+                continue
+        except ValueError:
+            continue
+        pos = re.sub(r'\s+', '', m.group('pos')).replace(',', '/')
+        out.append({'hold': hold, 'config': re.sub(r'\s+', ' ', m.group('cfg')), 'pos': pos,
+                    'max_kg': float(m.group('max')), 'arm': arm, 'from': fwd, 'to': aft, 'index_per_kg': idx})
     return {'registrations_group': sh['regs'], 'positions': out, 'source': src(sh)} if out else None
 
 
