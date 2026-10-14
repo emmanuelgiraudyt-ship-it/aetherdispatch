@@ -1,5 +1,5 @@
 # =============================================================================
-# AETHERDISPATCH v6.6 — Agent IA Handling Aérien
+# AETHERDISPATCH v6.7 — Agent IA Handling Aérien
 # Développé par EG Conseil & Lobbying | Mars 2026
 # Modules : Masse & Centrage | Performances | V-Speeds | METAR Live
 #           Carburant | Optimisation PuLP | Référentiel compagnie | Export PDF | PWA
@@ -433,7 +433,7 @@ def login_page(users: dict):
         st.markdown("""
         <div style="text-align:center;font-size:0.72rem;color:#556688;letter-spacing:1px">
         ACCÈS RESTREINT — Équipe Handling & Dispatch autorisée uniquement<br>
-        AETHERDISPATCH v6.6 | EG Conseil & Lobbying © 2026
+        AETHERDISPATCH v6.7 | EG Conseil & Lobbying © 2026
         </div>
         """, unsafe_allow_html=True)
 
@@ -1279,7 +1279,7 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     pdf.cell(190, 3.8, f"Référentiel : {fs.get('referentiel_text', '-')}", align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "I", 7)
     pdf.set_text_color(130, 130, 130)
-    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v6.6. Vérification obligatoire par le commandant de bord.",
+    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v6.7. Vérification obligatoire par le commandant de bord.",
              align='C')
     return bytes(pdf.output())
 
@@ -2893,6 +2893,17 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
         uld_cargo_kg = int(u1.number_input("Fret à placer en ULD (kg)", 0, 300000, 0, step=50, key=f"uldcargo_{wk}"))
         uld_mail_kg = int(u2.number_input("Courrier à placer en ULD (kg)", 0, 300000, 0, step=10, key=f"uldmail_{wk}"))
         st.caption("Ces deux totaux alimentent la proposition de répartition : la masse comptée reste celle du plan de chargement.")
+        _rw = (ac.get("uld") or {}).get("rows") or []
+        _pal = [r_["max_kg"] for r_ in _rw if set(r_.get("types") or []) & {"PMC", "PAG", "M SIZE"}]
+        _fc = uld_cargo_kg + uld_mail_kg
+        if _fc > 0 and _pal:
+            import math as _m2
+            st.info(f"**Nombre d'ULD à utiliser pour le fret et le courrier** : au minimum **{int(_m2.ceil(_fc / max(_pal)))} ULD** "
+                    f"(palettes ou conteneurs, {int(max(_pal)):,} kg bruts maximum par position) pour {int(_fc):,} kg. "
+                    "Le nombre réel dépend du volume ; la répartition par position se calcule dans le plan de chargement "
+                    "(bouton « Calculer la proposition »).".replace(",", " "))
+        elif _fc <= 0:
+            st.caption("Nombre d'ULD à utiliser : il s'affichera ici dès que vous saisissez le fret ou le courrier.")
     bap = st.session_state.get(f"bulk_applied_{wk}") or {}               # répartition appliquée (soutes en vrac)
     ks = f"_v{bap['ver']}" if bap.get("ver") else ""
     cargo_w = {c["name"]: 0 for c in comps_all}
@@ -2950,6 +2961,11 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
     else:
         bag_total = int(st.number_input("Masse réelle des bagages (kg)", 0, 100000, 0, key=f"bag_kg_{wk}"))
 
+    if not is_freighter:
+        if uld_on and bag_total <= 0:
+            st.info("**Nombre d'ULD à utiliser pour les bagages** : il sera proposé ici dès que vous aurez saisi les bagages.")
+        elif not uld_on and bag_total > 0:
+            st.caption("Cette configuration charge les bagages en vrac (soutes à chargement manuel) : aucun ULD à prévoir. ")
     bag_none_ok = False
     if bag_total <= 0 and not is_freighter:
         bag_none_ok = st.checkbox("Aucun bagage en soute sur ce vol (confirmation obligatoire pour éditer la loadsheet)",
@@ -2992,10 +3008,10 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
                     st.session_state[f"bagcapdef_{wk}"] = 0.0
                 if _per > 0 and bag_pieces:
                     _n_est = int(_m.ceil((bag_pieces - (reserve_kg / bag_std if bag_std else 0)) / _per))
-                    st.success(f"Proposition : **{max(_n_est, _nmin)} ULD** de type {_typ} pour {int(_bag_u):,} kg de bagages "
+                    st.success(f"**Nombre d'ULD à utiliser : {max(_n_est, _nmin)}** · type {_typ} pour {int(_bag_u):,} kg de bagages "
                                f"({_per} bagages par ULD). Minimum par la masse : {_nmin}.".replace(",", " "))
                 else:
-                    st.info(f"Minimum par la masse : **{_nmin} ULD** de type {_typ} pour {int(_bag_u):,} kg de bagages "
+                    st.info(f"**Nombre d'ULD à utiliser pour les bagages : au minimum {_nmin}** (type {_typ}), pour {int(_bag_u):,} kg de bagages "
                             f"(limite de {int(_cap):,} kg bruts par position). Saisissez les bagages par ULD observés pour "
                             "obtenir le nombre réel ; la répartition par position se calcule plus bas.".replace(",", " "))
     else:
@@ -4658,7 +4674,7 @@ def main():
              border-radius:10px;border:1px solid rgba(0,191,255,0.2);margin-bottom:1rem">
             <div style="font-size:2.5rem">✈</div>
             <div style="font-weight:900;font-size:1.1rem;color:#00BFFF;letter-spacing:3px">AETHERDISPATCH</div>
-            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v6.6 | EG CONSEIL</div>
+            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v6.7 | EG CONSEIL</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -5238,7 +5254,7 @@ def main():
     # ── Footer ─────────────────────────────────────────────────────────────────
     st.markdown("""
     <div class="aether-footer">
-        AETHERDISPATCH v6.6 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
+        AETHERDISPATCH v6.7 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
         Données à usage opérationnel restreint — Vérification obligatoire par le commandant de bord
     </div>
     """, unsafe_allow_html=True)
