@@ -2309,7 +2309,8 @@
      ],
      "where": "page"
     }
-   }
+   },
+   "uld_positions": null
   },
   "A320-232": {
    "id": "A320-232",
@@ -4375,7 +4376,8 @@
      ],
      "where": "page"
     }
-   }
+   },
+   "uld_positions": null
   },
   "A321-231": {
    "id": "A321-231",
@@ -6370,7 +6372,8 @@
      ],
      "where": "page"
     }
-   }
+   },
+   "uld_positions": null
   },
   "A350-941": {
    "id": "A350-941",
@@ -6717,6 +6720,18 @@
           "weight_kg": 195700.0,
           "pct_mac": 22.7,
           "index": 74.21
+         }
+        ],
+        "aft": [
+         {
+          "weight_kg": 127000.0,
+          "pct_mac": 34.4,
+          "index": 110.05
+         },
+         {
+          "weight_kg": 155296.0,
+          "pct_mac": 38.1,
+          "index": 122.64
          },
          {
           "weight_kg": 159976.0,
@@ -6742,18 +6757,6 @@
           "weight_kg": 195700.0,
           "pct_mac": 39.9,
           "index": 134.74
-         }
-        ],
-        "aft": [
-         {
-          "weight_kg": 127000.0,
-          "pct_mac": 34.4,
-          "index": 110.05
-         },
-         {
-          "weight_kg": 155296.0,
-          "pct_mac": 38.1,
-          "index": 122.64
          }
         ]
        },
@@ -9615,7 +9618,8 @@
      ],
      "where": "page"
     }
-   }
+   },
+   "uld_positions": null
   },
   "B737-800": {
    "id": "B737-800",
@@ -11170,7 +11174,8 @@
      ],
      "where": "page"
     }
-   }
+   },
+   "uld_positions": null
   },
   "B737-8MAX": {
    "id": "B737-8MAX",
@@ -11462,21 +11467,6 @@
           "weight_kg": 65952.0,
           "pct_mac": 11.3,
           "index": 19.3
-         },
-         {
-          "weight_kg": 60728.0,
-          "pct_mac": 30.8,
-          "index": 74.1
-         },
-         {
-          "weight_kg": 62561.0,
-          "pct_mac": 30.9,
-          "index": 75.4
-         },
-         {
-          "weight_kg": 65952.0,
-          "pct_mac": 28.6,
-          "index": 70.2
          }
         ],
         "aft": [
@@ -11494,6 +11484,21 @@
           "weight_kg": 59875.0,
           "pct_mac": 30.5,
           "index": 72.8
+         },
+         {
+          "weight_kg": 60728.0,
+          "pct_mac": 30.8,
+          "index": 74.1
+         },
+         {
+          "weight_kg": 62561.0,
+          "pct_mac": 30.9,
+          "index": 75.4
+         },
+         {
+          "weight_kg": 65952.0,
+          "pct_mac": 28.6,
+          "index": 70.2
          }
         ]
        },
@@ -12996,7 +13001,8 @@
      ],
      "where": "page"
     }
-   }
+   },
+   "uld_positions": null
   },
   "B777-300": {
    "id": "B777-300",
@@ -17178,7 +17184,8 @@
      ],
      "where": "page"
     }
-   }
+   },
+   "uld_positions": null
   },
   "B787-9": {
    "id": "B787-9",
@@ -20299,7 +20306,8 @@
      ],
      "where": "page"
     }
-   }
+   },
+   "uld_positions": null
   },
   "A330-243F": {
    "id": "A330-243F",
@@ -22740,6 +22748,1119 @@
      ],
      "where": "page"
     }
+   },
+   "uld_positions": {
+    "registrations_group": "TC-JDP, TC-JDR, TC-JDS, TC-JCI, TC-JOU, TC-JOV, TC-JOY, TC-JOZ",
+    "positions": [
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "A",
+      "max_kg": 2826.0,
+      "arm": 15.766,
+      "from": 14.648,
+      "to": 16.883,
+      "index_per_kg": -0.006956
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "B",
+      "max_kg": 3123.0,
+      "arm": 18.026,
+      "from": 16.908,
+      "to": 19.144,
+      "index_per_kg": -0.006052
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "C",
+      "max_kg": 3391.0,
+      "arm": 20.287,
+      "from": 19.169,
+      "to": 21.404,
+      "index_per_kg": -0.005148
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "D",
+      "max_kg": 3391.0,
+      "arm": 22.548,
+      "from": 21.43,
+      "to": 23.665,
+      "index_per_kg": -0.004243
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "E",
+      "max_kg": 4687.0,
+      "arm": 24.808,
+      "from": 23.69,
+      "to": 25.925,
+      "index_per_kg": -0.003339
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "F",
+      "max_kg": 6033.0,
+      "arm": 27.069,
+      "from": 25.951,
+      "to": 28.186,
+      "index_per_kg": -0.002435
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "G",
+      "max_kg": 6033.0,
+      "arm": 29.329,
+      "from": 28.211,
+      "to": 30.447,
+      "index_per_kg": -0.001531
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "H",
+      "max_kg": 6033.0,
+      "arm": 31.59,
+      "from": 30.472,
+      "to": 32.707,
+      "index_per_kg": -0.000627
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "J",
+      "max_kg": 6033.0,
+      "arm": 33.851,
+      "from": 32.733,
+      "to": 34.968,
+      "index_per_kg": 0.000278
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "K",
+      "max_kg": 5945.0,
+      "arm": 36.111,
+      "from": 34.993,
+      "to": 37.228,
+      "index_per_kg": 0.001182
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "L",
+      "max_kg": 4037.0,
+      "arm": 38.372,
+      "from": 37.254,
+      "to": 39.489,
+      "index_per_kg": 0.002086
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "M",
+      "max_kg": 4037.0,
+      "arm": 40.632,
+      "from": 39.514,
+      "to": 41.75,
+      "index_per_kg": 0.00299
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "P",
+      "max_kg": 3725.0,
+      "arm": 42.893,
+      "from": 41.775,
+      "to": 44.01,
+      "index_per_kg": 0.003895
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "R",
+      "max_kg": 3714.0,
+      "arm": 45.56,
+      "from": 44.442,
+      "to": 46.677,
+      "index_per_kg": 0.004961
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "S",
+      "max_kg": 3714.0,
+      "arm": 48.024,
+      "from": 46.906,
+      "to": 49.141,
+      "index_per_kg": 0.005947
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "T",
+      "max_kg": 3059.0,
+      "arm": 50.488,
+      "from": 49.37,
+      "to": 51.605,
+      "index_per_kg": 0.006933
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PAG",
+      "pos": "U",
+      "max_kg": 2541.0,
+      "arm": 52.951,
+      "from": 51.833,
+      "to": 54.069,
+      "index_per_kg": 0.007918
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "AA",
+      "max_kg": 3080.0,
+      "arm": 15.867,
+      "from": 14.648,
+      "to": 17.086,
+      "index_per_kg": -0.006916
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "BB",
+      "max_kg": 3428.0,
+      "arm": 18.331,
+      "from": 17.112,
+      "to": 19.55,
+      "index_per_kg": -0.00593
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "CC",
+      "max_kg": 3696.0,
+      "arm": 20.795,
+      "from": 19.575,
+      "to": 22.014,
+      "index_per_kg": -0.004945
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "DD",
+      "max_kg": 3696.0,
+      "arm": 23.259,
+      "from": 22.039,
+      "to": 24.478,
+      "index_per_kg": -0.003959
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "EE",
+      "max_kg": 5670.0,
+      "arm": 25.722,
+      "from": 24.503,
+      "to": 26.941,
+      "index_per_kg": -0.002974
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "FF",
+      "max_kg": 5670.0,
+      "arm": 28.186,
+      "from": 26.967,
+      "to": 29.405,
+      "index_per_kg": -0.001988
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "GG",
+      "max_kg": 5670.0,
+      "arm": 30.65,
+      "from": 29.431,
+      "to": 31.869,
+      "index_per_kg": -0.001002
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "HH",
+      "max_kg": 5670.0,
+      "arm": 33.114,
+      "from": 31.894,
+      "to": 34.333,
+      "index_per_kg": -1.7e-05
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "JJ",
+      "max_kg": 5670.0,
+      "arm": 35.578,
+      "from": 34.358,
+      "to": 36.797,
+      "index_per_kg": 0.000969
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "KK",
+      "max_kg": 4822.0,
+      "arm": 38.067,
+      "from": 36.847,
+      "to": 39.286,
+      "index_per_kg": 0.001964
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "LL",
+      "max_kg": 4400.0,
+      "arm": 40.531,
+      "from": 39.311,
+      "to": 41.75,
+      "index_per_kg": 0.00295
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "MM",
+      "max_kg": 4091.0,
+      "arm": 42.994,
+      "from": 41.775,
+      "to": 44.213,
+      "index_per_kg": 0.003935
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "PP",
+      "max_kg": 4048.0,
+      "arm": 45.458,
+      "from": 44.239,
+      "to": 46.677,
+      "index_per_kg": 0.004921
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "RR",
+      "max_kg": 4048.0,
+      "arm": 47.922,
+      "from": 46.703,
+      "to": 49.141,
+      "index_per_kg": 0.005906
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "SS",
+      "max_kg": 3389.0,
+      "arm": 50.386,
+      "from": 49.166,
+      "to": 51.605,
+      "index_per_kg": 0.006892
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SINGLE ROW PMC",
+      "pos": "TT",
+      "max_kg": 2809.0,
+      "arm": 52.85,
+      "from": 51.63,
+      "to": 54.069,
+      "index_per_kg": 0.007877
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SR LATERAL PMC",
+      "pos": "AB",
+      "max_kg": 3429.0,
+      "arm": 16.236,
+      "from": 14.648,
+      "to": 17.823,
+      "index_per_kg": -0.006768
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SR LATERAL PMC",
+      "pos": "BC",
+      "max_kg": 3941.0,
+      "arm": 19.436,
+      "from": 17.848,
+      "to": 21.023,
+      "index_per_kg": -0.005488
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SR LATERAL PMC",
+      "pos": "CE",
+      "max_kg": 4001.0,
+      "arm": 22.637,
+      "from": 21.049,
+      "to": 24.224,
+      "index_per_kg": -0.004208
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SR LATERAL PMC",
+      "pos": "EF",
+      "max_kg": 6804.0,
+      "arm": 25.837,
+      "from": 24.249,
+      "to": 27.424,
+      "index_per_kg": -0.002928
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SR LATERAL PMC",
+      "pos": "FH",
+      "max_kg": 6804.0,
+      "arm": 29.037,
+      "from": 27.449,
+      "to": 30.624,
+      "index_per_kg": -0.001648
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SR LATERAL PMC",
+      "pos": "HJ",
+      "max_kg": 6804.0,
+      "arm": 32.238,
+      "from": 30.65,
+      "to": 33.825,
+      "index_per_kg": -0.000367
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SR LATERAL PMC",
+      "pos": "JK",
+      "max_kg": 6804.0,
+      "arm": 35.438,
+      "from": 33.85,
+      "to": 37.025,
+      "index_per_kg": 0.000913
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SR LATERAL PMC",
+      "pos": "KM",
+      "max_kg": 4868.0,
+      "arm": 38.639,
+      "from": 37.051,
+      "to": 40.226,
+      "index_per_kg": 0.002193
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "SR LATERAL PMC",
+      "pos": "MP",
+      "max_kg": 4445.0,
+      "arm": 41.864,
+      "from": 40.276,
+      "to": 43.451,
+      "index_per_kg": 0.003483
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "ABL/R",
+      "max_kg": 4000.0,
+      "arm": 16.146,
+      "from": 14.468,
+      "to": 17.823,
+      "index_per_kg": -0.006804
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "BCL/R",
+      "max_kg": 4716.0,
+      "arm": 19.436,
+      "from": 17.848,
+      "to": 21.023,
+      "index_per_kg": -0.005488
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "CEL/R",
+      "max_kg": 4800.0,
+      "arm": 22.637,
+      "from": 21.049,
+      "to": 24.224,
+      "index_per_kg": -0.004208
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "EFL/R",
+      "max_kg": 7650.0,
+      "arm": 25.837,
+      "from": 24.249,
+      "to": 27.424,
+      "index_per_kg": -0.002928
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "FHL/R",
+      "max_kg": 8642.0,
+      "arm": 29.037,
+      "from": 27.449,
+      "to": 30.624,
+      "index_per_kg": -0.001648
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "HJL/R",
+      "max_kg": 8642.0,
+      "arm": 32.088,
+      "from": 30.35,
+      "to": 33.825,
+      "index_per_kg": -0.000427
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "JKL/R",
+      "max_kg": 8642.0,
+      "arm": 35.438,
+      "from": 33.85,
+      "to": 37.025,
+      "index_per_kg": 0.000913
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "KML/R",
+      "max_kg": 5928.0,
+      "arm": 38.639,
+      "from": 37.051,
+      "to": 40.226,
+      "index_per_kg": 0.002193
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "MPL/R",
+      "max_kg": 5512.0,
+      "arm": 41.864,
+      "from": 40.276,
+      "to": 43.451,
+      "index_per_kg": 0.003483
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PAG SBS",
+      "pos": "PRL/R",
+      "max_kg": 5258.0,
+      "arm": 45.09,
+      "from": 43.502,
+      "to": 46.677,
+      "index_per_kg": 0.004773
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PMC SBS",
+      "pos": "ABL/R",
+      "max_kg": 4000.0,
+      "arm": 16.146,
+      "from": 14.468,
+      "to": 17.823,
+      "index_per_kg": -0.006804
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PMC SBS",
+      "pos": "BCL/R",
+      "max_kg": 4716.0,
+      "arm": 19.436,
+      "from": 17.848,
+      "to": 21.023,
+      "index_per_kg": -0.005488
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PMC SBS",
+      "pos": "CEL/R",
+      "max_kg": 4800.0,
+      "arm": 22.637,
+      "from": 21.049,
+      "to": 24.224,
+      "index_per_kg": -0.004208
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PMC SBS",
+      "pos": "EFL/R",
+      "max_kg": 7650.0,
+      "arm": 25.837,
+      "from": 24.249,
+      "to": 27.424,
+      "index_per_kg": -0.002928
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PMC SBS",
+      "pos": "FHL/R",
+      "max_kg": 8642.0,
+      "arm": 29.037,
+      "from": 27.449,
+      "to": 30.624,
+      "index_per_kg": -0.001648
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PMC SBS",
+      "pos": "HJL/R",
+      "max_kg": 8642.0,
+      "arm": 32.088,
+      "from": 30.35,
+      "to": 33.825,
+      "index_per_kg": -0.000427
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PMC SBS",
+      "pos": "JKL/R",
+      "max_kg": 8642.0,
+      "arm": 35.438,
+      "from": 33.85,
+      "to": 37.025,
+      "index_per_kg": 0.000913
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PMC SBS",
+      "pos": "KML/R",
+      "max_kg": 5928.0,
+      "arm": 38.639,
+      "from": 37.051,
+      "to": 40.226,
+      "index_per_kg": 0.002193
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PMC SBS",
+      "pos": "MPL/R",
+      "max_kg": 5512.0,
+      "arm": 41.864,
+      "from": 40.276,
+      "to": 43.451,
+      "index_per_kg": 0.003483
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PRA",
+      "pos": "CFR",
+      "max_kg": 7729.0,
+      "arm": 23.608,
+      "from": 21.119,
+      "to": 26.097,
+      "index_per_kg": -0.003819
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PRA",
+      "pos": "FJR",
+      "max_kg": 10668.0,
+      "arm": 29.793,
+      "from": 27.303,
+      "to": 32.282,
+      "index_per_kg": -0.001345
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PRA",
+      "pos": "JLR",
+      "max_kg": 10668.0,
+      "arm": 34.895,
+      "from": 32.416,
+      "to": 37.374,
+      "index_per_kg": 0.000696
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PRA",
+      "pos": "LPR",
+      "max_kg": 6236.0,
+      "arm": 40.016,
+      "from": 37.527,
+      "to": 42.505,
+      "index_per_kg": 0.002744
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PGA",
+      "pos": "CFG",
+      "max_kg": 10602.0,
+      "arm": 24.119,
+      "from": 21.089,
+      "to": 27.148,
+      "index_per_kg": -0.003615
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PGA",
+      "pos": "FJG",
+      "max_kg": 11340.0,
+      "arm": 30.304,
+      "from": 27.275,
+      "to": 33.333,
+      "index_per_kg": -0.001141
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "PGA",
+      "pos": "JLG",
+      "max_kg": 11340.0,
+      "arm": 36.488,
+      "from": 33.459,
+      "to": 39.517,
+      "index_per_kg": 0.001333
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "AKE",
+      "pos": "11L/R",
+      "max_kg": 1587.0,
+      "arm": 15.433,
+      "from": 14.662,
+      "to": 16.203,
+      "index_per_kg": -0.007089
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "AKE",
+      "pos": "12L/R",
+      "max_kg": 1587.0,
+      "arm": 17.195,
+      "from": 16.425,
+      "to": 17.965,
+      "index_per_kg": -0.006384
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "AKE",
+      "pos": "13L/R",
+      "max_kg": 1587.0,
+      "arm": 18.778,
+      "from": 18.007,
+      "to": 19.548,
+      "index_per_kg": -0.005751
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "AKE",
+      "pos": "14L/R",
+      "max_kg": 1587.0,
+      "arm": 20.36,
+      "from": 19.59,
+      "to": 21.13,
+      "index_per_kg": -0.005118
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "AKE",
+      "pos": "21L/R",
+      "max_kg": 1587.0,
+      "arm": 22.123,
+      "from": 21.352,
+      "to": 22.893,
+      "index_per_kg": -0.004413
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "AKE",
+      "pos": "22L/R",
+      "max_kg": 1587.0,
+      "arm": 23.705,
+      "from": 22.935,
+      "to": 24.475,
+      "index_per_kg": -0.00378
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "AKE",
+      "pos": "23L/R",
+      "max_kg": 1587.0,
+      "arm": 25.288,
+      "from": 24.517,
+      "to": 26.058,
+      "index_per_kg": -0.003147
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PLA",
+      "pos": "11",
+      "max_kg": 3174.0,
+      "arm": 15.433,
+      "from": 14.662,
+      "to": 16.203,
+      "index_per_kg": -0.007089
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PLA",
+      "pos": "12",
+      "max_kg": 3174.0,
+      "arm": 17.195,
+      "from": 16.425,
+      "to": 17.965,
+      "index_per_kg": -0.006384
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PLA",
+      "pos": "13",
+      "max_kg": 3174.0,
+      "arm": 18.778,
+      "from": 18.007,
+      "to": 19.548,
+      "index_per_kg": -0.005751
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PLA",
+      "pos": "14",
+      "max_kg": 3174.0,
+      "arm": 20.36,
+      "from": 19.59,
+      "to": 21.13,
+      "index_per_kg": -0.005118
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PLA",
+      "pos": "21",
+      "max_kg": 3174.0,
+      "arm": 22.123,
+      "from": 21.352,
+      "to": 22.893,
+      "index_per_kg": -0.004413
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PLA",
+      "pos": "22",
+      "max_kg": 3174.0,
+      "arm": 23.705,
+      "from": 22.935,
+      "to": 24.475,
+      "index_per_kg": -0.00378
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PLA",
+      "pos": "23",
+      "max_kg": 3174.0,
+      "arm": 25.288,
+      "from": 24.517,
+      "to": 26.058,
+      "index_per_kg": -0.003147
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PAG",
+      "pos": "12P",
+      "max_kg": 4626.0,
+      "arm": 17.546,
+      "from": 16.425,
+      "to": 18.666,
+      "index_per_kg": -0.006244
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PAG",
+      "pos": "13P",
+      "max_kg": 4626.0,
+      "arm": 20.01,
+      "from": 18.889,
+      "to": 21.13,
+      "index_per_kg": -0.005259
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PAG",
+      "pos": "21P",
+      "max_kg": 4626.0,
+      "arm": 22.473,
+      "from": 21.352,
+      "to": 23.594,
+      "index_per_kg": -0.004273
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PAG",
+      "pos": "22P",
+      "max_kg": 4626.0,
+      "arm": 24.937,
+      "from": 23.816,
+      "to": 26.058,
+      "index_per_kg": -0.003288
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PMC",
+      "pos": "12P",
+      "max_kg": 5103.0,
+      "arm": 17.444,
+      "from": 16.222,
+      "to": 18.666,
+      "index_per_kg": -0.006285
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PMC",
+      "pos": "13P",
+      "max_kg": 5103.0,
+      "arm": 19.908,
+      "from": 18.685,
+      "to": 21.13,
+      "index_per_kg": -0.005299
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PMC",
+      "pos": "21P",
+      "max_kg": 5103.0,
+      "arm": 22.372,
+      "from": 21.149,
+      "to": 23.594,
+      "index_per_kg": -0.004314
+     },
+     {
+      "hold": "LOWER DECK FORWARD",
+      "config": "PMC",
+      "pos": "22P",
+      "max_kg": 5103.0,
+      "arm": 24.836,
+      "from": 23.613,
+      "to": 26.058,
+      "index_per_kg": -0.003328
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "AKE",
+      "pos": "31L/R",
+      "max_kg": 1587.0,
+      "arm": 37.607,
+      "from": 36.837,
+      "to": 38.377,
+      "index_per_kg": 0.00178
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "AKE",
+      "pos": "32L/R",
+      "max_kg": 1587.0,
+      "arm": 39.19,
+      "from": 38.419,
+      "to": 39.96,
+      "index_per_kg": 0.002413
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "AKE",
+      "pos": "33L/R",
+      "max_kg": 1587.0,
+      "arm": 40.772,
+      "from": 40.002,
+      "to": 41.542,
+      "index_per_kg": 0.003046
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "AKE",
+      "pos": "41L/R",
+      "max_kg": 1587.0,
+      "arm": 42.749,
+      "from": 41.979,
+      "to": 43.519,
+      "index_per_kg": 0.003837
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "AKE",
+      "pos": "42L/R",
+      "max_kg": 1587.0,
+      "arm": 44.332,
+      "from": 43.562,
+      "to": 45.102,
+      "index_per_kg": 0.00447
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "AKE",
+      "pos": "43L/R",
+      "max_kg": 1587.0,
+      "arm": 45.914,
+      "from": 45.144,
+      "to": 46.684,
+      "index_per_kg": 0.005103
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PLA",
+      "pos": "31",
+      "max_kg": 3174.0,
+      "arm": 37.607,
+      "from": 36.837,
+      "to": 38.377,
+      "index_per_kg": 0.00178
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PLA",
+      "pos": "32",
+      "max_kg": 3174.0,
+      "arm": 39.19,
+      "from": 38.419,
+      "to": 39.96,
+      "index_per_kg": 0.002413
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PLA",
+      "pos": "33",
+      "max_kg": 3174.0,
+      "arm": 40.772,
+      "from": 40.002,
+      "to": 41.542,
+      "index_per_kg": 0.003046
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PLA",
+      "pos": "41",
+      "max_kg": 3174.0,
+      "arm": 42.749,
+      "from": 41.979,
+      "to": 43.519,
+      "index_per_kg": 0.003837
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PLA",
+      "pos": "42",
+      "max_kg": 3174.0,
+      "arm": 44.332,
+      "from": 43.562,
+      "to": 45.102,
+      "index_per_kg": 0.00447
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PLA",
+      "pos": "43",
+      "max_kg": 3174.0,
+      "arm": 45.914,
+      "from": 45.144,
+      "to": 46.684,
+      "index_per_kg": 0.005103
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PAG",
+      "pos": "31P",
+      "max_kg": 4626.0,
+      "arm": 37.958,
+      "from": 36.837,
+      "to": 39.079,
+      "index_per_kg": 0.001921
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PAG",
+      "pos": "32P",
+      "max_kg": 4626.0,
+      "arm": 40.421,
+      "from": 39.3,
+      "to": 41.542,
+      "index_per_kg": 0.002906
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PAG",
+      "pos": "41P",
+      "max_kg": 4626.0,
+      "arm": 43.1,
+      "from": 41.979,
+      "to": 44.22,
+      "index_per_kg": 0.003977
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PAG",
+      "pos": "42P",
+      "max_kg": 4626.0,
+      "arm": 45.36,
+      "from": 44.239,
+      "to": 46.48,
+      "index_per_kg": 0.004881
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PMC",
+      "pos": "31P",
+      "max_kg": 5103.0,
+      "arm": 38.059,
+      "from": 36.837,
+      "to": 39.281,
+      "index_per_kg": 0.001961
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PMC",
+      "pos": "32P",
+      "max_kg": 5103.0,
+      "arm": 40.523,
+      "from": 39.3,
+      "to": 41.745,
+      "index_per_kg": 0.002947
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PMC",
+      "pos": "41P",
+      "max_kg": 5103.0,
+      "arm": 42.998,
+      "from": 41.776,
+      "to": 44.22,
+      "index_per_kg": 0.003937
+     },
+     {
+      "hold": "LOWER DECK AFT",
+      "config": "PMC",
+      "pos": "42P",
+      "max_kg": 5103.0,
+      "arm": 45.462,
+      "from": 44.239,
+      "to": 46.684,
+      "index_per_kg": 0.004922
+     }
+    ],
+    "source": {
+     "sheet": "D 3",
+     "pages": [
+      53,
+      54
+     ],
+     "where": "page"
+    }
    }
   },
   "B777F": {
@@ -23007,16 +24128,6 @@
           "weight_kg": 248115.0,
           "pct_mac": 17.8,
           "index": 16.2
-         },
-         {
-          "weight_kg": 209901.0,
-          "pct_mac": 38.1,
-          "index": 69.0
-         },
-         {
-          "weight_kg": 248115.0,
-          "pct_mac": 35.9,
-          "index": 66.3
          }
         ],
         "aft": [
@@ -23039,6 +24150,16 @@
           "weight_kg": 207452.0,
           "pct_mac": 38.1,
           "index": 68.7
+         },
+         {
+          "weight_kg": 209901.0,
+          "pct_mac": 38.1,
+          "index": 69.0
+         },
+         {
+          "weight_kg": 248115.0,
+          "pct_mac": 35.9,
+          "index": 66.3
          }
         ]
        },
@@ -23217,16 +24338,6 @@
           "weight_kg": 248115.0,
           "pct_mac": 16.2,
           "index": 11.8
-         },
-         {
-          "weight_kg": 209901.0,
-          "pct_mac": 40.9,
-          "index": 75.6
-         },
-         {
-          "weight_kg": 248115.0,
-          "pct_mac": 38.3,
-          "index": 72.9
          }
         ],
         "aft": [
@@ -23249,6 +24360,16 @@
           "weight_kg": 207452.0,
           "pct_mac": 40.9,
           "index": 75.3
+         },
+         {
+          "weight_kg": 209901.0,
+          "pct_mac": 40.9,
+          "index": 75.6
+         },
+         {
+          "weight_kg": 248115.0,
+          "pct_mac": 38.3,
+          "index": 72.9
          }
         ]
        },
@@ -24872,6 +25993,1310 @@
      "pages": [
       18,
       19
+     ],
+     "where": "page"
+    }
+   },
+   "uld_positions": {
+    "registrations_group": "ALL",
+    "positions": [
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "AL/AR",
+      "max_kg": 8150.0,
+      "arm": 460.0,
+      "from": 397.5,
+      "to": 522.5,
+      "index_per_kg": -0.003192
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "BL/BR",
+      "max_kg": 8150.0,
+      "arm": 586.0,
+      "from": 523.5,
+      "to": 648.5,
+      "index_per_kg": -0.002688
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "CL/CR",
+      "max_kg": 8150.0,
+      "arm": 712.0,
+      "from": 649.5,
+      "to": 774.5,
+      "index_per_kg": -0.002184
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "DL/DR",
+      "max_kg": 8150.0,
+      "arm": 838.0,
+      "from": 775.5,
+      "to": 900.5,
+      "index_per_kg": -0.00168
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "EL/ER",
+      "max_kg": 8150.0,
+      "arm": 964.0,
+      "from": 901.5,
+      "to": 1026.5,
+      "index_per_kg": -0.001176
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "FL/FR",
+      "max_kg": 13606.0,
+      "arm": 1090.0,
+      "from": 1027.5,
+      "to": 1152.5,
+      "index_per_kg": -0.000672
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "GL/GR",
+      "max_kg": 13606.0,
+      "arm": 1216.0,
+      "from": 1153.5,
+      "to": 1278.5,
+      "index_per_kg": -0.000168
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "HL/HR",
+      "max_kg": 13606.0,
+      "arm": 1342.0,
+      "from": 1279.5,
+      "to": 1404.5,
+      "index_per_kg": 0.000336
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "JL/JR",
+      "max_kg": 8150.0,
+      "arm": 1468.0,
+      "from": 1405.5,
+      "to": 1530.5,
+      "index_per_kg": 0.00084
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "KL/KR",
+      "max_kg": 8150.0,
+      "arm": 1594.0,
+      "from": 1531.5,
+      "to": 1656.5,
+      "index_per_kg": 0.001344
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "LL/LR",
+      "max_kg": 8150.0,
+      "arm": 1719.0,
+      "from": 1656.5,
+      "to": 1781.5,
+      "index_per_kg": 0.001844
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "ML/MR",
+      "max_kg": 8150.0,
+      "arm": 1858.0,
+      "from": 1795.5,
+      "to": 1920.5,
+      "index_per_kg": 0.0024
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SBS",
+      "pos": "PL/PR",
+      "max_kg": 8150.0,
+      "arm": 1984.0,
+      "from": 1921.5,
+      "to": 2046.5,
+      "index_per_kg": 0.002904
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE SINGLE",
+      "pos": "R",
+      "max_kg": 3527.0,
+      "arm": 2095.0,
+      "from": 2047.0,
+      "to": 2143.0,
+      "index_per_kg": 0.003348
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "AL/AR",
+      "max_kg": 8150.0,
+      "arm": 460.0,
+      "from": 397.5,
+      "to": 522.5,
+      "index_per_kg": -0.003192
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "BL/BR",
+      "max_kg": 8150.0,
+      "arm": 586.0,
+      "from": 523.5,
+      "to": 648.5,
+      "index_per_kg": -0.002688
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "CL/CR",
+      "max_kg": 8150.0,
+      "arm": 712.0,
+      "from": 649.5,
+      "to": 774.5,
+      "index_per_kg": -0.002184
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "DL/DR",
+      "max_kg": 8150.0,
+      "arm": 838.0,
+      "from": 775.5,
+      "to": 900.5,
+      "index_per_kg": -0.00168
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "EL/ER",
+      "max_kg": 8150.0,
+      "arm": 964.0,
+      "from": 901.5,
+      "to": 1026.5,
+      "index_per_kg": -0.001176
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "FL/FR",
+      "max_kg": 13606.0,
+      "arm": 1090.0,
+      "from": 1027.5,
+      "to": 1152.5,
+      "index_per_kg": -0.000672
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "GL/GR",
+      "max_kg": 13606.0,
+      "arm": 1216.0,
+      "from": 1153.5,
+      "to": 1278.5,
+      "index_per_kg": -0.000168
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "HL/HR",
+      "max_kg": 13606.0,
+      "arm": 1342.0,
+      "from": 1279.5,
+      "to": 1404.5,
+      "index_per_kg": 0.000336
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "JL/JR",
+      "max_kg": 8150.0,
+      "arm": 1468.0,
+      "from": 1405.5,
+      "to": 1530.5,
+      "index_per_kg": 0.00084
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "KL/KR",
+      "max_kg": 8150.0,
+      "arm": 1594.0,
+      "from": 1531.5,
+      "to": 1656.5,
+      "index_per_kg": 0.001344
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "LL/LR",
+      "max_kg": 8150.0,
+      "arm": 1719.0,
+      "from": 1656.5,
+      "to": 1781.5,
+      "index_per_kg": 0.001844
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "ML/MR",
+      "max_kg": 8150.0,
+      "arm": 1858.0,
+      "from": 1795.5,
+      "to": 1920.5,
+      "index_per_kg": 0.0024
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SBS",
+      "pos": "PL/PR",
+      "max_kg": 8150.0,
+      "arm": 1984.0,
+      "from": 1921.5,
+      "to": 2046.5,
+      "index_per_kg": 0.002904
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE SINGLE",
+      "pos": "R",
+      "max_kg": 3233.0,
+      "arm": 2095.0,
+      "from": 2047.0,
+      "to": 2143.0,
+      "index_per_kg": 0.003348
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "G LONG SBS",
+      "pos": "ABL/ABR",
+      "max_kg": 15550.0,
+      "arm": 528.0,
+      "from": 408.8,
+      "to": 647.3,
+      "index_per_kg": -0.00292
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "G LONG SBS",
+      "pos": "CDL/CDR",
+      "max_kg": 15550.0,
+      "arm": 770.0,
+      "from": 650.8,
+      "to": 889.3,
+      "index_per_kg": -0.001952
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "G LONG SBS",
+      "pos": "EFL/EFR",
+      "max_kg": 15550.0,
+      "arm": 1031.0,
+      "from": 911.8,
+      "to": 1150.3,
+      "index_per_kg": -0.000908
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "G LONG SBS",
+      "pos": "GHL/GHR",
+      "max_kg": 22678.0,
+      "arm": 1273.0,
+      "from": 1153.8,
+      "to": 1392.3,
+      "index_per_kg": 6e-05
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "G LONG SBS",
+      "pos": "JKR",
+      "max_kg": 15550.0,
+      "arm": 1535.0,
+      "from": 1415.8,
+      "to": 1654.3,
+      "index_per_kg": 0.001108
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "G LONG SBS",
+      "pos": "MPL/MPR",
+      "max_kg": 15550.0,
+      "arm": 1917.0,
+      "from": 1797.8,
+      "to": 2036.3,
+      "index_per_kg": 0.002636
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R LONG SBS",
+      "pos": "ABL/ABR",
+      "max_kg": 12778.0,
+      "arm": 528.0,
+      "from": 430.0,
+      "to": 626.0,
+      "index_per_kg": -0.00292
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R LONG SBS",
+      "pos": "CDL/CDR",
+      "max_kg": 12778.0,
+      "arm": 770.0,
+      "from": 672.0,
+      "to": 868.0,
+      "index_per_kg": -0.001952
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R LONG SBS",
+      "pos": "EFL/EFR",
+      "max_kg": 12778.0,
+      "arm": 1031.0,
+      "from": 933.0,
+      "to": 1129.0,
+      "index_per_kg": -0.000908
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R LONG SBS",
+      "pos": "GHL/GHR",
+      "max_kg": 22678.0,
+      "arm": 1273.0,
+      "from": 1175.0,
+      "to": 1371.0,
+      "index_per_kg": 6e-05
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R LONG SBS",
+      "pos": "JKR",
+      "max_kg": 12778.0,
+      "arm": 1535.0,
+      "from": 1437.0,
+      "to": 1633.0,
+      "index_per_kg": 0.001108
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R LONG SBS",
+      "pos": "MPL/MPR",
+      "max_kg": 12778.0,
+      "arm": 1917.0,
+      "from": 1819.0,
+      "to": 2015.0,
+      "index_per_kg": 0.002636
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "G LONG CENTER",
+      "pos": "EF",
+      "max_kg": 11339.0,
+      "arm": 1031.0,
+      "from": 911.8,
+      "to": 1150.3,
+      "index_per_kg": -0.000908
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "G LONG CENTER",
+      "pos": "GH",
+      "max_kg": 11339.0,
+      "arm": 1273.0,
+      "from": 1153.8,
+      "to": 1392.3,
+      "index_per_kg": 6e-05
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "G LONG CENTER",
+      "pos": "JK",
+      "max_kg": 11339.0,
+      "arm": 1535.0,
+      "from": 1415.8,
+      "to": 1654.3,
+      "index_per_kg": 0.001108
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R LONG CENTER",
+      "pos": "EF",
+      "max_kg": 11339.0,
+      "arm": 1031.0,
+      "from": 911.8,
+      "to": 1150.3,
+      "index_per_kg": -0.000908
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R LONG CENTER",
+      "pos": "GH",
+      "max_kg": 11339.0,
+      "arm": 1273.0,
+      "from": 1153.8,
+      "to": 1392.3,
+      "index_per_kg": 6e-05
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R LONG CENTER",
+      "pos": "JK",
+      "max_kg": 11339.0,
+      "arm": 1535.0,
+      "from": 1415.8,
+      "to": 1654.3,
+      "index_per_kg": 0.001108
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "A",
+      "max_kg": 6803.0,
+      "arm": 460.0,
+      "from": 397.5,
+      "to": 522.5,
+      "index_per_kg": -0.003192
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "B",
+      "max_kg": 6803.0,
+      "arm": 586.0,
+      "from": 523.5,
+      "to": 648.5,
+      "index_per_kg": -0.002688
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "C",
+      "max_kg": 6803.0,
+      "arm": 712.0,
+      "from": 649.5,
+      "to": 774.5,
+      "index_per_kg": -0.002184
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "D",
+      "max_kg": 6803.0,
+      "arm": 838.0,
+      "from": 775.5,
+      "to": 900.5,
+      "index_per_kg": -0.00168
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "E",
+      "max_kg": 6803.0,
+      "arm": 964.0,
+      "from": 901.5,
+      "to": 1026.5,
+      "index_per_kg": -0.001176
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "F",
+      "max_kg": 6803.0,
+      "arm": 1090.0,
+      "from": 1027.5,
+      "to": 1152.5,
+      "index_per_kg": -0.000672
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "G",
+      "max_kg": 6803.0,
+      "arm": 1216.0,
+      "from": 1153.5,
+      "to": 1278.5,
+      "index_per_kg": -0.000168
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "H",
+      "max_kg": 6803.0,
+      "arm": 1342.0,
+      "from": 1279.5,
+      "to": 1404.5,
+      "index_per_kg": 0.000336
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "J",
+      "max_kg": 6803.0,
+      "arm": 1468.0,
+      "from": 1405.5,
+      "to": 1530.5,
+      "index_per_kg": 0.00084
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "K",
+      "max_kg": 6803.0,
+      "arm": 1594.0,
+      "from": 1531.5,
+      "to": 1656.5,
+      "index_per_kg": 0.001344
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "L",
+      "max_kg": 6803.0,
+      "arm": 1719.0,
+      "from": 1656.5,
+      "to": 1781.5,
+      "index_per_kg": 0.001844
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "M",
+      "max_kg": 6803.0,
+      "arm": 1858.0,
+      "from": 1795.5,
+      "to": 1920.5,
+      "index_per_kg": 0.0024
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "M SIZE CENTER",
+      "pos": "P",
+      "max_kg": 6803.0,
+      "arm": 1984.0,
+      "from": 1921.5,
+      "to": 2046.5,
+      "index_per_kg": 0.002904
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "A",
+      "max_kg": 6803.0,
+      "arm": 460.0,
+      "from": 397.5,
+      "to": 522.5,
+      "index_per_kg": -0.003192
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "B",
+      "max_kg": 6803.0,
+      "arm": 586.0,
+      "from": 523.5,
+      "to": 648.5,
+      "index_per_kg": -0.002688
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "C",
+      "max_kg": 6803.0,
+      "arm": 712.0,
+      "from": 649.5,
+      "to": 774.5,
+      "index_per_kg": -0.002184
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "D",
+      "max_kg": 6803.0,
+      "arm": 838.0,
+      "from": 775.5,
+      "to": 900.5,
+      "index_per_kg": -0.00168
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "E",
+      "max_kg": 6803.0,
+      "arm": 964.0,
+      "from": 901.5,
+      "to": 1026.5,
+      "index_per_kg": -0.001176
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "F",
+      "max_kg": 6803.0,
+      "arm": 1090.0,
+      "from": 1027.5,
+      "to": 1152.5,
+      "index_per_kg": -0.000672
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "G",
+      "max_kg": 6803.0,
+      "arm": 1216.0,
+      "from": 1153.5,
+      "to": 1278.5,
+      "index_per_kg": -0.000168
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "H",
+      "max_kg": 6803.0,
+      "arm": 1342.0,
+      "from": 1279.5,
+      "to": 1404.5,
+      "index_per_kg": 0.000336
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "J",
+      "max_kg": 6803.0,
+      "arm": 1468.0,
+      "from": 1405.5,
+      "to": 1530.5,
+      "index_per_kg": 0.00084
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "K",
+      "max_kg": 6803.0,
+      "arm": 1594.0,
+      "from": 1531.5,
+      "to": 1656.5,
+      "index_per_kg": 0.001344
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "L",
+      "max_kg": 6803.0,
+      "arm": 1719.0,
+      "from": 1656.5,
+      "to": 1781.5,
+      "index_per_kg": 0.001844
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "M",
+      "max_kg": 6803.0,
+      "arm": 1858.0,
+      "from": 1795.5,
+      "to": 1920.5,
+      "index_per_kg": 0.0024
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "A SIZE CENTER",
+      "pos": "P",
+      "max_kg": 6803.0,
+      "arm": 1984.0,
+      "from": 1921.5,
+      "to": 2046.5,
+      "index_per_kg": 0.002904
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R SIZE LATERAL",
+      "pos": "E/F",
+      "max_kg": 6268.0,
+      "arm": 1027.0,
+      "from": 979.0,
+      "to": 1075.0,
+      "index_per_kg": -0.000924
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R SIZE LATERAL",
+      "pos": "F/G",
+      "max_kg": 11339.0,
+      "arm": 1124.0,
+      "from": 1076.0,
+      "to": 1172.0,
+      "index_per_kg": -0.000536
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R SIZE LATERAL",
+      "pos": "G",
+      "max_kg": 11339.0,
+      "arm": 1221.0,
+      "from": 1173.0,
+      "to": 1269.0,
+      "index_per_kg": -0.000148
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R SIZE LATERAL",
+      "pos": "G/H",
+      "max_kg": 11339.0,
+      "arm": 1318.0,
+      "from": 1270.0,
+      "to": 1366.0,
+      "index_per_kg": 0.00024
+     },
+     {
+      "hold": "MAIN DECK",
+      "config": "R SIZE LATERAL",
+      "pos": "H/J",
+      "max_kg": 6268.0,
+      "arm": 1415.0,
+      "from": 1367.0,
+      "to": 1463.0,
+      "index_per_kg": 0.000628
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "AKE",
+      "pos": "11L/R",
+      "max_kg": 1587.0,
+      "arm": 441.4,
+      "from": 411.2,
+      "to": 471.6,
+      "index_per_kg": -0.003266
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "AKE",
+      "pos": "12L/R",
+      "max_kg": 1587.0,
+      "arm": 539.6,
+      "from": 509.4,
+      "to": 569.8,
+      "index_per_kg": -0.002874
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "AKE",
+      "pos": "13L/R",
+      "max_kg": 1587.0,
+      "arm": 602.1,
+      "from": 571.9,
+      "to": 632.3,
+      "index_per_kg": -0.002624
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "AKE",
+      "pos": "14L/R",
+      "max_kg": 1587.0,
+      "arm": 662.5,
+      "from": 632.3,
+      "to": 692.7,
+      "index_per_kg": -0.002382
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "AKE",
+      "pos": "21L/R",
+      "max_kg": 1587.0,
+      "arm": 723.1,
+      "from": 692.9,
+      "to": 753.3,
+      "index_per_kg": -0.00214
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "AKE",
+      "pos": "22L/R",
+      "max_kg": 1587.0,
+      "arm": 783.7,
+      "from": 753.5,
+      "to": 813.9,
+      "index_per_kg": -0.001897
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "AKE",
+      "pos": "23L/R",
+      "max_kg": 1587.0,
+      "arm": 844.3,
+      "from": 814.1,
+      "to": 874.5,
+      "index_per_kg": -0.001655
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "AKE",
+      "pos": "24L/R",
+      "max_kg": 1587.0,
+      "arm": 904.9,
+      "from": 874.7,
+      "to": 935.1,
+      "index_per_kg": -0.001412
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "AKE",
+      "pos": "25L/R",
+      "max_kg": 1587.0,
+      "arm": 965.7,
+      "from": 935.5,
+      "to": 995.9,
+      "index_per_kg": -0.001169
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PLA",
+      "pos": "11",
+      "max_kg": 3174.0,
+      "arm": 441.4,
+      "from": 411.2,
+      "to": 471.6,
+      "index_per_kg": -0.003266
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PLA",
+      "pos": "12",
+      "max_kg": 3174.0,
+      "arm": 539.6,
+      "from": 509.4,
+      "to": 569.8,
+      "index_per_kg": -0.002874
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PLA",
+      "pos": "13",
+      "max_kg": 3174.0,
+      "arm": 602.1,
+      "from": 571.9,
+      "to": 632.3,
+      "index_per_kg": -0.002624
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PLA",
+      "pos": "14",
+      "max_kg": 3174.0,
+      "arm": 662.5,
+      "from": 632.3,
+      "to": 692.7,
+      "index_per_kg": -0.002382
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PLA",
+      "pos": "21",
+      "max_kg": 3174.0,
+      "arm": 723.1,
+      "from": 692.9,
+      "to": 753.3,
+      "index_per_kg": -0.00214
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PLA",
+      "pos": "22",
+      "max_kg": 3174.0,
+      "arm": 783.7,
+      "from": 753.5,
+      "to": 813.9,
+      "index_per_kg": -0.001897
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PLA",
+      "pos": "23",
+      "max_kg": 3174.0,
+      "arm": 844.3,
+      "from": 814.1,
+      "to": 874.5,
+      "index_per_kg": -0.001655
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PLA",
+      "pos": "24",
+      "max_kg": 3174.0,
+      "arm": 904.9,
+      "from": 874.7,
+      "to": 935.1,
+      "index_per_kg": -0.001412
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PLA",
+      "pos": "25",
+      "max_kg": 3174.0,
+      "arm": 965.7,
+      "from": 935.5,
+      "to": 995.9,
+      "index_per_kg": -0.001169
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PAG",
+      "pos": "11P",
+      "max_kg": 4626.0,
+      "arm": 455.1,
+      "from": 411.1,
+      "to": 499.1,
+      "index_per_kg": -0.003212
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PAG",
+      "pos": "12P",
+      "max_kg": 4626.0,
+      "arm": 553.2,
+      "from": 509.2,
+      "to": 597.2,
+      "index_per_kg": -0.002819
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PAG",
+      "pos": "13P",
+      "max_kg": 4626.0,
+      "arm": 658.8,
+      "from": 614.8,
+      "to": 702.8,
+      "index_per_kg": -0.002397
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PAG",
+      "pos": "21P",
+      "max_kg": 4626.0,
+      "arm": 756.5,
+      "from": 712.5,
+      "to": 800.5,
+      "index_per_kg": -0.002006
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PAG",
+      "pos": "22P",
+      "max_kg": 4626.0,
+      "arm": 854.2,
+      "from": 810.2,
+      "to": 898.2,
+      "index_per_kg": -0.001615
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PAG",
+      "pos": "23P",
+      "max_kg": 4626.0,
+      "arm": 951.9,
+      "from": 907.9,
+      "to": 995.9,
+      "index_per_kg": -0.001224
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PMC",
+      "pos": "11P",
+      "max_kg": 5103.0,
+      "arm": 459.1,
+      "from": 411.1,
+      "to": 507.1,
+      "index_per_kg": -0.003196
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PMC",
+      "pos": "12P",
+      "max_kg": 5103.0,
+      "arm": 557.2,
+      "from": 509.2,
+      "to": 605.2,
+      "index_per_kg": -0.002803
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PMC",
+      "pos": "13P",
+      "max_kg": 5103.0,
+      "arm": 654.9,
+      "from": 606.9,
+      "to": 702.9,
+      "index_per_kg": -0.002412
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PMC",
+      "pos": "21P",
+      "max_kg": 5103.0,
+      "arm": 752.5,
+      "from": 704.5,
+      "to": 800.5,
+      "index_per_kg": -0.002022
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PMC",
+      "pos": "22P",
+      "max_kg": 5103.0,
+      "arm": 850.2,
+      "from": 802.2,
+      "to": 898.2,
+      "index_per_kg": -0.001631
+     },
+     {
+      "hold": "LOWER DECK - FWD",
+      "config": "PMC",
+      "pos": "23P",
+      "max_kg": 5103.0,
+      "arm": 947.9,
+      "from": 899.9,
+      "to": 995.9,
+      "index_per_kg": -0.00124
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "AKE",
+      "pos": "31L/R",
+      "max_kg": 1587.0,
+      "arm": 1472.4,
+      "from": 1442.2,
+      "to": 1502.6,
+      "index_per_kg": 0.000858
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "AKE",
+      "pos": "32L/R",
+      "max_kg": 1587.0,
+      "arm": 1533.2,
+      "from": 1503.0,
+      "to": 1563.4,
+      "index_per_kg": 0.001101
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "AKE",
+      "pos": "33L/R",
+      "max_kg": 1587.0,
+      "arm": 1593.8,
+      "from": 1563.6,
+      "to": 1624.0,
+      "index_per_kg": 0.001343
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "AKE",
+      "pos": "41L/R",
+      "max_kg": 1587.0,
+      "arm": 1654.1,
+      "from": 1623.9,
+      "to": 1684.3,
+      "index_per_kg": 0.001584
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "AKE",
+      "pos": "42L/R",
+      "max_kg": 1587.0,
+      "arm": 1716.6,
+      "from": 1686.4,
+      "to": 1746.8,
+      "index_per_kg": 0.001834
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "AKE",
+      "pos": "43L/R",
+      "max_kg": 1587.0,
+      "arm": 1788.9,
+      "from": 1758.7,
+      "to": 1819.1,
+      "index_per_kg": 0.002124
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "AKE",
+      "pos": "44L/R",
+      "max_kg": 1587.0,
+      "arm": 1849.6,
+      "from": 1819.4,
+      "to": 1879.8,
+      "index_per_kg": 0.002366
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PLA",
+      "pos": "31",
+      "max_kg": 3174.0,
+      "arm": 1472.4,
+      "from": 1442.2,
+      "to": 1502.6,
+      "index_per_kg": 0.000858
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PLA",
+      "pos": "32",
+      "max_kg": 3174.0,
+      "arm": 1533.2,
+      "from": 1503.0,
+      "to": 1563.4,
+      "index_per_kg": 0.001101
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PLA",
+      "pos": "33",
+      "max_kg": 3174.0,
+      "arm": 1593.8,
+      "from": 1563.6,
+      "to": 1624.0,
+      "index_per_kg": 0.001343
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PLA",
+      "pos": "41",
+      "max_kg": 3174.0,
+      "arm": 1654.1,
+      "from": 1623.9,
+      "to": 1684.3,
+      "index_per_kg": 0.001584
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PLA",
+      "pos": "42",
+      "max_kg": 3174.0,
+      "arm": 1716.6,
+      "from": 1686.4,
+      "to": 1746.8,
+      "index_per_kg": 0.001834
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PLA",
+      "pos": "43",
+      "max_kg": 3174.0,
+      "arm": 1788.9,
+      "from": 1758.7,
+      "to": 1819.1,
+      "index_per_kg": 0.002124
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PLA",
+      "pos": "44",
+      "max_kg": 3174.0,
+      "arm": 1849.6,
+      "from": 1819.4,
+      "to": 1879.8,
+      "index_per_kg": 0.002366
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PAG",
+      "pos": "31P",
+      "max_kg": 4626.0,
+      "arm": 1486.2,
+      "from": 1442.2,
+      "to": 1530.2,
+      "index_per_kg": 0.000913
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PAG",
+      "pos": "32P",
+      "max_kg": 4626.0,
+      "arm": 1575.9,
+      "from": 1531.9,
+      "to": 1619.9,
+      "index_per_kg": 0.001272
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PAG",
+      "pos": "41P",
+      "max_kg": 4626.0,
+      "arm": 1730.2,
+      "from": 1686.2,
+      "to": 1774.2,
+      "index_per_kg": 0.001889
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PAG",
+      "pos": "42P",
+      "max_kg": 4626.0,
+      "arm": 1835.9,
+      "from": 1791.9,
+      "to": 1879.9,
+      "index_per_kg": 0.002312
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PMC",
+      "pos": "31P",
+      "max_kg": 5103.0,
+      "arm": 1490.2,
+      "from": 1442.2,
+      "to": 1538.2,
+      "index_per_kg": 0.000929
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PMC",
+      "pos": "32P",
+      "max_kg": 5103.0,
+      "arm": 1587.9,
+      "from": 1539.9,
+      "to": 1635.9,
+      "index_per_kg": 0.00132
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PMC",
+      "pos": "41P",
+      "max_kg": 5103.0,
+      "arm": 1734.2,
+      "from": 1686.2,
+      "to": 1782.2,
+      "index_per_kg": 0.001905
+     },
+     {
+      "hold": "LOWER DECK - AFT",
+      "config": "PMC",
+      "pos": "42P",
+      "max_kg": 5103.0,
+      "arm": 1831.9,
+      "from": 1783.9,
+      "to": 1879.9,
+      "index_per_kg": 0.002296
+     }
+    ],
+    "source": {
+     "sheet": "D 3",
+     "pages": [
+      30,
+      31,
+      32
      ],
      "where": "page"
     }

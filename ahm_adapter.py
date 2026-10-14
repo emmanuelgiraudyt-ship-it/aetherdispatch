@@ -122,6 +122,53 @@ def _comps(t, ix, f, status, srcfn):
     return out
 
 
+_MAIN_CFG = re.compile(r"^(SINGLE ROW (PAG|PMC)|M SIZE (SBS|SINGLE))$")
+_LOW_CFG = re.compile(r"^(AKE|PAG|PMC)$")
+
+
+def _uld_rows(up, comps, f):
+    """Positions ULD (feuille D3, § 3.1) au format du plan de chargement par position. Configurations retenues : pont principal
+    en palettes une rangée (PAG, PMC) ou M SIZE côte à côte ; soute inférieure en AKE, PAG, PMC. Les autres variantes
+    (centrales, latérales, A SIZE, longues) ne sont pas reprises. Les positions qui se recouvrent sont exclusives dans le calcul."""
+    uc = [c for c in comps if "(ULD" in c["name"]]
+    if not (up and up.get("positions") and uc):
+        return None
+    rows = []
+
+    def comp_of(hold, arm_m):
+        main = hold.upper().startswith("MAIN")
+        cand = [c for c in uc if (("pont principal" in c["name"]) == main)]
+        return min(cand, key=lambda c: abs(c["arm_m"] - arm_m))["name"] if cand else None
+
+    for p in up["positions"]:
+        main = p["hold"].upper().startswith("MAIN")
+        if not (_MAIN_CFG.match(p["config"]) if main else _LOW_CFG.match(p["config"])):
+            continue
+        typ = re.sub(r"^SINGLE ROW ", "", p["config"])
+        typ = re.sub(r" (SBS|SINGLE)$", "", typ)
+        pos = p["pos"]
+        arm_m = round(p["arm"] * f, 4)
+        comp = comp_of(p["hold"], arm_m)
+        if comp is None:
+            continue
+        if "/" in pos:
+            a, b = pos.split("/")
+            names = [(a, "L"), (a[:-1] + b, b)] if len(b) == 1 else [(a, "L"), (b, "R")]
+            kind = "C"
+        else:
+            names = [(pos, None)]
+            kind = "P"
+        for nm, side in names:
+            rows.append({"id": f"{nm}\u00b7{typ}", "label": f"{nm} \u00b7 {typ}", "hold": p["hold"], "pos": nm, "bay": nm[:-1] if side else nm,
+                         "kind": kind, "sides": [side] if side else ["L", "R"], "max_kg": p["max_kg"], "arm_m": arm_m,
+                         "from_m": round(p["from"] * f, 4), "to_m": round(p["to"] * f, 4), "types": [typ], "comp": comp})
+    if not rows:
+        return None
+    order = {h: i for i, h in enumerate(dict.fromkeys(r["hold"] for r in rows))}
+    rows.sort(key=lambda r: (order[r["hold"]], r["from_m"], r["id"]))
+    return {"rows": rows, "specs": [], "comps": sorted({r["comp"] for r in rows})}
+
+
 def to_app_record(t, mode="demo", info=None):
     """t : type (catalogue v2 ou résultat de ahm_text.build_entry). info : dict d'identité (label, organisme, edition, date,
     fichier, watermark). Renvoie (ac, rapport) ou (None, rapport)."""
@@ -231,10 +278,17 @@ def to_app_record(t, mode="demo", info=None):
           "max_seats": max(c["sieges"] for c in cfgs), "cg_limits_by_state": True}
     if "law" in env:
         ac["cg_envelope_law"] = env["law"]
+    if ac["max_seats"] == 0:                       # avion tout cargo : plan de chargement par position de ULD
+        U_ = _uld_rows(t.get("uld_positions"), ac["cargo_comps"], f)
+        if U_:
+            ac["uld"], ac["loading_mode"] = U_, "uld"
+            rap.append(("info", f"Positions ULD lues dans l'AHM (feuille D3) : {len(U_['rows'])} positions. Les masses maximales sont celles "
+                                "du fichier pour une position ; les limites cumulées (feuille 7.3) ne sont pas contrôlées."))
     if not ac["cargo_comps"]:
         rap.append(("attention", "Aucune soute en vrac exploitable : à saisir dans « Données aéronef »."))
     rap.append(("info", "Masse à vide injectée = masse de base de la feuille E5 + équipage (2 PNT et un PNC par tranche de 50 sièges, minimum réglementaire) ; offices, eau et pantry ne sont pas inclus : à ajuster."))
-    rap.append(("info", "Positions ULD non importées par ce lecteur : chargement en vrac par soute."))
+    if not ac.get("uld"):
+        rap.append(("info", "Positions ULD non importées pour ce type : chargement en vrac par soute."))
     it = t.get("ideal_trim")
     if it and it.get("ideal_trim_line"):
         ac["ideal_trim"] = {"reference": it.get("ideal_trim_reference_remark") or "TOW",

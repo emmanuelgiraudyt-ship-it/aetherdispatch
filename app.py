@@ -1,5 +1,5 @@
 # =============================================================================
-# AETHERDISPATCH v6.3 — Agent IA Handling Aérien
+# AETHERDISPATCH v6.5 — Agent IA Handling Aérien
 # Développé par EG Conseil & Lobbying | Mars 2026
 # Modules : Masse & Centrage | Performances | V-Speeds | METAR Live
 #           Carburant | Optimisation PuLP | Référentiel compagnie | Export PDF | PWA
@@ -388,7 +388,7 @@ def login_page(users: dict):
         st.markdown("""
         <div style="text-align:center;font-size:0.72rem;color:#556688;letter-spacing:1px">
         ACCÈS RESTREINT — Équipe Handling & Dispatch autorisée uniquement<br>
-        AETHERDISPATCH v6.3 | EG Conseil & Lobbying © 2026
+        AETHERDISPATCH v6.5 | EG Conseil & Lobbying © 2026
         </div>
         """, unsafe_allow_html=True)
 
@@ -1234,7 +1234,7 @@ def generate_pdf(fs: dict, include_speeds: bool = False) -> bytes:
     pdf.cell(190, 3.8, f"Référentiel : {fs.get('referentiel_text', '-')}", align='C', new_x="LMARGIN", new_y="NEXT")
     pdf.set_font("Helvetica", "I", 7)
     pdf.set_text_color(130, 130, 130)
-    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v6.3. Vérification obligatoire par le commandant de bord.",
+    pdf.cell(190, 3.8, "Document généré par AETHERDISPATCH v6.5. Vérification obligatoire par le commandant de bord.",
              align='C')
     return bytes(pdf.output())
 
@@ -2238,7 +2238,11 @@ def generate_loading_plan_pdf(d: dict) -> bytes:
                  ("Pièces", pc if pc is not None else "-", "", "", ""),
                  ("Masse (kg)", n(loads.get("Bagages", 0)) if loads.get("Bagages") else "NIL", n(loads.get("Fret", 0)) if loads.get("Fret") else "NIL",
                   n(loads.get("Courrier", 0)) if loads.get("Courrier") else "NIL", n(tot_l) if tot_l else "NIL")]
-    grid(rows_, [58, 33, 33, 33, 33], header=True, bold_cols=(0,), bold_rows=(len(rows_) - 1,), aligns=["L", "C", "C", "C", "C"], gap=1.0)
+    if fs.get("freighter"):                       # avion cargo : pas de bagages
+        rows_ = [tuple(v for i_, v in enumerate(r_) if i_ != 1) for r_ in rows_]
+        grid(rows_, [74, 42, 42, 42], header=True, bold_cols=(0,), bold_rows=(len(rows_) - 1,), aligns=["L", "C", "C", "C"], gap=1.0)
+    else:
+        grid(rows_, [58, 33, 33, 33, 33], header=True, bold_cols=(0,), bold_rows=(len(rows_) - 1,), aligns=["L", "C", "C", "C", "C"], gap=1.0)
 
     plan = d.get("plan") or []
     if not plan:
@@ -2294,6 +2298,11 @@ def generate_loading_plan_pdf(d: dict) -> bytes:
                 pdf.set_font("Helvetica", "", 5.8)
                 pdf.set_xy(xx, yy + hh / 2)
                 pdf.cell(ww, 3.0, f"{n(x_['gross'])}", align="C")
+            if not any(loaded.get(r["label"]) for r in hr):
+                pdf.set_font("Helvetica", "B", 12)
+                pdf.set_text_color(*GREY)
+                pdf.set_xy(x0, yL + h - 3)
+                pdf.cell(wdt, 6, "NIL", align="C")
             pdf.set_draw_color(0, 0, 0)
             pdf.set_y(yR + h + 3)
         pdf.set_x(10)
@@ -2308,7 +2317,7 @@ def generate_loading_plan_pdf(d: dict) -> bytes:
             lx += 30
         pdf.set_xy(lx + 6, pdf.get_y())
         pdf.set_text_color(*GREY)
-        pdf.cell(110, 4.2, "Valeur affichée : masse brute (contenu + tare), en kg. Position vide : contour gris.")
+        pdf.cell(110, 4.2, "Valeur affichée : masse brute en kg. Position vide : contour gris. Soute vide : NIL.")
         pdf.ln(7)
     elif plan and mode == "bulk":
         section("SCHÉMA DES SOUTES (avant à gauche, arrière à droite ; n° = ordre de chargement, de l'avant vers l'arrière)")
@@ -2365,18 +2374,26 @@ def generate_loading_plan_pdf(d: dict) -> bytes:
 
     # ── Détail ───────────────────────────────────────────────────────────
     if plan and mode == "uld":
-        section("DÉTAIL PAR POSITION (masse brute = contenu + tare)")
-        rows_ = [("Soute", "Position", "ULD", "Nature", "Contenu", "Tare", "Brut", "Maxi", "Bras (m)")]
+        section("DÉTAIL PAR POSITION (de l'avant vers l'arrière)")
+        rows_ = [("Ordre", "Pont / soute", "Position", "ULD", "Nature", "Masse brute (kg)")]
         colors = {}
-        for i, x in enumerate(plan, start=1):
-            rows_.append((x["comp"], x["pos"], x["uld"], x["nature"], n(x["content"]), n(x["tare"]), n(x["gross"]), n(x["max"]),
-                          f"{x['arm']:.2f}"))
-            if x["gross"] > x["max"] + 1e-9:
-                colors[(i, 6)] = RED
-        rows_.append(("TOTAL", f"{len(plan)} pos.", "", "", n(sum(x["content"] for x in plan)), n(sum(x["tare"] for x in plan)),
-                      n(sum(x["gross"] for x in plan)), "", ""))
-        grid(rows_, [42, 30, 14, 20, 18, 14, 18, 18, 16], header=True, bold_rows=(len(rows_) - 1,),
-             aligns=["L", "L", "C", "L", "R", "R", "R", "R", "R"], colors=colors, gap=1.2, fsz=7.6)
+        seq_n = 0
+        hold_order = list(dict.fromkeys(r["hold"] for r in (d.get("rows") or [])))
+        for hold in hold_order:
+            hp = sorted([x for x in plan if x.get("hold") == hold], key=lambda x: x["arm"])
+            if not hp:
+                rows_.append(("-", hold, "NIL", "NIL", "NIL", "NIL"))
+                continue
+            for x in hp:
+                seq_n += 1
+                rows_.append((seq_n, hold, x["pos"], x["uld"], x["nature"], n(x["gross"])))
+                if x["gross"] > x["max"] + 1e-9:
+                    colors[(len(rows_) - 1, 5)] = RED
+        rows_.append(("", "TOTAL", f"{len(plan)} pos.", "", "", n(sum(x["gross"] for x in plan))))
+        grid(rows_, [16, 62, 40, 18, 24, 30], header=True, bold_rows=(len(rows_) - 1,), bold_cols=(1,),
+             aligns=["C", "L", "L", "C", "L", "R"], colors=colors, gap=1.2, fsz=8)
+        note("Exécution : charger de l'avant vers l'arrière ; décharger l'arrière en premier (stabilité de l'avion au sol).", 7.2, TEXT, "")
+        pdf.ln(1)
     elif plan and mode == "bulk":
         section("DÉTAIL PAR SOUTE")
         rows_ = [("Ordre", "Soute", "Bagages (pièces)", "Bagages (kg)", "Fret (kg)", "Courrier (kg)", "Total (kg)", "Maxi (kg)")]
@@ -2468,8 +2485,10 @@ def render_loading_proposal(ac: dict, wk: str, ctx: dict):
     mode = ctx["mode"]
     fs = ctx["fs"]
     st.markdown("### 🧮 Proposition préliminaire de répartition et plan de chargement")
-    if fs.get("bags_missing"):
-        st.error("Plan de chargement indisponible : les bagages ne sont pas renseignés (voir « Bagages en soute »).")
+    if fs.get("prop_blocked"):
+        st.error("Plan de chargement indisponible : "
+                 + ("la charge payante n'est pas renseignée (fret, courrier), ou confirmez un vol sans charge payante."
+                    if fs.get("freighter") else "les bagages ne sont pas renseignés (voir « Bagages en soute »)."))
         return
     if ULDP is None or not ULDP.available():
         st.info("La répartition automatique n'est pas disponible : le module uldplan.py est absent du dépôt, ou la "
@@ -2856,11 +2875,22 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
                    + (f" Des valeurs saisies ({kept_total:,} kg) sont conservées, mais ne sont pas comptées tant que la case "
                       "est décochée." if kept_total else ""))
 
-    st.markdown("**🧳 Bagages en soute**")
-    bag_mode = st.radio("Mode de détermination", ["Masse forfaitaire", "Pesée réelle"], horizontal=True,
-                        key=f"bag_mode_{wk}")
+    is_freighter = is_freighter_ac(ac)
+    empty_ok = False
+    if is_freighter:
+        st.markdown("**📦 Charge payante (avion cargo)**")
+        st.caption("Avion tout cargo : pas de passagers ni de bagages. La charge payante est le fret et le courrier, saisis "
+                   "ci-dessus et dans le plan de chargement par position.")
+        empty_ok = st.checkbox("Vol sans charge payante (convoyage, positionnement) : confirmation obligatoire pour éditer "
+                               "la loadsheet", key=f"empty_ok_{wk}")
+    bag_mode = "Masse forfaitaire" if is_freighter else st.radio("Mode de détermination", ["Masse forfaitaire", "Pesée réelle"],
+                                                               horizontal=True, key=f"bag_mode_{wk}")
+    if not is_freighter:
+        st.markdown("**🧳 Bagages en soute**")
     bag_pieces, bag_std, bag_ft_label, bag_src = 0, None, "", ""
-    if bag_mode == "Masse forfaitaire":
+    if is_freighter:
+        bag_total = 0
+    elif bag_mode == "Masse forfaitaire":
         b1, b2, b3 = st.columns(3)
         bag_pieces = int(b1.number_input("Nombre de bagages", 0, 3000, 0, key=f"bag_n_{wk}"))
         ft_labels = [lab for _, lab in BAG_FLIGHT_TYPES]
@@ -2874,7 +2904,7 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
         bag_total = int(st.number_input("Masse réelle des bagages (kg)", 0, 100000, 0, key=f"bag_kg_{wk}"))
 
     bag_none_ok = False
-    if bag_total <= 0:
+    if bag_total <= 0 and not is_freighter:
         bag_none_ok = st.checkbox("Aucun bagage en soute sur ce vol (confirmation obligatoire pour éditer la loadsheet)",
                                   key=f"bag_none_{wk}")
         if not bag_none_ok:
@@ -3265,7 +3295,11 @@ def render_flight_tab(ac: dict, selected_ac: str, airports: dict, blocked: bool,
         "status_ok": all([zfw_ok, tow_ok, lw_ok, cg_ok, stock_ok, zones_ok, lmc_ok]),
         "origin_text": origin_txt, "referentiel_text": referentiel_label(ref),
         "data_certified": bool(aircraft_certified and ref_acceptable(ref)),
-        "bags_missing": bool(bag_total <= 0 and not bag_none_ok and sum(bag_w.values()) <= 0),
+        "freighter": is_freighter,
+        "bags_missing": (bool(sum(comp_loads.values()) <= 0 and not empty_ok) if is_freighter
+                         else bool(bag_total <= 0 and not bag_none_ok and sum(bag_w.values()) <= 0)),
+        "prop_blocked": (bool(sum(comp_loads.values()) + uld_cargo_kg + uld_mail_kg <= 0 and not empty_ok) if is_freighter
+                         else bool(bag_total <= 0 and not bag_none_ok and sum(bag_w.values()) <= 0)),
     }
     st.session_state.flight_summary = fs
     st.session_state.mc_result = result
@@ -3354,8 +3388,13 @@ def render_pdf_tab(blocked: bool, missing: list):
                    "indiquées comme telles sur le document.")
     st.markdown('<div class="aether-divider"></div>', unsafe_allow_html=True)
     if fs.get("bags_missing"):
-        st.error("Édition impossible : les bagages ne sont pas renseignés. Retournez dans l'onglet « Nouveau vol », rubrique "
-                 "« Bagages en soute », saisissez le nombre de bagages ou confirmez qu'il n'y en a aucun.")
+        if fs.get("freighter"):
+            st.error("Édition impossible : aucune charge payante n'est enregistrée. Retournez dans l'onglet « Nouveau vol », "
+                     "saisissez le fret et le courrier, appliquez le plan de chargement par position, ou confirmez un vol "
+                     "sans charge payante.")
+        else:
+            st.error("Édition impossible : les bagages ne sont pas renseignés. Retournez dans l'onglet « Nouveau vol », rubrique "
+                     "« Bagages en soute », saisissez le nombre de bagages ou confirmez qu'il n'y en a aucun.")
     if st.button("📄 GÉNÉRER LA LOAD & TRIM SHEET PDF", use_container_width=True, disabled=bool(fs.get("bags_missing"))):
         data = dict(fs)
         data["vspeeds"] = st.session_state.get("vspeeds", {})
@@ -3905,6 +3944,13 @@ def load_demo_types(db: dict) -> dict:
         except Exception:
             continue
     return out
+
+
+def is_freighter_ac(ac: dict) -> bool:
+    """Avion tout cargo : catégorie du catalogue, ou configuration « CARGO » choisie, ou aucun siège."""
+    cfg = str(((ac or {}).get("ahm_selection") or {}).get("config") or "").upper()
+    return ((ac or {}).get("category") == "freighter" or cfg.startswith("CARGO")
+            or (ac or {}).get("max_seats") == 0)
 
 
 def is_demo(ac: dict) -> bool:
@@ -4539,7 +4585,7 @@ def main():
              border-radius:10px;border:1px solid rgba(0,191,255,0.2);margin-bottom:1rem">
             <div style="font-size:2.5rem">✈</div>
             <div style="font-weight:900;font-size:1.1rem;color:#00BFFF;letter-spacing:3px">AETHERDISPATCH</div>
-            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v6.3 | EG CONSEIL</div>
+            <div style="font-size:0.65rem;color:#556688;letter-spacing:1.5px;margin-top:2px">v6.5 | EG CONSEIL</div>
         </div>
         """, unsafe_allow_html=True)
 
@@ -4934,9 +4980,11 @@ def main():
     # =========================================================================
     with tab5:
         st.subheader("🧠 Optimisation cargo par programmation linéaire (PuLP)")
+        st.caption("Sélection des offres de fret qui maximisent le revenu dans la limite de la masse sans carburant (MZFW). "
+                   "Seules les données de masse et de centrage sont nécessaires : les vitesses et la consommation ne sont pas utilisées.")
 
-        if blocked:
-            blocked_message(missing)
+        if blocked_mc:
+            blocked_message(missing_mc)
         elif not PULP_OK:
             st.warning("⚠ PuLP non installé. Ajoutez `PuLP` à requirements.txt.")
         else:
@@ -5117,7 +5165,7 @@ def main():
     # ── Footer ─────────────────────────────────────────────────────────────────
     st.markdown("""
     <div class="aether-footer">
-        AETHERDISPATCH v6.3 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
+        AETHERDISPATCH v6.5 — EG Conseil & Lobbying © 2026 — Système de gestion handling aérien augmenté par IA<br>
         Données à usage opérationnel restreint — Vérification obligatoire par le commandant de bord
     </div>
     """, unsafe_allow_html=True)

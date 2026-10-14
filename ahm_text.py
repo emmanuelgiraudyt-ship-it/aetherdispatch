@@ -327,6 +327,17 @@ def x_cg(sheets, group):
         if m and cur is not None and cur['envelope_type'] is None and 'Certified' in l:
             cur['envelope_type'] = 'curtailed' if m.group(1) else 'certified'; continue
         m = re.match(r'\s*' + EV + r'(\*{0,2})\s+(' + NUM + r')\s+(' + NUM + r')\s+(' + NUM + r')(.*)$', l)
+        if m and not m.group(6).strip() and cur is not None:
+            # ligne seule (le texte est compacté) : colonne de droite si le poids repart en arrière de la fin de la colonne de gauche
+            kk = m.group(1).replace(' ', '')
+            fw_, af_ = cur['envelopes'][kk]['fwd'], cur['envelopes'][kk]['aft']
+            w_ = fnum(m.group(3))
+            ss = cur.setdefault('_ss', {})
+            if fw_ and af_ and ((ss.get(kk) == 'aft' and w_ >= af_[-1]['weight_kg'])
+                                or (ss.get(kk) is None and w_ < fw_[-1]['weight_kg'] and w_ >= af_[-1]['weight_kg'])):
+                af_.append(pt(m.group(3), m.group(4), m.group(5), m.group(2)))
+                ss[kk] = 'aft'
+                continue
         if m:
             if cur is None:
                 cur = new_table()
@@ -340,6 +351,8 @@ def x_cg(sheets, group):
         m = re.match(r'\s{12,}' + EV + r'(\*{0,2})\s+(' + NUM + r')\s+(' + NUM + r')\s+(' + NUM + r')\s*$', l)
         if m and cur is not None:
             cur['envelopes'][m.group(1).replace(' ', '')]['aft'].append(pt(m.group(3), m.group(4), m.group(5), m.group(2)))
+    for t_ in tables:
+        t_.pop('_ss', None)
     if not tables:
         return None
     if len(tables) == 1 and tables[0]['envelope_type'] is None:
@@ -667,6 +680,31 @@ def groups_of(sheets):
     return out
 
 
+def x_uld_positions(sheets, group):
+    """Feuille D3 « ULD Configurations » (§ 3.1) : positions de ULD par pont, avec masse maximale et bras (unités du fichier)."""
+    shs = pick(sheets, 'ULD Configurations', group, must='ULD Positions')
+    if not shs:
+        return None
+    sh = shs[0]
+    rx = re.compile(r'^\s*(?P<cfg>[A-Z][A-Z ]*?[A-Z])\s+(?P<pos>[A-Z0-9]{1,4}(?:/[A-Z0-9]{1,3})?)\s+(?P<max>\d+(?:\.\d+)?)\s+'
+                    r'(?P<lat>\S+)\s+(?P<frm>\S+)\s+(?P<to>\S+)\s+(?P<arm>\d+(?:\.\d+)?)\s+(?P<fwd>\d+(?:\.\d+)?)\s+'
+                    r'(?P<aft>\d+(?:\.\d+)?)\s+(?P<idx>[-+]?\d*\.\d+)(?:\s+\S+)?\s*$')
+    out, hold = [], None
+    for l in sh['txt'].split('\n'):
+        m = re.match(r'\s*Hold Name:\s*(.+?)\s*$', l)
+        if m:
+            hold = re.sub(r'\s+', ' ', m.group(1)); continue
+        if hold is None:
+            continue
+        m = rx.match(l)
+        if not m:
+            continue
+        out.append({'hold': hold, 'config': re.sub(r'\s+', ' ', m.group('cfg')), 'pos': m.group('pos'),
+                    'max_kg': float(m.group('max')), 'arm': float(m.group('arm')),
+                    'from': float(m.group('fwd')), 'to': float(m.group('aft')), 'index_per_kg': float(m.group('idx'))})
+    return {'registrations_group': sh['regs'], 'positions': out, 'source': src(sh)} if out else None
+
+
 def build_entry(sheets, group_label):
     """Construit le type pour un groupe. Renvoie (entrée, rapport) ; entrée None si l'import est impossible.
     rapport : liste de (niveau, message) avec niveau « erreur », « attention » ou « info »."""
@@ -814,6 +852,7 @@ def build_entry(sheets, group_label):
         'crew': {'pnt': pnt, 'pnc': pnc, 'kg_pnt': cw.get('flight_deck', 85), 'kg_pnc': cw.get('cabin', 75), 'source': (CREW or {}).get('source')},
         'standards': STD, 'group': group_label,
         'ideal_trim': x_ideal(sheets, g),
+        'uld_positions': x_uld_positions(sheets, g),
     }
     if not entry['ideal_trim']:
         inf("Ligne de centrage idéale (feuille C7) introuvable : la répartition des bagages visera le milieu de l'enveloppe.")
