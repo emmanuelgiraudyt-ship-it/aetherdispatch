@@ -1,4 +1,4 @@
-# AETHERDISPATCH v6.2
+# AETHERDISPATCH v7.0
 
 Prototype d'aide à la préparation de la loadsheet et au suivi trafic pour le handling aérien : masse et centrage, carburant, météo, export PDF.
 

@@ -1053,9 +1053,10 @@ def parse_uld(doc: Doc):
             "compat_fw": compat_fw, "specs": specs}
 
 
-def parse_all(data: bytes = None, path: str = None, filename: str = ""):
-    """Lit un AHM 565 et renvoie toutes les données trouvées (valeurs d'origine du fichier, unités du fichier)."""
-    doc = Doc(data=data, path=path)
+def parse_all(data: bytes = None, path: str = None, filename: str = "", doc=None):
+    """Lit un AHM 565 et renvoie toutes les données trouvées (valeurs d'origine du fichier, unités du fichier).
+    `doc` : document déjà ouvert (PDF ou Excel, voir ahm_excel.py) ; sinon le PDF est ouvert ici."""
+    doc = doc if doc is not None else Doc(data=data, path=path)
     P = {"fichier": filename, "pages": doc.n}
     P["couverture"] = parse_cover(doc)
     P["identification"] = parse_ident(doc)

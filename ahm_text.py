@@ -220,6 +220,7 @@ def x_ideal(sheets, group):
         return None
     sh = shs[0]
     line, sec, tabs, cur = [], None, [], None
+    wev, wcur = [], None
     ref_kind = 'TOW'
     num = r'[+-]?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?'
     for l in sh['txt'].split('\n'):
@@ -239,6 +240,12 @@ def x_ideal(sheets, group):
             m = re.match(r'Condition:\s*(.*)$', t)
             if m and cur is not None:
                 cur['condition'] = m.group(1).strip()
+                mw = re.search(r'(\d+(?:\.\d+)?)\s*knots?', cur['condition'], re.I)
+                if mw:
+                    cur['wind_kt'] = float(mw.group(1))
+                continue
+            if cur is not None and re.search(r'Wind\s*Speed', t, re.I) and re.search(r'Weight', t):
+                cur['by_wind'] = True
                 continue
         toks = t.split()
         if toks and all(re.fullmatch(num, x) for x in toks):
@@ -246,11 +253,40 @@ def x_ideal(sheets, group):
             if sec == '43' and len(v) in (3, 7) and v[0] >= 1000:
                 line.append({'weight_kg': v[0], 'pct_mac': v[1], 'index': v[2],
                              'fwd_pct_mac': v[3] if len(v) == 7 else None, 'aft_pct_mac': v[5] if len(v) == 7 else None})
+            elif sec == '44' and cur is not None and cur.get('by_wind') and len(v) == 4 and v[1] >= 1000:
+                wev.append(('wind', v[0])); wev.append(('pt', v[1], v[2], v[3])); wcur = cur
+            elif sec == '44' and cur is not None and cur.get('by_wind') and len(v) == 3 and v[0] >= 1000:
+                wev.append(('pt', v[0], v[1], v[2])); wcur = cur
+            elif sec == '44' and cur is not None and cur.get('by_wind') and len(v) == 1 and float(v[0]).is_integer() and 0 <= v[0] < 400:
+                wev.append(('wind', v[0])); wcur = cur
             elif sec == '44' and cur is not None and len(v) == 3 and v[0] >= 1000:
                 if cur['points'] and v[0] < cur['points'][-1]['weight_kg']:      # nouvelle table sans nouvel en-tête
                     cur = {'name': cur['name'], 'condition': '', 'points': []}
                     tabs.append(cur)
                 cur['points'].append({'weight_kg': v[0], 'pct_mac': v[1], 'index': v[2]})
+    if wev and wcur is not None:
+        # tableau par vitesse de vent : une courbe par bloc de points. Excel : la vitesse précède le bloc ; PDF : elle figure dans
+        # le bloc (ligne seule ou accolée au 2e point), le bloc commençant au point de masse maximale.
+        w0 = next((e[1] for e in wev if e[0] == 'pt'), None)
+        wind_first = wev[0][0] == 'wind'
+        blocks, cb = [], None
+        for e in wev:
+            if e[0] == 'wind':
+                if wind_first:
+                    cb = {'wind': e[1], 'pts': []}
+                    blocks.append(cb)
+                elif cb is not None:
+                    cb['wind'] = e[1]
+            else:
+                if not wind_first and (cb is None or e[1] == w0):
+                    cb = {'wind': None, 'pts': []}
+                    blocks.append(cb)
+                if cb is not None:
+                    cb['pts'].append({'weight_kg': e[1], 'pct_mac': e[2], 'index': e[3]})
+        base = {k: x for k, x in wcur.items() if k not in ('points', 'wind_kmh', 'wind_kt')}
+        for bl in blocks:
+            if bl['wind'] is not None and bl['pts']:
+                tabs.append(dict(base, points=bl['pts'], wind_kmh=bl['wind'], wind_kt=round(bl['wind'] / 1.852, 1)))
     if not line:
         return None
     return {'registrations_group': sh['regs'], 'ideal_trim_line': line, 'ideal_trim_reference_remark': ref_kind,
@@ -370,7 +406,7 @@ def x_weights(sheets, group):
     sh = shs[0]
     rows = []
     for l in sh['txt'].split('\n'):
-        m = re.match(r'\s*(?:0\s+|-1\s+|-\s+)?(?:(WEIGHT VARIANT \d+)\s+)?([A-Z0-9]{1,2}-?\w+)\s+(\d{5,6})\s+(\d{5,6})\s+(\d{5,6})(?:\s+(\d{5,6}))?', l)
+        m = re.match(r'\s*(?:0\s+|-1\s+|-\s+)?(?:(WEIGHT VARIANT \d+)\s+)?([A-Z0-9]{1,2}-?\w+)\s+(\d{5,6})(?:\s*kg)?\s+(\d{5,6})(?:\s*kg)?\s+(\d{5,6})(?:\s*kg)?(?:\s+(\d{5,6}))?', l)
         if m:
             rows.append({'variant': m.group(1), 'reg': m.group(2), 'mzfw': int(m.group(3)), 'mlw': int(m.group(4)),
                          'mtow': int(m.group(5)), 'mtaxi': int(m.group(6)) if m.group(6) else None})
@@ -402,13 +438,13 @@ def x_holds(sheets, group):
         m = re.match(r'\s*Deck Name:\s*(\w+)', l)
         if m:
             deck = m.group(1); continue
-        m = re.match(r'\s*(HOLD(?:\s+[A-Z]+)?|(?:CPT|BAY)(?:\s+\d{1,3}(?=\s))?|(?:MAIN|LOWER)\s+[A-Z]+|(?:FWD|AFT)(?:\s+\d+&\d+|\s+\d{1,2}(?=\s))?)\s+((?:-|[-+]?\d+(?:\.\d+)?)(?:\s+(?:-|[-+]?\d+(?:\.\d+)?))*)\s*$', l)
+        m = re.match(r'\s*(HOLD(?:\s+[A-Z]+)?|(?:CPT|BAY)(?:\s+\d{1,3}[A-Z]?(?=\s))?|(?:MAIN|LOWER)\s+[A-Z]+|(?:FWD|AFT)(?:\s+\d+&\d+|\s+\d{1,2}(?=\s))?)\s+((?:-|[-+]?\d+(?:\.\d+)?)(?:\s+(?:-|[-+]?\d+(?:\.\d+)?))*)\s*$', l)
         if not m:
             continue
         label = re.sub(r'\s+', ' ', m.group(1).strip())
         toks = m.group(2).split()
         lm = re.match(r'(HOLD|CPT|BAY)\s*$', label)
-        if lm and toks and re.fullmatch(r'\d+', toks[0]):
+        if lm and toks and re.fullmatch(r'\d+[A-Z]?', toks[0]):
             label = label + ' ' + toks[0]; toks = toks[1:]
         n = _nums(toks)
         kind = 'hold' if label.startswith('HOLD') else 'cpt'
@@ -425,6 +461,58 @@ def x_holds(sheets, group):
         else:
             v = {'raw': n}
         out['entries'].append({'mode': mode, 'deck': deck, 'kind': kind, 'label': label, 'values': v})
+    return out
+
+
+def x_structural(sheets, group):
+    """Feuilles « Structural Limitations » : limites combinées (7.3), cumulées (7.2), linéaires (7.1), au sol (7.4), asymétriques (7.5).
+    Seules les limites combinées simples « CPT a  CPT b  max » et les limites cumulées « zone de à max cumulé sens » sont interprétées ;
+    le reste est signalé comme lu mais non appliqué."""
+    out = {'combined': [], 'cumulative': [], 'not_applied': [], 'source': None}
+    shs = [s for s in sheets if s['title'].endswith('Structural Limitations') and
+           ('ALL' in regs_list(s['regs']) or group in regs_list(s['regs']))]
+    for s in shs:
+        sec = None
+        for l in s['txt'].split('\n'):
+            t = l.strip()
+            m = re.match(r'(7\.[1-5])\s', t)
+            if m:
+                sec = m.group(1)
+                continue
+            if not t or re.match(r'(Table Name|Condition|From:|Remarks|\*|Weight|Zone|Name|Left|Deck|Location|Completed|\(Sig|Issue|EDP|SEMI|Sheet|Aircraft|Registrations|AHM|Configuration|Structural)', t):
+                continue
+            if sec == '7.3':
+                m = re.fullmatch(r'((?:(?:CPT|BAY)\s*\d{1,3}[A-Z]?\s+){2,6})(\d{3,6})', t + '')
+                if m:
+                    locs = [re.sub(r'\s+', ' ', x) for x in re.findall(r'(?:CPT|BAY)\s*\d{1,3}[A-Z]?', m.group(1))]
+                    locs = [re.sub(r'^(CPT|BAY)(\d)', r'\1 \2', x) for x in locs]
+                    out['combined'].append({'locations': locs, 'max_kg': float(m.group(2)), 'sheet': s['regs']})
+                    out['source'] = src(s)
+                elif re.search(r'\d', t):
+                    out['not_applied'].append(('7.3', t[:80]))
+            elif sec == '7.2':
+                m = re.fullmatch(r'([A-Z]{1,3})\s+(-?\d+(?:\.\d+)?)\s+(-?\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?|-)\s+(FWD|AFT|CENT|\+|-|0)', t)
+                if m:
+                    out['cumulative'].append({'zone': m.group(1), 'from': float(m.group(2)), 'to': float(m.group(3)),
+                                              'max_kg': float(m.group(4)), 'max_cum_kg': (None if m.group(5) == '-' else float(m.group(5))),
+                                              'dir': m.group(6)})
+                    out['source'] = src(s)
+                elif re.search(r'\d', t) and not t.startswith('7.2'):
+                    out['not_applied'].append(('7.2', t[:80]))
+            elif sec in ('7.1', '7.4', '7.5') and re.search(r'\d', t) and not re.match(r'7\.', t):
+                out['not_applied'].append((sec, t[:80]))
+    # dédoublonnage (la même ligne peut figurer dans plusieurs feuilles du groupe)
+    seen, comb = set(), []
+    for c in out['combined']:
+        k = (tuple(c['locations']), c['max_kg'])
+        if k not in seen:
+            seen.add(k)
+            comb.append(c)
+    out['combined'] = comb
+    cnt = {}
+    for sec, _ in out['not_applied']:
+        cnt[sec] = cnt.get(sec, 0) + 1
+    out['not_applied_count'] = cnt
     return out
 
 
@@ -584,7 +672,7 @@ def x_crew(sheets, group):
     """Équipage de la composition « STANDARD » : PNT (commandant + copilote) et PNC (total des emplacements cabine)."""
     shs = pick(sheets, 'Aircraft Registration Weights', group) + [s for s in find_sheets(sheets, 'Dry Operating Weight', group)]
     for sh in find_sheets(sheets, 'Aircraft Registration Weights', group) + find_sheets(sheets, 'Dry Operating', group):
-        if 'Crew Codes' not in sh['txt']:
+        if not re.search(r'Crew\s+Codes', sh['txt']):
             continue
         lines = sh['txt'].split('\n')
         for i, l in enumerate(lines):
@@ -677,6 +765,19 @@ def groups_of(sheets):
                 b = x_basic([s], 'ALL')
                 if b and b['aircraft']:
                     out.append((s['regs'], len(b['aircraft'])))
+    if len(out) == 1 and out[0][0].strip().upper() == 'ALL':
+        # masses de base publiées pour « ALL », mais d'autres feuilles (soutes, limites de centrage...) citent des immatriculations
+        # précises : on découpe la flotte selon les feuilles auxquelles chaque avion appartient (cellules de même appartenance).
+        b = x_basic(sheets, 'ALL')
+        regs = [a['reg'] for a in (b['aircraft'] if b else [])]
+        if len(regs) > 1:
+            sig = {r: frozenset(i for i, sh in enumerate(sheets) if 'ALL' not in regs_list(sh['regs']) and r in regs_list(sh['regs']))
+                   for r in regs}
+            cells = {}
+            for r in regs:
+                cells.setdefault(sig[r], []).append(r)
+            if len(cells) > 1 and all(k for k in cells):
+                return [(', '.join(v), len(v)) for v in cells.values()]
     return out
 
 
@@ -687,7 +788,7 @@ def x_uld_positions(sheets, group):
         return None
     sh = shs[0]
     rx = re.compile(r'^\s*(?P<cfg>[A-Z][A-Z ]*?[A-Z])\s+(?P<pos>[A-Z0-9]{1,4}(?:\s*[,/]\s*[A-Z0-9]{1,4})?)\s+'
-                    r'(?P<max>\d+(?:\.\d+)?)\s+(?P<rest>[-+0-9.±\s]+?)(?:\s+-)?\s*$')
+                    r'(?P<max>\d+(?:\.\d+)?)\s+(?P<rest>[-+0-9.±eE\s]+?)(?:\s+-)?\s*$')
     out, hold = [], None
     for l in sh['txt'].split('\n'):
         m = re.match(r'\s*Hold Name:\s*(.+?)\s*$', l)
@@ -696,7 +797,7 @@ def x_uld_positions(sheets, group):
         if hold is None:
             continue
         m = rx.match(l)
-        if not m:
+        if not m or m.group('cfg').strip().upper() in ('VERSION', 'POS'):
             continue
         tk = m.group('rest').split()
         try:
@@ -754,6 +855,9 @@ def build_entry(sheets, group_label):
     if not B or not B['aircraft']:
         er("Masses de base par appareil (feuille E5) introuvables : import impossible.")
         return None, rap
+    members = [x.strip() for x in (group_label or '').split(',') if x.strip()]
+    if members and members[0].upper() != 'ALL' and all(any(a['reg'] == m for a in B['aircraft']) for m in members):
+        B['aircraft'] = [a for a in B['aircraft'] if a['reg'] in members]        # sous-groupe de la flotte (feuilles propres à chaque version)
     H, FU, CAB, SAL = x_holds(sheets, g), x_fuel(sheets, g), x_cabin(sheets, g), x_saleable(sheets, g)
     STD, CREW = x_standards(sheets), x_crew(sheets, g)
     ref = W['rows'][0] if W['rows'] else None
@@ -806,7 +910,11 @@ def build_entry(sheets, group_label):
             at("Effet cumulé du carburant non publié : table déduite de la séquence de remplissage (5.3) et des tables par réservoir. À vérifier.")
             tot = sum(tk.get('max_weight_kg') or 0 for tk in FU['tanks'] if abs((tk.get('density') or 0.8) - 0.8) < 0.006)
             if tot and abs(dcum['max_weight_kg'] - tot) > 0.02 * tot:
-                at(f"Table carburant déduite : capacité {dcum['max_weight_kg']:.0f} kg différente de la somme des réservoirs ({tot:.0f} kg).")
+                # séquence lue de façon incomplète : la table déduite est rejetée plutôt que d'être utilisée avec un simple avertissement
+                at(f"Table carburant déduite rejetée : capacité {dcum['max_weight_kg']:.0f} kg différente de la somme des réservoirs "
+                   f"({tot:.0f} kg) ; le bras du carburant reste à renseigner.")
+                cum = {}
+                FU.pop('cumulative', None)
         else:
             at(f"Effet cumulé du carburant introuvable ({why}).")
     if not cum.get('points') or len(cum['points']) < 2:
@@ -862,7 +970,22 @@ def build_entry(sheets, group_label):
         'standards': STD, 'group': group_label,
         'ideal_trim': x_ideal(sheets, g),
         'uld_positions': x_uld_positions(sheets, g),
+        'structural': x_structural(sheets, g),
     }
+    try:
+        import dowbuild as _DB
+        _bd = _DB.build(sheets, group_label or g)
+        entry['dow_build'] = _DB.to_record(_bd)
+        for _m in _bd['issues']:
+            at(_m)
+        if not _bd['pantry'] or not _bd['crew_table']['cockpit']:
+            at("Construction du DOW/DOI impossible à partir de l'AHM (codes pantry ou masses d'équipage introuvables) : "
+               "la masse à vide reste celle de la masse de base et de l'équipage standard.")
+    except Exception as _e:                                  # la construction du DOW est un plus : l'import ne doit pas échouer
+        at(f"Construction du DOW/DOI non disponible ({type(_e).__name__}).")
+    _st = entry['structural']
+    if _st['not_applied_count']:
+        at("Limites structurelles lues mais non appliquées : " + ", ".join(f"§ {k} ({v} ligne(s))" for k, v in sorted(_st['not_applied_count'].items())) + ".")
     if not entry['ideal_trim']:
         inf("Ligne de centrage idéale (feuille C7) introuvable : la répartition des bagages visera le milieu de l'enveloppe.")
     return entry, rap
@@ -891,7 +1014,7 @@ def x_fuel_sequence(sheets, group):
             m = re.match(r'\s*Fuel Density:\s*(' + NUM + ')', l)
             if m:
                 cur['density'] = fnum(m.group(1)); continue
-            m = re.match(r'\s*(?:Step\s+\d+|[A-Z][A-Z0-9&\. ]*?)\s+(\d+)\s+(\d+)\s+Vol\s+(.+?)\s+\d+\s+(?:\d+|#VALUE!)\s+\d\.\d+\s*$', l)
+            m = re.match(r'\s*(?:Step\s+\d+|[A-Z][A-Z0-9&\. ]*?)\s+(\d+(?:\.\d+)?)\s+(\d+(?:\.\d+)?)\s+Vol\s+(.+?)\s+\d+(?:\.\d+)?\s+(?:\d+(?:\.\d+)?|#VALUE!)\s+\d(?:\.\d+)?(?:[eE]-?\d+)?\s*$', l)
             if m:
                 cur['steps'].append({'frm': float(m.group(1)), 'to': float(m.group(2)), 'tank': m.group(3).strip()})
     return [c for c in out if c['steps']]
@@ -906,6 +1029,13 @@ def derive_fuel_cumulative(fuel, seqs):
     d_tab = 0.8 if any(abs(d - 0.8) < 0.006 for d in dens) else (dens[0] if dens else None)
     tanks = {tk['name'].upper(): tk for tk in fuel['tanks']
              if len(tk['points']) >= 2 and (d_tab is None or not tk.get('density') or abs(tk['density'] - d_tab) < 0.006)}
+    cand = [tk for tk in fuel['tanks'] if len(tk['points']) >= 2 and (d_tab is None or not tk.get('density') or abs(tk['density'] - d_tab) < 0.006)]
+    by_name = {}
+    for tk in cand:
+        by_name.setdefault(tk['name'].upper(), []).append(tk)
+    dup = [n for n, v in by_name.items() if len({(round(x.get('max_weight_kg') or 0), len(x['points'])) for x in v}) > 1]
+    if dup:
+        return None, f"plusieurs tables différentes pour le réservoir « {dup[0].title()} » (versions ou densités non départagées)"
     seq = next((s for s in seqs if d_tab and s['density'] and abs(s['density'] - d_tab) < 0.006), seqs[0])
     for st in seq['steps']:
         if st['tank'].upper() not in tanks:

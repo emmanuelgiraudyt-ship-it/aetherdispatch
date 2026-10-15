@@ -108,6 +108,7 @@ def _comps(t, ix, f, status, srcfn):
                 continue
             parents = [o for o in ents if _is_child(e, o)]
             par = min(parents, key=lambda o: (o["values"]["max_kg"], -_rank(o)[0])) if parents else None
+            anc = sorted((o for o in parents if o["values"].get("max_kg")), key=lambda o: (o["values"]["max_kg"], -_rank(o)[0]))
             tag = ""
             if mode == "uld":
                 tag = " (ULD" + (", pont principal" if (e.get("deck") or "").upper() == "MAIN" else "") + ")"
@@ -118,25 +119,72 @@ def _comps(t, ix, f, status, srcfn):
             out.append({"name": name, "arm_m": round(arm, 4), "max_kg": v["max_kg"], "status": status,
                         "source": srcfn(f"feuille {_sheet(t['holds'])}, soutes"),
                         "groupe": (par["label"] + tag) if par else None,
-                        "max_groupe_kg": par["values"]["max_kg"] if par else None, "volume_m3": v.get("volume"), "type": None})
+                        "max_groupe_kg": par["values"]["max_kg"] if par else None, "volume_m3": v.get("volume"), "type": None,
+                        "libelle": e["label"], "mode": mode,
+                        "ancetres": [[o["label"] + tag, o["values"]["max_kg"], o["label"]] for o in anc]})
     return out
 
 
+def _apply_group_chain(comps, structural, rap):
+    """Ajoute à chaque soute la liste complète des groupes qui la contiennent (« groupes ») : tous les parents (par ex. CPT 1A < CPT 1 < HOLD FWD)
+    et les limites combinées du paragraphe 7.3 de l'AHM. Les anciens champs « groupe » / « max_groupe_kg » restent le plus petit parent."""
+    by_lab = {}
+    for c in comps:
+        c["groupes"] = [[a[0], a[1]] for a in c.get("ancetres", [])]
+        by_lab.setdefault(c.get("libelle"), []).append(c)
+    n_added = 0
+    for cb in (structural or {}).get("combined", []):
+        locs = set(cb["locations"])
+        mem = [c for c in comps if c.get("libelle") in locs or any(a[2] in locs for a in c.get("ancetres", []))]
+        if len(mem) < 1:
+            rap.append(("attention", f"Limite combinée « {' + '.join(cb['locations'])} » ({cb['max_kg']:g} kg) : aucune soute retenue ne correspond, non appliquée."))
+            continue
+        names = {c["name"] for c in mem}
+        redundant = False
+        for c in mem:
+            for a in c.get("ancetres", []):
+                if a[1] <= cb["max_kg"] + 1e-6:
+                    memb = {x["name"] for x in comps if x.get("libelle") == a[2] or any(b[2] == a[2] for b in x.get("ancetres", []))}
+                    if memb == names:
+                        redundant = True
+        if redundant:
+            continue
+        gname = "Limite combinée " + " + ".join(cb["locations"])
+        for c in mem:
+            c["groupes"].append([gname, cb["max_kg"]])
+        n_added += 1
+    for c in comps:
+        c.pop("ancetres", None)
+        if not c["groupes"]:
+            c.pop("groupes")
+    if n_added:
+        rap.append(("info", f"{n_added} limite(s) combinée(s) de l'AHM (paragraphe 7.3) appliquée(s) en plus des limites de groupe."))
+
+
 _MAIN_CFG = re.compile(r"^(SINGLE ROW (PAG|PMC)|M SIZE (SBS|SINGLE))$")
-_LOW_CFG = re.compile(r"^(AKE|PAG|PMC)$")
+_LOW_CFG = re.compile(r"^(AKE|AKH|PKC|PAG|PMC)$")
+_CONTAINERS = {"AKE", "AKH", "PKC"}
+_BULK5 = re.compile(r"^(CPT|BAY)\s*5\d?\b")
 
 
-def _uld_rows(up, comps, f):
+def _uld_rows(up, comps, f, alt=False):
     """Positions ULD (feuille D3, § 3.1) au format du plan de chargement par position. Configurations retenues : pont principal
     en palettes une rangée (PAG, PMC) ou M SIZE côte à côte ; soute inférieure en AKE, PAG, PMC. Les autres variantes
     (centrales, latérales, A SIZE, longues) ne sont pas reprises. Les positions qui se recouvrent sont exclusives dans le calcul."""
     uc = [c for c in comps if "(ULD" in c["name"]]
+    if alt:
+        # variante ULD d'un avion chargé en vrac : les positions se rattachent aux soutes existantes (sauf la soute vrac 5x),
+        # à condition que le bras de la position soit proche de celui de la soute
+        uc = [c for c in comps if not _BULK5.match(c["name"])]
     if not (up and up.get("positions") and uc):
         return None
     rows = []
 
     def comp_of(hold, arm_m):
         main = hold.upper().startswith("MAIN")
+        if alt:
+            best = min(uc, key=lambda c: abs(c["arm_m"] - arm_m))
+            return best["name"] if abs(best["arm_m"] - arm_m) <= 1.2 else None
         cand = [c for c in uc if (("pont principal" in c["name"]) == main)]
         return min(cand, key=lambda c: abs(c["arm_m"] - arm_m))["name"] if cand else None
 
@@ -157,7 +205,7 @@ def _uld_rows(up, comps, f):
             kind = "C"
         else:
             names = [(pos, None)]
-            kind = "P"
+            kind = "C" if typ in _CONTAINERS else "P"
         for nm, side in names:
             rows.append({"id": f"{nm}\u00b7{typ}", "label": f"{nm} \u00b7 {typ}", "hold": p["hold"], "pos": nm, "bay": nm[:-1] if side else nm,
                          "kind": kind, "sides": [side] if side else ["L", "R"], "max_kg": p["max_kg"], "arm_m": arm_m,
@@ -280,10 +328,20 @@ def to_app_record(t, mode="demo", info=None):
         ac["cg_envelope_law"] = env["law"]
     if True:                                       # plan de chargement par position de ULD (cargos et gros porteurs)
         U_ = _uld_rows(t.get("uld_positions"), ac["cargo_comps"], f)
+        if not U_:
+            Ua_ = _uld_rows(t.get("uld_positions"), ac["cargo_comps"], f, alt=True)
+            if Ua_:                                     # avion chargé en vrac, avec une variante ULD au choix du vol
+                ac["uld_alt"] = Ua_
+                rap.append(("info", f"Variante ULD lue dans l'AHM (feuille D3) : {len(Ua_['rows'])} positions (AKH, PKC). Le mode de "
+                                    "chargement (vrac ou ULD) se choisit au moment du vol."))
         if U_:
             ac["uld"], ac["loading_mode"] = U_, "uld"
             rap.append(("info", f"Positions ULD lues dans l'AHM (feuille D3) : {len(U_['rows'])} positions. Les masses maximales sont celles "
-                                "du fichier pour une position ; les limites cumulées (feuille 7.3) ne sont pas contrôlées."))
+                                "du fichier pour une position ; les limites par groupe et combinées (feuille 7.3) sont contrôlées au niveau des soutes."))
+    _apply_group_chain(ac["cargo_comps"], t.get("structural"), rap)
+    ac["structural"] = {k: v for k, v in (t.get("structural") or {}).items() if k in ("combined", "cumulative", "not_applied_count")}
+    if t.get("dow_build"):
+        ac["dow_build"] = t["dow_build"]
     if not ac["cargo_comps"]:
         rap.append(("attention", "Aucune soute en vrac exploitable : à saisir dans « Données aéronef »."))
     rap.append(("info", "Masse à vide injectée = masse de base de la feuille E5 + équipage (2 PNT et un PNC par tranche de 50 sièges, minimum réglementaire) ; offices, eau et pantry ne sont pas inclus : à ajuster."))
@@ -294,7 +352,8 @@ def to_app_record(t, mode="demo", info=None):
         ac["ideal_trim"] = {"reference": it.get("ideal_trim_reference_remark") or "TOW",
                             "line": [{"weight_kg": p["weight_kg"], "pct_mac": p["pct_mac"], "fwd_pct_mac": p.get("fwd_pct_mac"),
                                       "aft_pct_mac": p.get("aft_pct_mac")} for p in it["ideal_trim_line"]],
-                            "tipping": [{"name": x["name"], "condition": x.get("condition") or "",
+                            "tipping": [{"name": x["name"], "condition": x.get("condition") or "", "wind_kt": x.get("wind_kt"),
+                                         "wind_kmh": x.get("wind_kmh"),
                                          "points": [(p["weight_kg"], p["pct_mac"]) for p in x["points"]]}
                                         for x in (it.get("tipping_tables") or [])],
                             "source": srcfn("feuille C7, ligne de centrage idéale et limites de basculement")}
