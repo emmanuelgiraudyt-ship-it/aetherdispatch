@@ -1470,6 +1470,7 @@ def apply_selection(ac, cfg_name=None, reg=None):
     e['crew_std_flight'], e['crew_std_cabin'] = cfg['pnt'], cfg['pnc']
     e['pax_zones'] = cfg['zones']
     e['seats'] = cfg['sieges']
+    e['max_seats'] = cfg['sieges']              # capacité de la configuration choisie (et non le maximum de toutes les configurations)
     lim = h['limites_par_immat'].get(reg) or h['limites_defaut']
     e['max_zfw_kg'], e['max_tow_kg'], e['max_lw_kg'] = int(lim['zfw']), int(lim['tow']), int(lim['law'])
     e['ahm_selection'] = {"config": cfg['nom'], "immat": reg, "dow_kg": round(W, 1), "dow_index": round(Idx, 2),

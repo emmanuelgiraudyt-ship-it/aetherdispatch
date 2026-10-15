@@ -8,7 +8,7 @@ Date : 15/10/2026. Les corrections décrites ci-dessous sont incluses dans le pa
 - Comparaison Excel contre PDF, groupe par groupe, avec tolérance d'arrondi.
 - 16 tableaux DOW/DOI de la compagnie rapprochés de la formule de construction : environ 405 000 cellules.
 - Liste « Flight - Pantry code list » rev. 36 : 1 457 liaisons lues.
-- Essais de réception automatisés (Streamlit AppTest) : 20 essais d'origine, plus 12 essais ajoutés.
+- Essais de réception automatisés (Streamlit AppTest) : 20 essais d'origine, plus 13 essais ajoutés.
 
 ## 2. Défauts corrigés
 
@@ -27,6 +27,7 @@ Date : 15/10/2026. Les corrections décrites ci-dessous sont incluses dans le pa
 | 11 | Empreinte de verrouillage incomplète. | Étendue : zones passagers, moments, DOW construit, vent, profil et édition AHM, limites, référentiel, résultat de la LMC. |
 | 12 | Limites cumulées 7.2 des cargos non contrôlées. | Contrôle par zone (A330F, B777F), avec réserve sur le pont (voir 4). |
 | 13 | Import sans état de conformité. | Tableau par rubrique : conforme / absent / non vérifiable / discordant, plus contrôle croisé Excel contre PDF. |
+| 14 | Capacité maximale affichée (onglet Passagers) : plus grand nombre de sièges de toutes les configurations du type, et non celui de la configuration choisie (A320 16C/135Y : 159 affichés pour 151). L'alerte de dépassement de capacité était donc trop tolérante. Concernait 17 configurations avec classe affaires : A319 (5), A320 (6), A321 (6). Les autres types n'ont qu'un total de sièges, sans écart. | La capacité est celle de la configuration choisie (ahm565.py, apply_selection). Vérifié sur les 120 configurations des AHM : total des sièges, somme des zones et libellé concordent. Essai de non-régression ajouté. |
 
 ## 3. Résultats de la campagne
 
@@ -63,5 +64,5 @@ Voir la dernière exécution : tests/run_all.py (variable AHM_DIR pour les fichi
 
 ## 7. Fichiers modifiés ou nouveaux (paquet v7.0)
 
-Modifiés : app.py (étiquette v7.0), ahm_text.py, ahm_adapter.py, uldplan.py, tests/run_all.py, aetherdispatch_aircraft_db.json.
+Modifiés : app.py (étiquette v7.0), ahm565.py, ahm_text.py, ahm_adapter.py, uldplan.py, tests/run_all.py, aetherdispatch_aircraft_db.json.
 Nouveaux : dowbuild.py, conformity.py, pantry_routes.json, pantry_list.py, tests/campagne_ahm.py, tests/dowdoi.py, RAPPORT_AUDIT.md.

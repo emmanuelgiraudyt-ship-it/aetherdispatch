@@ -437,6 +437,25 @@ def t_pdf_equality():
 
 check("PDF : DOW, ZFW, TOW, LW et résultat des LMC identiques à l'écran (A350 importé)", t_pdf_equality)
 
+def t_capacite_config():
+    """La capacité maximale affichée est celle de la configuration choisie (et non le maximum de toutes les configurations)."""
+    import ahm_adapter as _AD, ahm565 as _AHM
+    cat = _json.load(open(os.path.join(ROOT, "aetherdispatch_aircraft_db.json"), encoding="utf-8"))["aircraft"]
+    n = 0
+    for t_ in ("A319-132", "A320-232", "A321-231", "A350-941", "B737-8MAX", "B777-300", "B787-9"):
+        ac_ = _AD.to_app_record(cat[t_])[0]
+        for c_ in ac_["ahm"]["configs"]:
+            sel = _AHM.apply_selection(ac_, c_["nom"], None)
+            zs = sum(int(z.get("max_pax") or 0) for z in sel["pax_zones"])
+            assert sel["max_seats"] == c_["sieges"] == zs, (t_, c_["nom"], sel["max_seats"], c_["sieges"], zs)
+            n += 1
+    a320 = _AHM.apply_selection(_AD.to_app_record(cat["A320-232"])[0], "16C/135Y", None)
+    assert a320["max_seats"] == 151, a320["max_seats"]
+    assert n >= 20
+
+
+check("Capacité maximale = sièges de la configuration choisie (A319, A320, A321, A350, 737, 777, 787)", t_capacite_config)
+
 try:
     os.remove(os.path.join(ROOT, "_app_inj.py"))
 except OSError:
